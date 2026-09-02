@@ -1,0 +1,91 @@
+<html xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers" data-namespace-typo3-fluid="true">
+
+<nav class="pn-category-filter__pagination" aria-label="Pagination">
+    <ul class="f3-widget-paginator0 pn-category-filter__pagination-list">
+        <f:if condition="{pagination.previousPageNumber}">
+            <li class="pn-category-filter__pagination-item pn-category-filter__pagination-item--prev">
+                <f:variable name="pluginParams" value="{paginationArguments.tx_pncategoryfilter_categoryfilterlist}" />
+                <f:link.action action="ajaxLoadResults" pageType="{settings.pageType.ajaxLoadResults}" arguments="{selectedCategories: pluginParams.selectedCategories, sorting: pluginParams.sorting, sortField: pluginParams.sortField, search: pluginParams.search, ttContentUid: ttContentUid, page: pagination.previousPageNumber}" class="pn-category-filter__pagination-link" data="{page-link: '1'}">
+                    <span class="assistive">
+                        <f:translate key="LLL:EXT:pn_category_filter/Resources/Private/Language/locallang.xlf:pagination.previous" />
+                        <f:translate key="LLL:EXT:pn_category_filter/Resources/Private/Language/locallang.xlf:pagination.page" />
+                    </span>
+                </f:link.action>
+            </li>
+        </f:if>
+
+        <f:if condition="{pagination.hasLessPages}">
+            <li class="pn-category-filter__pagination-item">
+                <f:variable name="pluginParams" value="{paginationArguments.tx_pncategoryfilter_categoryfilterlist}" />
+                <f:link.action action="ajaxLoadResults" pageType="{settings.pageType.ajaxLoadResults}" arguments="{selectedCategories: pluginParams.selectedCategories, sorting: pluginParams.sorting, sortField: pluginParams.sortField, search: pluginParams.search, ttContentUid: ttContentUid, page: 1}" class="pn-category-filter__pagination-link" data="{page-link: '1'}">
+                    <span class="assistive">
+                        <f:translate key="LLL:EXT:pn_category_filter/Resources/Private/Language/locallang.xlf:pagination.page" />
+                    </span>
+                    1
+                </f:link.action>
+            </li>
+
+            <li class="pn-category-filter__pagination-item pn-category-filter__pagination-item--ellipsis">
+                <span>...</span>
+            </li>
+        </f:if>
+
+        <f:for each="{pagination.allPageNumbers}" as="pageNumber">
+            <f:if condition="{pageNumber} >= {pagination.displayRangeStart} && {pageNumber} <= {pagination.displayRangeEnd}">
+                <li class="pn-category-filter__pagination-item {f:if(condition: '{pageNumber} == {paginator.currentPageNumber}', then: 'pn-category-filter__pagination-item--active')}">
+                    <f:if condition="{pageNumber} == {paginator.currentPageNumber}">
+                        <f:then>
+                            <span class="pn-category-filter__pagination-link pn-category-filter__pagination-link--current">
+                                <span class="assistive">
+                                    <f:translate key="LLL:EXT:pn_category_filter/Resources/Private/Language/locallang.xlf:pagination.page" />
+                                </span>
+                                {pageNumber}
+                            </span>
+                        </f:then>
+                        <f:else>
+                            <f:variable name="pluginParams" value="{paginationArguments.tx_pncategoryfilter_categoryfilterlist}" />
+                            <f:link.action action="ajaxLoadResults" pageType="{settings.pageType.ajaxLoadResults}" arguments="{selectedCategories: pluginParams.selectedCategories, sorting: pluginParams.sorting, sortField: pluginParams.sortField, search: pluginParams.search, ttContentUid: ttContentUid, page: pageNumber}" class="pn-category-filter__pagination-link" data="{page-link: '1'}">
+                                <span class="assistive">
+                                    <f:translate key="LLL:EXT:pn_category_filter/Resources/Private/Language/locallang.xlf:pagination.page" />
+                                </span>
+                                {pageNumber}
+                            </f:link.action>
+                        </f:else>
+                    </f:if>
+                </li>
+            </f:if>
+        </f:for>
+
+        <f:if condition="{pagination.hasMorePages}">
+            <li class="pn-category-filter__pagination-item pn-category-filter__pagination-item--ellipsis">
+                <span>...</span>
+            </li>
+
+            <li class="pn-category-filter__pagination-item">
+                <f:variable name="pluginParams" value="{paginationArguments.tx_pncategoryfilter_categoryfilterlist}" />
+                <f:link.action action="ajaxLoadResults" pageType="{settings.pageType.ajaxLoadResults}" arguments="{selectedCategories: pluginParams.selectedCategories, sorting: pluginParams.sorting, sortField: pluginParams.sortField, search: pluginParams.search, ttContentUid: ttContentUid, page: paginator.numberOfPages}" class="pn-category-filter__pagination-link" data="{page-link: '1'}">
+                    {paginator.numberOfPages}
+                </f:link.action>
+            </li>
+        </f:if>
+
+        <f:if condition="{pagination.nextPageNumber}">
+            <li class="pn-category-filter__pagination-item pn-category-filter__pagination-item--next">
+                <f:variable name="pluginParams" value="{paginationArguments.tx_pncategoryfilter_categoryfilterlist}" />
+                <f:link.action action="ajaxLoadResults" pageType="{settings.pageType.ajaxLoadResults}" arguments="{selectedCategories: pluginParams.selectedCategories, sorting: pluginParams.sorting, sortField: pluginParams.sortField, search: pluginParams.search, ttContentUid: ttContentUid, page: pagination.nextPageNumber}" class="pn-category-filter__pagination-link" data="{page-link: '1'}">
+                    <span class="assistive">
+                        <f:translate key="LLL:EXT:pn_category_filter/Resources/Private/Language/locallang.xlf:pagination.next" />
+                        <f:translate key="LLL:EXT:pn_category_filter/Resources/Private/Language/locallang.xlf:pagination.page" />
+                    </span>
+                </f:link.action>
+            </li>
+        </f:if>
+    </ul>
+
+    <div class="pn-category-filter__pagination-info">
+        <f:translate key="LLL:EXT:pn_category_filter/Resources/Private/Language/locallang.xlf:pagination.page" />
+        {paginator.currentPageNumber} / {paginator.numberOfPages}
+    </div>
+</nav>
+
+</html>

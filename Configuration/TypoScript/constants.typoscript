@@ -1,0 +1,92 @@
+plugin.tx_pncategoryfilter {
+  view {
+    # cat=plugin.tx_pncategoryfilter/file; type=string; label=Path to template root (FE)
+    templateRootPath = EXT:pn_category_filter/Resources/Private/Templates/
+    # cat=plugin.tx_pncategoryfilter/file; type=string; label=Path to template partials (FE)
+    partialRootPath = EXT:pn_category_filter/Resources/Private/Partials/
+    # cat=plugin.tx_pncategoryfilter/file; type=string; label=Path to template layouts (FE)
+    layoutRootPath = EXT:pn_category_filter/Resources/Private/Layouts/
+  }
+
+  settings {
+    # cat=plugin.tx_pncategoryfilter/text; type=int; label=Text cropping length for teaser/description in results
+    textCropLength = 140
+
+    # cat=plugin.tx_pncategoryfilter/display; type=options[horizontal,vertical]; label=Default display mode (used when FlexForm value is empty)
+    displayMode = horizontal
+
+    # cat=plugin.tx_pncategoryfilter/display; type=boolean; label=Show result-count badge behind each filter option (FlexForm overrides this). Default off (opt-in).
+    showResultCount = 0
+
+    # cat=plugin.tx_pncategoryfilter/display; type=boolean; label=Show active-sub-filter count badge on parent categories (FlexForm overrides this). Default on (existing behaviour).
+    showActiveFilterCount = 1
+
+    pageType {
+      # cat=plugin.tx_pncategoryfilter/pageType; type=int; label=Page type for AJAX loading of filtered results
+      ajaxLoadResults = 1769081246
+    }
+
+    pageContent {
+      # cat=plugin.tx_pncategoryfilter/pageContent; type=boolean; label=Enable page content hydration (extracts tt_content into record.teaser and record._pageContent for pages-table records)
+      enabled = 0
+
+      teaser {
+        # cat=plugin.tx_pncategoryfilter/pageContent; type=string; label=Teaser colPos (single colPos to extract teaser bodytext from; leave empty to skip teaser extraction)
+        colPos = 1
+        # cat=plugin.tx_pncategoryfilter/pageContent; type=string; label=Teaser fields (comma-separated tt_content columns; first non-empty wins)
+        fields = bodytext
+        # cat=plugin.tx_pncategoryfilter/pageContent; type=string; label=Teaser CTypes (comma-separated; leave empty to include all)
+        cTypes =
+      }
+
+      search {
+        # cat=plugin.tx_pncategoryfilter/pageContent; type=string; label=Search colPos (comma-separated; leave empty to include all colPos)
+        colPos =
+        # cat=plugin.tx_pncategoryfilter/pageContent; type=string; label=Search fields (comma-separated tt_content columns to concatenate into record._pageContent)
+        fields = header,bodytext
+        # cat=plugin.tx_pncategoryfilter/pageContent; type=string; label=Search CTypes (comma-separated; leave empty to include all)
+        cTypes =
+      }
+    }
+
+    frontendSortingOptions {
+      10 {
+        # cat=plugin.tx_pncategoryfilter/frontendSortingOptions/10; type=string; label=Label for sorting option 10
+        label = Date
+        # cat=plugin.tx_pncategoryfilter/frontendSortingOptions/10; type=string; label=Field for sorting option 10
+        field = crdate
+      }
+
+      20 {
+        # cat=plugin.tx_pncategoryfilter/frontendSortingOptions/20; type=string; label=Label for sorting option 20
+        label = Title
+        # cat=plugin.tx_pncategoryfilter/frontendSortingOptions/20; type=string; label=Field for sorting option 20
+        field = title
+      }
+    }
+  }
+}
+
+[siteLanguage("locale") == "nl-NL"]
+plugin.tx_pncategoryfilter.settings.frontendSortingOptions {
+  10 {
+    label = Datum
+  }
+
+  20 {
+    label = Titel
+  }
+}
+[END]
+
+[siteLanguage("locale") == "de-DE"]
+plugin.tx_pncategoryfilter.settings.frontendSortingOptions {
+  10 {
+    label = Datum
+  }
+
+  20 {
+    label = Titel
+  }
+}
+[END]

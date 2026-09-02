@@ -1,0 +1,74 @@
+<html xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers" data-namespace-typo3-fluid="true">
+
+<f:comment>
+    <!-- Filter Menu Partial
+
+    Expected variables:
+    - {categoryTree} - Hierarchical array of categories
+    - {level} - Current nesting level (default: 0)
+    -->
+</f:comment>
+
+<f:if condition="{categoryTree}">
+    <ul class="pn-category-filter__category-children">
+        <f:for each="{categoryTree}" as="category">
+            <f:if condition="{category.hasChildren}">
+                <f:then>
+                    <li class="pn-category-filter__category-child" data-category-uid="{category.uid}" data-has-children="true">
+
+                        <f:comment><!-- Parent category with children - expandable, no checkbox --></f:comment>
+                        <a href="#category-{category.uid}" class="pn-category-filter__category-toggle" role="button" aria-expanded="false" aria-controls="category-children-{category.uid}" data-category-toggle="{category.uid}">
+                            <span class="pn-category-filter__toggle-icon" aria-hidden="true">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" class="icon-chevron">
+                                    <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" class="icon-plus">
+                                    <path d="M7.99998 3.33325V12.6666M3.33331 7.99992H12.6666" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" class="icon-minus">
+                                    <path d="M3.33331 7.99992H12.6666" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                            </span>
+                            <span class="pn-category-filter__category-label">
+                                <f:format.htmlspecialchars>{category.title}</f:format.htmlspecialchars>
+                            </span>
+                            <f:comment><!-- Result-count badge (deduplicated rollup for this parent) — toggled by showResultCount. The visible badge is decorative (aria-hidden); the adjacent .assistive span carries the screenreader phrase "{count} results" and is read as part of the toggle. JS patches both on data-result-count / data-result-count-value. --></f:comment>
+                            <f:if condition="{settings.showResultCount}">
+                                <span class="pn-category-filter__result-count" data-result-count aria-hidden="true">{category.count}</span>
+                                <span class="assistive" data-result-count-sr><span data-result-count-value>{category.count}</span> <f:translate key="LLL:EXT:pn_category_filter/Resources/Private/Language/locallang.xlf:filter.resultCountUnit" /></span>
+                            </f:if>
+                        </a>
+
+                        <f:comment><!-- Nested children - initially hidden --></f:comment>
+                        <f:if condition="{category.childCategories}">
+                            <f:render partial="FilterMenu/CategoryList" arguments="{categoryTree: category.childCategories, level: '{level} + 1', ttContentUid: ttContentUid, settings: settings}" />
+                        </f:if>
+                    </li>
+                </f:then>
+                <f:else>
+                    <f:comment><!-- 0-count leaf is disabled (grey, not clickable) — only when result counts are shown --></f:comment>
+                    <f:variable name="resultCountEmpty" value="{f:if(condition: '{settings.showResultCount} && {category.count} == 0', then: 1, else: 0)}" />
+                    <li class="pn-category-filter__category-child{f:if(condition: resultCountEmpty, then: ' pn-category-filter__category-child--empty')}" data-category-uid="{category.uid}">
+
+                        <f:comment><!-- Leaf category - checkbox for filtering --></f:comment>
+                        <div class="pn-category-filter__category-checkbox-wrapper">
+                            <input type="checkbox" id="category-{category.uid}" name="tx_pncategoryfilter_categoryfilterlist[selectedCategories][]" value="{category.uid}" class="pn-category-filter__category-checkbox" data-category-filter="{category.uid}" data-ajax-url="{f:uri.action(action: 'ajaxLoadResults', pageType: settings.pageType.ajaxLoadResults, arguments: {ttContentUid: ttContentUid})}" {f:if(condition: resultCountEmpty, then: 'disabled')}{f:if(condition: settings.showResultCount, then: ' aria-describedby=pn-cf-count-{category.uid}')} />
+                            <label for="category-{category.uid}" class="pn-category-filter__category-label">
+                                <f:format.htmlspecialchars>{category.title}</f:format.htmlspecialchars>
+                            </label>
+                            <f:comment><!-- Result-count badge for this leaf — toggled by showResultCount. The visible badge is decorative (aria-hidden); the .assistive span (referenced by the checkbox aria-describedby) carries the screenreader phrase "{count} results". JS patches both on data-result-count / data-result-count-value. --></f:comment>
+                            <f:if condition="{settings.showResultCount}">
+                                <span class="pn-category-filter__result-count" data-result-count aria-hidden="true">{category.count}</span>
+                                <span class="assistive" id="pn-cf-count-{category.uid}" data-result-count-sr><span data-result-count-value>{category.count}</span> <f:translate key="LLL:EXT:pn_category_filter/Resources/Private/Language/locallang.xlf:filter.resultCountUnit" /></span>
+                            </f:if>
+                        </div>
+                    </li>
+                </f:else>
+            </f:if>
+        </f:for>
+    </ul>
+</f:if>
+
+</html>

@@ -1,0 +1,4 @@
+tx_pncategoryfilter {
+    # Comma-separated list of table names to show in the FlexForm
+    availableTables = pages,tt_content,tx_news_domain_model_news
+}

@@ -1,0 +1,59 @@
+<html xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers" xmlns:pn="http://typo3.org/ns/ProudNerds/PnCategoryFilter/ViewHelpers" data-namespace-typo3-fluid="true">
+<f:if condition="{records}">
+    <f:then>
+        <h2 class="pn-category-filter__results-title">
+            <f:translate key="LLL:EXT:pn_category_filter/Resources/Private/Language/locallang.xlf:results.title" />
+        </h2>
+
+        <p class="pn-category-filter__count" {f:if(condition: '{selectedCategories} || {activeSearchTerm}' , then: 'role="status"' )}>
+            <f:translate key="LLL:EXT:pn_category_filter/Resources/Private/Language/locallang.xlf:results.count" arguments="{0: totalRecords}" />
+        </p>
+
+        <div class="pn-category-filter__items">
+            <f:for each="{records}" as="record">
+                <article class="pn-category-filter__item" data-table="{record._tableName}" data-uid="{record.uid}">
+                    <header>
+                        <f:if condition="{record.title}">
+                            <h3 class="pn-category-filter__item-title">{record.title}</h3>
+                        </f:if>
+
+                        <f:if condition="{record.header}">
+                            <h3 class="pn-category-filter__item-title">{record.header}</h3>
+                        </f:if>
+                    </header>
+
+                    <f:if condition="{record.crdate}">
+                        <p class="pn-category-filter__item-date">
+                            <f:format.date format="d-m-Y">{record.crdate}</f:format.date>
+                        </p>
+                    </f:if>
+
+                    <f:variable name="previewText"><f:if condition="{record.teaser}"><f:then>{record.teaser}</f:then><f:else>{record.description}</f:else></f:if></f:variable>
+                    <f:if condition="{previewText}">
+                        <div class="pn-category-filter__item-text pn-category-filter__item-text--preview">
+                            <pn:highlightSearchTerm searchTerm="{activeSearchTerm}" stripTags="1">
+                                {previewText -> f:format.crop(maxCharacters: '{settings.textCropLength}', respectWordBoundaries: '1', append: '…')}
+                            </pn:highlightSearchTerm>
+                        </div>
+                    </f:if>
+
+                    <f:comment><!--Example how to make a link to a detailpage--></f:comment>
+                    <f:comment><!--<f:link.action action="show" extensionName="yourExtension" pluginName="Show" controller="MyNews" arguments="{news: record.uid}" pageUid="{settings.pages.myNewsDetail}">Read more</f:link.action>--></f:comment>
+                </article>
+            </f:for>
+        </div>
+
+        <f:if condition="{paginator.numberOfPages} > 1">
+            <f:render partial="Pagination" arguments="{pagination: pagination, paginator: paginator, paginationArguments: paginationArguments, ttContentUid: ttContentUid}" />
+        </f:if>
+    </f:then>
+    <f:else>
+        <div class="pn-category-filter__empty">
+            <p>
+                <f:translate key="LLL:EXT:pn_category_filter/Resources/Private/Language/locallang.xlf:results.empty" />
+            </p>
+        </div>
+    </f:else>
+</f:if>
+
+</html>

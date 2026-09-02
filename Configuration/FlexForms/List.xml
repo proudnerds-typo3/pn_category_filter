@@ -1,0 +1,312 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<T3DataStructure>
+    <sheets>
+        <sDEF>
+            <ROOT>
+                <sheetTitle>LLL:EXT:pn_category_filter/Resources/Private/Language/locallang_be.xlf:sheet.general</sheetTitle>
+                <type>array</type>
+                <el>
+                    <settings.categories>
+                        <label>LLL:EXT:pn_category_filter/Resources/Private/Language/locallang_be.xlf:settings.categories</label>
+                        <description>LLL:EXT:pn_category_filter/Resources/Private/Language/locallang_be.xlf:settings.categories.description</description>
+                        <config>
+                            <type>category</type>
+                            <size>25</size>
+                            <maxitems>99</maxitems>
+                            <minitems>0</minitems>
+                            <treeConfig>
+                                <parentField>parent</parentField>
+                                <startingPoints>###SITE:categories.root###</startingPoints>
+                                <appearance>
+                                    <showHeader>1</showHeader>
+                                    <expandAll>1</expandAll>
+                                </appearance>
+                            </treeConfig>
+                        </config>
+                    </settings.categories>
+
+                    <settings.includeSubcategories>
+                        <label>LLL:EXT:pn_category_filter/Resources/Private/Language/locallang_be.xlf:settings.includeSubcategories</label>
+                        <description>LLL:EXT:pn_category_filter/Resources/Private/Language/locallang_be.xlf:settings.includeSubcategories.description</description>
+                        <config>
+                            <type>check</type>
+                            <default>1</default>
+                        </config>
+                    </settings.includeSubcategories>
+
+                    <settings.showOnlyChildrenInFilter>
+                        <label>LLL:EXT:pn_category_filter/Resources/Private/Language/locallang_be.xlf:settings.showOnlyChildrenInFilter</label>
+                        <description>LLL:EXT:pn_category_filter/Resources/Private/Language/locallang_be.xlf:settings.showOnlyChildrenInFilter.description</description>
+                        <config>
+                            <type>check</type>
+                            <default>1</default>
+                        </config>
+                    </settings.showOnlyChildrenInFilter>
+
+                    <settings.showFilterMenu>
+                        <label>LLL:EXT:pn_category_filter/Resources/Private/Language/locallang_be.xlf:settings.showFilterMenu</label>
+                        <description>LLL:EXT:pn_category_filter/Resources/Private/Language/locallang_be.xlf:settings.showFilterMenu.description</description>
+                        <config>
+                            <type>check</type>
+                            <default>1</default>
+                        </config>
+                    </settings.showFilterMenu>
+
+                    <settings.filterLogic>
+                        <label>LLL:EXT:pn_category_filter/Resources/Private/Language/locallang_be.xlf:settings.filterLogic</label>
+                        <description>LLL:EXT:pn_category_filter/Resources/Private/Language/locallang_be.xlf:settings.filterLogic.description</description>
+                        <config>
+                            <type>select</type>
+                            <renderType>selectSingle</renderType>
+                            <items type="array">
+                                <numIndex index="0" type="array">
+                                    <numIndex index="0">LLL:EXT:pn_category_filter/Resources/Private/Language/locallang_be.xlf:settings.filterLogic.expand</numIndex>
+                                    <numIndex index="1">expand</numIndex>
+                                </numIndex>
+                                <numIndex index="1" type="array">
+                                    <numIndex index="0">LLL:EXT:pn_category_filter/Resources/Private/Language/locallang_be.xlf:settings.filterLogic.facet</numIndex>
+                                    <numIndex index="1">facet</numIndex>
+                                </numIndex>
+                            </items>
+                            <default>expand</default>
+                        </config>
+                    </settings.filterLogic>
+                </el>
+            </ROOT>
+        </sDEF>
+
+        <tableSettings>
+            <ROOT>
+                <sheetTitle>LLL:EXT:pn_category_filter/Resources/Private/Language/locallang_be.xlf:sheet.tableSettings</sheetTitle>
+                <type>array</type>
+                <el>
+                    <settings.tables>
+                        <label>LLL:EXT:pn_category_filter/Resources/Private/Language/locallang_be.xlf:settings.tables</label>
+                        <description>LLL:EXT:pn_category_filter/Resources/Private/Language/locallang_be.xlf:settings.tables.description</description>
+                        <config>
+                            <type>select</type>
+                            <renderType>selectMultipleSideBySide</renderType>
+                            <size>5</size>
+                            <maxitems>99</maxitems>
+                            <itemsProcFunc>ProudNerds\PnCategoryFilter\UserFunc\CategoryItemsProcFunc->getTableItems</itemsProcFunc>
+                        </config>
+                    </settings.tables>
+
+                    <settings.recordPids>
+                        <label>LLL:EXT:pn_category_filter/Resources/Private/Language/locallang_be.xlf:settings.recordPids</label>
+                        <description>LLL:EXT:pn_category_filter/Resources/Private/Language/locallang_be.xlf:settings.recordPids.description</description>
+                        <config>
+                            <type>group</type>
+                            <allowed>pages</allowed>
+                            <size>5</size>
+                            <maxitems>99</maxitems>
+                            <minitems>0</minitems>
+                        </config>
+                    </settings.recordPids>
+                </el>
+            </ROOT>
+        </tableSettings>
+
+        <displaySettings>
+            <ROOT>
+                <sheetTitle>LLL:EXT:pn_category_filter/Resources/Private/Language/locallang_be.xlf:sheet.displaySettings</sheetTitle>
+                <type>array</type>
+                <el>
+                    <settings.displayMode>
+                        <label>LLL:EXT:pn_category_filter/Resources/Private/Language/locallang_be.xlf:settings.displayMode</label>
+                        <description>LLL:EXT:pn_category_filter/Resources/Private/Language/locallang_be.xlf:settings.displayMode.description</description>
+                        <config>
+                            <type>select</type>
+                            <renderType>selectSingle</renderType>
+                            <items type="array">
+                                <numIndex index="0" type="array">
+                                    <numIndex index="0">LLL:EXT:pn_category_filter/Resources/Private/Language/locallang_be.xlf:settings.displayMode.vertical</numIndex>
+                                    <numIndex index="1">vertical</numIndex>
+                                </numIndex>
+                                <numIndex index="1" type="array">
+                                    <numIndex index="0">LLL:EXT:pn_category_filter/Resources/Private/Language/locallang_be.xlf:settings.displayMode.horizontal</numIndex>
+                                    <numIndex index="1">horizontal</numIndex>
+                                </numIndex>
+                            </items>
+                            <default>horizontal</default>
+                        </config>
+                    </settings.displayMode>
+
+                    <settings.showResultCount>
+                        <label>LLL:EXT:pn_category_filter/Resources/Private/Language/locallang_be.xlf:settings.showResultCount</label>
+                        <description>LLL:EXT:pn_category_filter/Resources/Private/Language/locallang_be.xlf:settings.showResultCount.description</description>
+                        <config>
+                            <type>check</type>
+                            <default>0</default>
+                        </config>
+                    </settings.showResultCount>
+
+                    <settings.showActiveFilterCount>
+                        <label>LLL:EXT:pn_category_filter/Resources/Private/Language/locallang_be.xlf:settings.showActiveFilterCount</label>
+                        <description>LLL:EXT:pn_category_filter/Resources/Private/Language/locallang_be.xlf:settings.showActiveFilterCount.description</description>
+                        <config>
+                            <type>check</type>
+                            <default>1</default>
+                        </config>
+                    </settings.showActiveFilterCount>
+
+                    <settings.enablePushState>
+                        <label>LLL:EXT:pn_category_filter/Resources/Private/Language/locallang_be.xlf:settings.enablePushState</label>
+                        <description>LLL:EXT:pn_category_filter/Resources/Private/Language/locallang_be.xlf:settings.enablePushState.description</description>
+                        <config>
+                            <type>check</type>
+                            <default>1</default>
+                        </config>
+                    </settings.enablePushState>
+
+                    <settings.limit>
+                        <label>LLL:EXT:pn_category_filter/Resources/Private/Language/locallang_be.xlf:settings.limit</label>
+                        <description>LLL:EXT:pn_category_filter/Resources/Private/Language/locallang_be.xlf:settings.limit.description</description>
+                        <config>
+                            <type>number</type>
+                            <default>0</default>
+                            <range>
+                                <lower>0</lower>
+                            </range>
+                        </config>
+                    </settings.limit>
+
+                    <settings.sorting>
+                        <label>LLL:EXT:pn_category_filter/Resources/Private/Language/locallang_be.xlf:settings.sorting</label>
+                        <description>LLL:EXT:pn_category_filter/Resources/Private/Language/locallang_be.xlf:settings.sorting.description</description>
+                        <config>
+                            <type>select</type>
+                            <renderType>selectSingle</renderType>
+                            <items type="array">
+                                <numIndex index="0" type="array">
+                                    <numIndex index="0">LLL:EXT:pn_category_filter/Resources/Private/Language/locallang_be.xlf:settings.sorting.none</numIndex>
+                                    <numIndex index="1">none</numIndex>
+                                </numIndex>
+                                <numIndex index="1" type="array">
+                                    <numIndex index="0">LLL:EXT:pn_category_filter/Resources/Private/Language/locallang_be.xlf:settings.sorting.desc</numIndex>
+                                    <numIndex index="1">desc</numIndex>
+                                </numIndex>
+                                <numIndex index="2" type="array">
+                                    <numIndex index="0">LLL:EXT:pn_category_filter/Resources/Private/Language/locallang_be.xlf:settings.sorting.asc</numIndex>
+                                    <numIndex index="1">asc</numIndex>
+                                </numIndex>
+                            </items>
+                            <default>desc</default>
+                        </config>
+                    </settings.sorting>
+
+                    <settings.sortField>
+                        <label>LLL:EXT:pn_category_filter/Resources/Private/Language/locallang_be.xlf:settings.sortField</label>
+                        <description>LLL:EXT:pn_category_filter/Resources/Private/Language/locallang_be.xlf:settings.sortField.description</description>
+                        <config>
+                            <type>input</type>
+                            <default>crdate</default>
+                            <eval>trim</eval>
+                        </config>
+                    </settings.sortField>
+
+                    <settings.boostFields>
+                        <label>LLL:EXT:pn_category_filter/Resources/Private/Language/locallang_be.xlf:settings.boostFields</label>
+                        <description>LLL:EXT:pn_category_filter/Resources/Private/Language/locallang_be.xlf:settings.boostFields.description</description>
+                        <config>
+                            <type>input</type>
+                            <eval>trim</eval>
+                            <placeholder>istopnews</placeholder>
+                        </config>
+                    </settings.boostFields>
+                </el>
+            </ROOT>
+        </displaySettings>
+
+        <paginationSettings>
+            <ROOT>
+                <sheetTitle>LLL:EXT:pn_category_filter/Resources/Private/Language/locallang_be.xlf:sheet.paginationSettings</sheetTitle>
+                <type>array</type>
+                <el>
+                    <settings.pagination.itemsPerPage>
+                        <label>LLL:EXT:pn_category_filter/Resources/Private/Language/locallang_be.xlf:settings.pagination.itemsPerPage</label>
+                        <description>LLL:EXT:pn_category_filter/Resources/Private/Language/locallang_be.xlf:settings.pagination.itemsPerPage.description</description>
+                        <config>
+                            <type>number</type>
+                            <default>10</default>
+                            <range>
+                                <lower>1</lower>
+                            </range>
+                        </config>
+                    </settings.pagination.itemsPerPage>
+
+                    <settings.pagination.maxLinks>
+                        <label>LLL:EXT:pn_category_filter/Resources/Private/Language/locallang_be.xlf:settings.pagination.maxLinks</label>
+                        <description>LLL:EXT:pn_category_filter/Resources/Private/Language/locallang_be.xlf:settings.pagination.maxLinks.description</description>
+                        <config>
+                            <type>number</type>
+                            <default>8</default>
+                            <range>
+                                <lower>1</lower>
+                            </range>
+                        </config>
+                    </settings.pagination.maxLinks>
+                </el>
+            </ROOT>
+        </paginationSettings>
+
+        <searchSettings>
+            <ROOT>
+                <sheetTitle>LLL:EXT:pn_category_filter/Resources/Private/Language/locallang_be.xlf:sheet.searchSettings</sheetTitle>
+                <type>array</type>
+                <el>
+                    <settings.showSearchForm>
+                        <label>LLL:EXT:pn_category_filter/Resources/Private/Language/locallang_be.xlf:settings.showSearchForm</label>
+                        <description>LLL:EXT:pn_category_filter/Resources/Private/Language/locallang_be.xlf:settings.showSearchForm.description</description>
+                        <config>
+                            <type>check</type>
+                            <default>0</default>
+                        </config>
+                    </settings.showSearchForm>
+
+                    <settings.searchFields>
+                        <label>LLL:EXT:pn_category_filter/Resources/Private/Language/locallang_be.xlf:settings.searchFields</label>
+                        <description>LLL:EXT:pn_category_filter/Resources/Private/Language/locallang_be.xlf:settings.searchFields.description</description>
+                        <config>
+                            <type>input</type>
+                            <default>title,description</default>
+                            <eval>trim</eval>
+                            <placeholder>title,description,content</placeholder>
+                        </config>
+                    </settings.searchFields>
+
+                    <settings.searchPlaceholder>
+                        <label>LLL:EXT:pn_category_filter/Resources/Private/Language/locallang_be.xlf:settings.searchPlaceholder</label>
+                        <description>LLL:EXT:pn_category_filter/Resources/Private/Language/locallang_be.xlf:settings.searchPlaceholder.description</description>
+                        <config>
+                            <type>input</type>
+                            <eval>trim</eval>
+                        </config>
+                    </settings.searchPlaceholder>
+
+                    <settings.searchMinChars>
+                        <label>LLL:EXT:pn_category_filter/Resources/Private/Language/locallang_be.xlf:settings.searchMinChars</label>
+                        <description>LLL:EXT:pn_category_filter/Resources/Private/Language/locallang_be.xlf:settings.searchMinChars.description</description>
+                        <config>
+                            <type>number</type>
+                            <default>3</default>
+                            <range>
+                                <lower>1</lower>
+                                <upper>10</upper>
+                            </range>
+                        </config>
+                    </settings.searchMinChars>
+
+                    <settings.useSolrSynonyms>
+                        <label>LLL:EXT:pn_category_filter/Resources/Private/Language/locallang_be.xlf:settings.useSolrSynonyms</label>
+                        <description>LLL:EXT:pn_category_filter/Resources/Private/Language/locallang_be.xlf:settings.useSolrSynonyms.description</description>
+                        <config>
+                            <type>check</type>
+                            <default>0</default>
+                        </config>
+                    </settings.useSolrSynonyms>
+                </el>
+            </ROOT>
+        </searchSettings>
+    </sheets>
+</T3DataStructure>

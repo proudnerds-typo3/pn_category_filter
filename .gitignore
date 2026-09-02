@@ -1,0 +1,10 @@
+/.Build/
+/composer.lock
+/vendor/
+/node_modules/
+
+# Output of a local documentation render (see Documentation/guides.xml)
+/Documentation-GENERATED-temp/
+
+.DS_Store
+.idea/

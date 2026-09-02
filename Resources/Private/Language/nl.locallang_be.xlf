@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<xliff version="1.0">
+    <file source-language="en" target-language="nl" datatype="plaintext" original="EXT:pn_category_filter/Resources/Private/Language/locallang_be.xlf" date="2026-01-16T00:00:00Z" product-name="pn_category_filter">
+        <header/>
+        <body>
+            <!-- Sheet Titles -->
+            <trans-unit id="sheet.general" resname="sheet.general">
+                <source>General Settings</source>
+                <target>Categorie Instellingen</target>
+            </trans-unit>
+            <trans-unit id="sheet.tableSettings" resname="sheet.tableSettings">
+                <source>Table Settings</source>
+                <target>Tabel Instellingen</target>
+            </trans-unit>
+            <trans-unit id="sheet.displaySettings" resname="sheet.displaySettings">
+                <source>Display Settings</source>
+                <target>Weergave Instellingen</target>
+            </trans-unit>
+            <trans-unit id="sheet.paginationSettings" resname="sheet.paginationSettings">
+                <source>Pagination Settings</source>
+                <target>Paginering Instellingen</target>
+            </trans-unit>
+
+            <!-- Category Settings -->
+            <trans-unit id="settings.categories" resname="settings.categories">
+                <source>Categories to Filter</source>
+                <target>Categorieën om te Filteren</target>
+            </trans-unit>
+            <trans-unit id="settings.categories.description" resname="settings.categories.description">
+                <source>Select specific categories to filter records by</source>
+                <target>Selecteer specifieke categorieën om records op te filteren</target>
+            </trans-unit>
+
+            <trans-unit id="settings.includeSubcategories" resname="settings.includeSubcategories">
+                <source>Include Subcategories</source>
+                <target>Inclusief Subcategorieën</target>
+            </trans-unit>
+            <trans-unit id="settings.includeSubcategories.description" resname="settings.includeSubcategories.description">
+                <source>When checked, records assigned to subcategories of selected categories will also be included</source>
+                <target>Indien aangevinkt, worden ook records die zijn toegewezen aan subcategorieën van geselecteerde categorieën opgenomen</target>
+            </trans-unit>
+
+            <trans-unit id="settings.showFilterMenu" resname="settings.showFilterMenu">
+                <source>Show Filter Menu</source>
+                <target>Toon Filter Menu</target>
+            </trans-unit>
+            <trans-unit id="settings.showFilterMenu.description" resname="settings.showFilterMenu.description">
+                <source>Display a category filter menu on the frontend, allowing users to filter results by selecting categories and subcategories</source>
+                <target>Toon een categorie filtermenu op de frontend, waarmee gebruikers resultaten kunnen filteren door categorieën en subcategorieën te selecteren</target>
+            </trans-unit>
+
+            <trans-unit id="settings.showOnlyChildrenInFilter" resname="settings.showOnlyChildrenInFilter">
+                <source>Show Only Children in Filter Menu</source>
+                <target>Toon Alleen Onderliggende Categorieën in Filter Menu</target>
+            </trans-unit>
+            <trans-unit id="settings.showOnlyChildrenInFilter.description" resname="settings.showOnlyChildrenInFilter.description">
+                <source>When enabled, only child categories and sub-children of selected categories will be shown in the filter menu. The selected parent categories themselves will be hidden.</source>
+                <target>Indien ingeschakeld, worden alleen onderliggende categorieën en sub-categorieën van geselecteerde categorieën getoond in het filtermenu. De geselecteerde hoofdcategorieën zelf worden verborgen.</target>
+            </trans-unit>
+            <trans-unit id="settings.filterLogic" resname="settings.filterLogic">
+                <source>Filter Combine Logic</source>
+                <target>Filter-combinatielogica</target>
+            </trans-unit>
+            <trans-unit id="settings.filterLogic.description" resname="settings.filterLogic.description">
+                <source>How multiple selected filters combine. "Expand" widens results (any selected category matches). "Refine" uses faceted logic: OR within one group, AND across different groups.</source>
+                <target>Hoe meerdere geselecteerde filters worden gecombineerd. "Verbreden" verruimt de resultaten (elke geselecteerde categorie telt mee). "Verfijnen" gebruikt facetlogica: OR binnen één groep, AND tussen verschillende groepen.</target>
+            </trans-unit>
+            <trans-unit id="settings.filterLogic.expand" resname="settings.filterLogic.expand">
+                <source>Expand — each extra filter shows more results</source>
+                <target>Verbreden — elk extra filter toont méér resultaten</target>
+            </trans-unit>
+            <trans-unit id="settings.filterLogic.facet" resname="settings.filterLogic.facet">
+                <source>Refine — OR within a group, AND across groups</source>
+                <target>Verfijnen — OR binnen een groep, AND tussen groepen</target>
+            </trans-unit>
+
+            <!-- Table Settings -->
+            <trans-unit id="settings.tables" resname="settings.tables">
+                <source>Tables to Query</source>
+                <target>Te Bevragen Tabellen</target>
+            </trans-unit>
+            <trans-unit id="settings.tables.description" resname="settings.tables.description">
+                <source>Select which database tables to fetch records from</source>
+                <target>Selecteer uit welke databasetabellen records moeten worden opgehaald</target>
+            </trans-unit>
+
+            <trans-unit id="settings.tables.pages" resname="settings.tables.pages">
+                <source>Pages</source>
+                <target>Pagina's</target>
+            </trans-unit>
+            <trans-unit id="settings.tables.tt_content" resname="settings.tables.tt_content">
+                <source>Content Elements</source>
+                <target>Content Elementen</target>
+            </trans-unit>
+            <trans-unit id="settings.tables.sys_file_metadata" resname="settings.tables.sys_file_metadata">
+                <source>File Metadata</source>
+                <target>Bestand Metadata</target>
+            </trans-unit>
+
+            <trans-unit id="settings.recordPids" resname="settings.recordPids">
+                <source>Record Storage PIDs</source>
+                <target>Record Opslag PIDs</target>
+            </trans-unit>
+            <trans-unit id="settings.recordPids.description" resname="settings.recordPids.description">
+                <source>Select one or more storage folders to fetch records from. Leave empty to search all pages.</source>
+                <target>Selecteer één of meer opslagmappen om records uit op te halen. Laat leeg om alle pagina's te doorzoeken.</target>
+            </trans-unit>
+
+            <!-- Display Settings -->
+            <trans-unit id="settings.displayMode" resname="settings.displayMode">
+                <source>Display Mode</source>
+                <target>Weergavemodus</target>
+            </trans-unit>
+            <trans-unit id="settings.displayMode.description" resname="settings.displayMode.description">
+                <source>Choose how the filter and results are laid out. Vertical places the filter menu in a sidebar next to the results. Horizontal places the filter menu above the results.</source>
+                <target>Kies hoe het filter en de resultaten worden weergegeven. Verticaal plaatst het filtermenu in een zijbalk naast de resultaten. Horizontaal plaatst het filtermenu boven de resultaten.</target>
+            </trans-unit>
+            <trans-unit id="settings.displayMode.vertical" resname="settings.displayMode.vertical">
+                <source>Vertical (sidebar)</source>
+                <target>Verticaal (zijbalk)</target>
+            </trans-unit>
+            <trans-unit id="settings.displayMode.horizontal" resname="settings.displayMode.horizontal">
+                <source>Horizontal (above results)</source>
+                <target>Horizontaal (boven resultaten)</target>
+            </trans-unit>
+
+            <trans-unit id="settings.showResultCount" resname="settings.showResultCount">
+                <source>Show result count behind each filter</source>
+                <target>Aantal resultaten achter filters tonen</target>
+            </trans-unit>
+            <trans-unit id="settings.showResultCount.description" resname="settings.showResultCount.description">
+                <source>Display the number of matching results behind each filter option (Solr-style facet counts). Counts update with the search term and other active filters. Options with 0 results are shown greyed-out and cannot be selected.</source>
+                <target>Toon achter elke filteroptie het aantal matchende resultaten (Solr-achtige facet-tellingen). De aantallen bewegen mee met de zoekterm en andere actieve filters. Opties met 0 resultaten worden grijs weergegeven en zijn niet aanklikbaar.</target>
+            </trans-unit>
+
+            <trans-unit id="settings.showActiveFilterCount" resname="settings.showActiveFilterCount">
+                <source>Show Active Sub-filter Count</source>
+                <target>Aantal actieve subfilters tonen</target>
+            </trans-unit>
+            <trans-unit id="settings.showActiveFilterCount.description" resname="settings.showActiveFilterCount.description">
+                <source>Display a badge on parent categories showing how many of their sub-filters are currently active.</source>
+                <target>Toon op hoofdcategorieën een badge met het aantal actieve subfilters daarbinnen.</target>
+            </trans-unit>
+
+            <trans-unit id="settings.limit" resname="settings.limit">
+                <source>Maximum Number of Records</source>
+                <target>Maximum Aantal Records</target>
+            </trans-unit>
+            <trans-unit id="settings.limit.description" resname="settings.limit.description">
+                <source>Set maximum number of records to display (0 = unlimited)</source>
+                <target>Stel het maximum aantal weer te geven records in (0 = onbeperkt)</target>
+            </trans-unit>
+
+            <trans-unit id="settings.enablePushState" resname="settings.enablePushState">
+                <source>Enable URL Updates (pushState)</source>
+                <target>URL-updates inschakelen (pushState)</target>
+            </trans-unit>
+            <trans-unit id="settings.enablePushState.description" resname="settings.enablePushState.description">
+                <source>When enabled, the browser URL will be updated when filtering or paginating without reloading the page. This allows users to bookmark or share filtered results. Disable if you experience conflicts with other JavaScript on the page.</source>
+                <target>Indien ingeschakeld, wordt de browser-URL bijgewerkt bij het filteren of pagineren zonder de pagina te herladen. Hierdoor kunnen gebruikers gefilterde resultaten bookmarken of delen. Schakel uit als u problemen ondervindt met andere JavaScript op de pagina.</target>
+            </trans-unit>
+
+            <trans-unit id="settings.sorting" resname="settings.sorting">
+                <source>Sort Order</source>
+                <target>Sorteervolgorde</target>
+            </trans-unit>
+            <trans-unit id="settings.sorting.description" resname="settings.sorting.description">
+                <source>Choose the default sort order for filtered results</source>
+                <target>Kies de standaard sorteervolgorde voor de gefilterde resultaten</target>
+            </trans-unit>
+            <trans-unit id="settings.sorting.none" resname="settings.sorting.none">
+                <source>None</source>
+                <target>Geen</target>
+            </trans-unit>
+            <trans-unit id="settings.sorting.desc" resname="settings.sorting.desc">
+                <source>Descending (newest/Z-A first)</source>
+                <target>Aflopend (nieuwste/Z-A eerst)</target>
+            </trans-unit>
+            <trans-unit id="settings.sorting.asc" resname="settings.sorting.asc">
+                <source>Ascending (oldest/A-Z first)</source>
+                <target>Oplopend (oudste/A-Z eerst)</target>
+            </trans-unit>
+
+            <trans-unit id="settings.sortField" resname="settings.sortField">
+                <source>Sort Field</source>
+                <target>Sorteerveld</target>
+            </trans-unit>
+            <trans-unit id="settings.sortField.description" resname="settings.sortField.description">
+                <source>Default field name to use for sorting (e.g., tstamp, crdate, title, header). Multiple fields can be comma-separated for fallback (e.g., "title,header" tries title first, then header).</source>
+                <target>Standaard veldnaam voor sortering (bijv. tstamp, crdate, title, header). Meerdere velden kunnen worden gescheiden door komma's voor fallback (bijv. "title,header" probeert eerst title, dan header).</target>
+            </trans-unit>
+
+            <trans-unit id="settings.boostFields" resname="settings.boostFields">
+                <source>Boost Fields</source>
+                <target>Boostvelden</target>
+            </trans-unit>
+            <trans-unit id="settings.boostFields.description" resname="settings.boostFields.description">
+                <source>Comma-separated list of boolean field names that pin matching records to the top of the results, regardless of the active sort order. Only applies to the default sort order — when a visitor manually sorts the results, boost is ignored. Example: "istopnews" for ext:news.</source>
+                <target>Kommagescheiden lijst van booleaanse veldnamen die overeenkomende records bovenaan de resultaten vastzetten, ongeacht de actieve sorteervolgorde. Geldt alleen bij de standaard sorteervolgorde — wanneer een bezoeker zelf sorteert, wordt de boost genegeerd. Voorbeeld: "istopnews" voor ext:news.</target>
+            </trans-unit>
+
+            <!-- Pagination Settings -->
+            <trans-unit id="settings.pagination.itemsPerPage" resname="settings.pagination.itemsPerPage">
+                <source>Items Per Page</source>
+                <target>Items Per Pagina</target>
+            </trans-unit>
+            <trans-unit id="settings.pagination.itemsPerPage.description" resname="settings.pagination.itemsPerPage.description">
+                <source>Number of items to display per page</source>
+                <target>Aantal items dat per pagina moet worden weergegeven</target>
+            </trans-unit>
+
+            <trans-unit id="settings.pagination.maxLinks" resname="settings.pagination.maxLinks">
+                <source>Maximum Page Links</source>
+                <target>Maximum Pagina Links</target>
+            </trans-unit>
+            <trans-unit id="settings.pagination.maxLinks.description" resname="settings.pagination.maxLinks.description">
+                <source>Maximum number of page links to display in pagination</source>
+                <target>Maximum aantal paginalinks om weer te geven in de paginering</target>
+            </trans-unit>
+
+            <!-- Search Settings -->
+            <trans-unit id="sheet.searchSettings" resname="sheet.searchSettings">
+                <source>Search Settings</source>
+                <target>Zoek Instellingen</target>
+            </trans-unit>
+
+            <trans-unit id="settings.showSearchForm" resname="settings.showSearchForm">
+                <source>Show Search Form</source>
+                <target>Toon Zoekformulier</target>
+            </trans-unit>
+            <trans-unit id="settings.showSearchForm.description" resname="settings.showSearchForm.description">
+                <source>Display a search form on the frontend, allowing users to search through filtered results</source>
+                <target>Toon een zoekformulier op de frontend, waarmee gebruikers door de gefilterde resultaten kunnen zoeken</target>
+            </trans-unit>
+
+            <trans-unit id="settings.searchFields" resname="settings.searchFields">
+                <source>Fieldnames to Search</source>
+                <target>Veldnamen om te Doorzoeken</target>
+            </trans-unit>
+            <trans-unit id="settings.searchFields.description" resname="settings.searchFields.description">
+                <source>Comma-separated list of field names to search in (e.g., title,description,content). The search will look for matches in any of these fields.</source>
+                <target>Kommagescheiden lijst van veldnamen waarin gezocht moet worden (bijv. title,description,content). De zoekopdracht zoekt naar overeenkomsten in elk van deze velden.</target>
+            </trans-unit>
+
+            <trans-unit id="settings.searchPlaceholder" resname="settings.searchPlaceholder">
+                <source>Search Placeholder Text</source>
+                <target>Zoek Placeholder Tekst</target>
+            </trans-unit>
+            <trans-unit id="settings.searchPlaceholder.description" resname="settings.searchPlaceholder.description">
+                <source>Optional placeholder text to display in the search input field</source>
+                <target>Optionele placeholder tekst om weer te geven in het zoekinvoerveld</target>
+            </trans-unit>
+
+            <trans-unit id="settings.searchMinChars" resname="settings.searchMinChars">
+                <source>Minimum Characters for Search</source>
+                <target>Minimum Aantal Tekens voor Zoeken</target>
+            </trans-unit>
+            <trans-unit id="settings.searchMinChars.description" resname="settings.searchMinChars.description">
+                <source>Minimum number of characters required before search is triggered. Default is 3 to prevent performance issues with very short search terms. Range: 1-10 characters.</source>
+                <target>Minimum aantal tekens vereist voordat het zoeken wordt geactiveerd. Standaard is 3 om prestatieproblemen met zeer korte zoektermen te voorkomen. Bereik: 1-10 tekens.</target>
+            </trans-unit>
+
+            <trans-unit id="settings.useSolrSynonyms" resname="settings.useSolrSynonyms">
+                <source>Use Solr Synonyms</source>
+                <target>Solr Synoniemen Gebruiken</target>
+            </trans-unit>
+            <trans-unit id="settings.useSolrSynonyms.description" resname="settings.useSolrSynonyms.description">
+                <source>When enabled, synonyms configured in the Solr backend module (Search → Core Optimization → Synonyms) are used to expand search terms. For example, searching for "cursus" will also match records containing "opleiding" or "training". Requires EXT:solr to be installed and connected.</source>
+                <target>Indien ingeschakeld, worden synoniemen die zijn ingesteld in de Solr-backendmodule (Zoeken → Core Optimalisatie → Synoniemen) gebruikt om zoektermen uit te breiden. Zo vindt een zoekopdracht op "cursus" ook records met "opleiding" of "training". Vereist dat EXT:solr is geïnstalleerd en verbonden.</target>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>
+

@@ -1,0 +1,61 @@
+{
+    "name": "proudnerds/pn-category-filter",
+    "type": "typo3-cms-extension",
+    "description": "Category filtering and search for TYPO3 records — AJAX-powered, faceted, no Solr required, with optional Solr synonym support.",
+    "keywords": [
+        "TYPO3 CMS",
+        "category",
+        "filter",
+        "facet",
+        "search",
+        "ajax"
+    ],
+    "homepage": "https://github.com/proudnerds-typo3/pn_category_filter",
+    "license": "GPL-2.0-or-later",
+    "version": "1.0.0",
+    "authors": [
+        {
+            "name": "Jacco van der Post",
+            "email": "Jacco.VanDerPost@ProudNerds.com",
+            "role": "Developer"
+        },
+        {
+            "name": "Emile Blume",
+            "email": "Emile.Blume@ProudNerds.com",
+            "role": "Developer"
+        }
+    ],
+    "support": {
+        "email": "extensions@proudnerds.com",
+        "issues": "https://github.com/proudnerds-typo3/pn_category_filter/issues",
+        "source": "https://github.com/proudnerds-typo3/pn_category_filter",
+        "docs": "https://docs.typo3.org/p/proudnerds/pn-category-filter/main/en-us/"
+    },
+    "require": {
+        "php": "^8.3",
+        "typo3/cms-backend": "^13.4",
+        "typo3/cms-core": "^13.4",
+        "typo3/cms-extbase": "^13.4",
+        "typo3/cms-fluid": "^13.4",
+        "typo3/cms-frontend": "^13.4"
+    },
+    "suggest": {
+        "apache-solr-for-typo3/solr": "Enables the optional synonym expansion of search terms (see 'Solr synonym expansion' in the documentation)."
+    },
+    "replace": {
+        "typo3-ter/pn-category-filter": "self.version"
+    },
+    "autoload": {
+        "psr-4": {
+            "ProudNerds\\PnCategoryFilter\\": "Classes/"
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "extra": {
+        "typo3/cms": {
+            "extension-key": "pn_category_filter"
+        }
+    }
+}

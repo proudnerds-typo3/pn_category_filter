@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<xliff version="1.0">
+    <file source-language="en" datatype="plaintext" original="EXT:pn_category_filter/Resources/Private/Language/locallang.xlf" date="2026-01-16T00:00:00Z" product-name="pn_category_filter">
+        <header/>
+        <body>
+            <!-- Results Messages -->
+            <trans-unit id="results.title" resname="results.title">
+                <source>RESULTS</source>
+            </trans-unit>
+            <trans-unit id="results.count" resname="results.count">
+                <source>%s results found</source>
+            </trans-unit>
+            <trans-unit id="results.empty" resname="results.empty">
+                <source>No results found.</source>
+            </trans-unit>
+
+            <!-- Filter Menu -->
+            <trans-unit id="filter.title" resname="filter.title">
+                <source>Filter restults</source>
+            </trans-unit>
+            <trans-unit id="filter.navigation" resname="filter.navigation">
+                <source>Category filter navigation</source>
+            </trans-unit>
+            <trans-unit id="filter.all" resname="filter.all">
+                <source>Show All</source>
+            </trans-unit>
+            <trans-unit id="filter.reset" resname="filter.reset">
+                <source>Reset Filter</source>
+            </trans-unit>
+            <trans-unit id="filter.resultCountUnit" resname="filter.resultCountUnit">
+                <source>results</source>
+            </trans-unit>
+
+            <!-- Search -->
+            <trans-unit id="search.title" resname="search.title">
+                <source>Search</source>
+            </trans-unit>
+            <trans-unit id="search.label" resname="search.label">
+                <source>Search</source>
+            </trans-unit>
+            <trans-unit id="search.placeholder" resname="search.placeholder">
+                <source>Search...</source>
+            </trans-unit>
+            <trans-unit id="search.button" resname="search.button">
+                <source>Search</source>
+            </trans-unit>
+            <trans-unit id="search.clear" resname="search.clear">
+                <source>Clear search</source>
+            </trans-unit>
+            <trans-unit id="search.description" resname="search.description">
+                <source>Enter search terms to filter results</source>
+            </trans-unit>
+            <trans-unit id="search.minChars" resname="search.minChars">
+                <source>Minimum %s characters required</source>
+            </trans-unit>
+
+            <!-- Sort Options -->
+            <trans-unit id="sort.title" resname="sort.title">
+                <source>Sort</source>
+            </trans-unit>
+            <trans-unit id="sort.ascending" resname="sort.ascending">
+                <source>Ascending</source>
+            </trans-unit>
+            <trans-unit id="sort.descending" resname="sort.descending">
+                <source>Descending</source>
+            </trans-unit>
+            <trans-unit id="sort.iconAlt" resname="sort.iconAlt">
+                <source>Sort</source>
+            </trans-unit>
+            <trans-unit id="sort.recent" resname="sort.recent">
+                <source>Show Most Recent</source>
+            </trans-unit>
+            <trans-unit id="sort.alphabet" resname="sort.alphabet">
+                <source>Sort Alphabetically</source>
+            </trans-unit>
+
+            <!-- Pagination -->
+            <trans-unit id="pagination.previous" resname="pagination.previous">
+                <source>Previous</source>
+            </trans-unit>
+            <trans-unit id="pagination.next" resname="pagination.next">
+                <source>Next</source>
+            </trans-unit>
+            <trans-unit id="pagination.first" resname="pagination.first">
+                <source>First</source>
+            </trans-unit>
+            <trans-unit id="pagination.last" resname="pagination.last">
+                <source>Last</source>
+            </trans-unit>
+            <trans-unit id="pagination.page" resname="pagination.page">
+                <source>Page</source>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>
+

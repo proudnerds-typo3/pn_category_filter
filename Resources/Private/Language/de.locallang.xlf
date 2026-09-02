@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<xliff version="1.0">
+    <file source-language="en" target-language="de" datatype="plaintext" original="EXT:pn_category_filter/Resources/Private/Language/locallang.xlf" date="2026-01-16T00:00:00Z" product-name="pn_category_filter">
+        <header/>
+        <body>
+            <!-- Results Messages -->
+            <trans-unit id="results.title" resname="results.title">
+                <source>RESULTS</source>
+                <target>ERGEBNISSE</target>
+            </trans-unit>
+            <trans-unit id="results.count" resname="results.count">
+                <source>%s results found</source>
+                <target>%s Ergebnisse gefunden</target>
+            </trans-unit>
+            <trans-unit id="results.empty" resname="results.empty">
+                <source>No results found.</source>
+                <target>Keine Ergebnisse gefunden.</target>
+            </trans-unit>
+
+            <!-- Filter Menu -->
+            <trans-unit id="filter.title" resname="filter.title">
+                <source>Filter by Category</source>
+                <target>Nach Kategorie filtern</target>
+            </trans-unit>
+            <trans-unit id="filter.navigation" resname="filter.navigation">
+                <source>Category filter navigation</source>
+                <target>Kategoriefilter-Navigation</target>
+            </trans-unit>
+            <trans-unit id="filter.all" resname="filter.all">
+                <source>Show All</source>
+                <target>Alle anzeigen</target>
+            </trans-unit>
+            <trans-unit id="filter.reset" resname="filter.reset">
+                <source>Reset Filter</source>
+                <target>Filter zurücksetzen</target>
+            </trans-unit>
+            <trans-unit id="filter.resultCountUnit" resname="filter.resultCountUnit">
+                <source>results</source>
+                <target>Ergebnisse</target>
+            </trans-unit>
+
+            <!-- Search -->
+            <trans-unit id="search.title" resname="search.title">
+                <source>Search</source>
+                <target>Suche</target>
+            </trans-unit>
+            <trans-unit id="search.label" resname="search.label">
+                <source>Search</source>
+                <target>Suche</target>
+            </trans-unit>
+            <trans-unit id="search.placeholder" resname="search.placeholder">
+                <source>Search...</source>
+                <target>Suchen...</target>
+            </trans-unit>
+            <trans-unit id="search.button" resname="search.button">
+                <source>Search</source>
+                <target>Suchen</target>
+            </trans-unit>
+            <trans-unit id="search.clear" resname="search.clear">
+                <source>Clear search</source>
+                <target>Suche löschen</target>
+            </trans-unit>
+            <trans-unit id="search.description" resname="search.description">
+                <source>Enter search terms to filter results</source>
+                <target>Geben Sie Suchbegriffe ein, um Ergebnisse zu filtern</target>
+            </trans-unit>
+            <trans-unit id="search.minChars" resname="search.minChars">
+                <source>Minimum %s characters required</source>
+                <target>Mindestens %s Zeichen erforderlich</target>
+            </trans-unit>
+
+            <!-- Sort Options -->
+            <trans-unit id="sort.title" resname="sort.title">
+                <source>Sort</source>
+                <target>Sortieren</target>
+            </trans-unit>
+            <trans-unit id="sort.ascending" resname="sort.ascending">
+                <source>Ascending</source>
+                <target>Aufsteigend</target>
+            </trans-unit>
+            <trans-unit id="sort.descending" resname="sort.descending">
+                <source>Descending</source>
+                <target>Absteigend</target>
+            </trans-unit>
+            <trans-unit id="sort.iconAlt" resname="sort.iconAlt">
+                <source>Sort</source>
+                <target>Sortieren</target>
+            </trans-unit>
+            <trans-unit id="sort.recent" resname="sort.recent">
+                <source>Show Most Recent</source>
+                <target>Neueste anzeigen</target>
+            </trans-unit>
+            <trans-unit id="sort.alphabet" resname="sort.alphabet">
+                <source>Sort Alphabetically</source>
+                <target>Alphabetisch sortieren</target>
+            </trans-unit>
+
+            <!-- Pagination -->
+            <trans-unit id="pagination.previous" resname="pagination.previous">
+                <source>Previous</source>
+                <target>Zurück</target>
+            </trans-unit>
+            <trans-unit id="pagination.next" resname="pagination.next">
+                <source>Next</source>
+                <target>Weiter</target>
+            </trans-unit>
+            <trans-unit id="pagination.first" resname="pagination.first">
+                <source>First</source>
+                <target>Erste</target>
+            </trans-unit>
+            <trans-unit id="pagination.last" resname="pagination.last">
+                <source>Last</source>
+                <target>Letzte</target>
+            </trans-unit>
+            <trans-unit id="pagination.page" resname="pagination.page">
+                <source>Page</source>
+                <target>Seite</target>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>

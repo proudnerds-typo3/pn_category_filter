@@ -1,0 +1,17 @@
+# Files that must not end up in the distributed package (Packagist dist zip / TER upload).
+/.editorconfig     export-ignore
+/.gitattributes    export-ignore
+/.github/          export-ignore
+/.gitignore        export-ignore
+/CONTRIBUTING.md   export-ignore
+/Build/            export-ignore
+/Tests/            export-ignore
+/phpstan.neon      export-ignore
+/.php-cs-fixer.php export-ignore
+
+# Normalise line endings so a Windows checkout does not produce a dirty diff.
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.gif binary
+*.svg text eol=lf

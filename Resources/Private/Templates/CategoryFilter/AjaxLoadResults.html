@@ -1,0 +1,20 @@
+<html xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers" data-namespace-typo3-fluid="true">
+<f:if condition="{pushStateBaseUrl}">
+    <f:then>
+        <div data-pushstate-url="{pushStateBaseUrl}">
+            <f:render partial="Results" arguments="{_all}" />
+        </div>
+    </f:then>
+    <f:else>
+        <div>
+            <f:render partial="Results" arguments="{_all}" />
+        </div>
+    </f:else>
+</f:if>
+<f:comment><!-- Per-category match counts (all nodes, zeros included) as the single source of truth for
+    the JS badge patch after an AJAX swap. Raw output: content is a machine-generated int=>int JSON
+    map (json_encode with JSON_HEX_TAG|JSON_HEX_AMP), so it is safe inside the script element. --></f:comment>
+<f:if condition="{categoryCountsJson}">
+    <script type="application/json" data-category-counts><f:format.raw>{categoryCountsJson}</f:format.raw></script>
+</f:if>
+</html>

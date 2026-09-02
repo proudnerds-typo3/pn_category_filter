@@ -1,0 +1,88 @@
+<html xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers" data-namespace-typo3-fluid="true">
+
+<f:comment>
+    <!-- Filter Menu Partial
+
+    Expected variables:
+    - {categoryTree} - Hierarchical array of categories
+    - {level} - Current nesting level (default: 0)
+
+    - Use of details for expandable categories. See:
+    https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/details
+
+    <details>
+        <summary>Details</summary>
+        Something small enough to escape casual notice.
+    </details>
+
+    -->
+</f:comment>
+
+<f:if condition="{categoryTree}">
+    <div class="pn-category-filter__category-list flex" role="list">
+        <f:for each="{categoryTree}" as="category">
+            <f:if condition="{category.hasChildren}">
+                <f:then>
+                    <details class="pn-category-filter__category-item" data-category-uid="{category.uid}" data-has-children="true">
+
+                        <f:comment><!-- Parent category with children - expandable, no checkbox --></f:comment>
+                        <summary class="pn-category-filter__category-toggle">
+                            <span class="pn-category-filter__category-label">
+                                <f:format.htmlspecialchars>{category.title}</f:format.htmlspecialchars>
+                            </span>
+                            <f:comment><!-- Active-sub-filter count badge (existing behaviour) — toggled by showActiveFilterCount --></f:comment>
+                            <f:if condition="{settings.showActiveFilterCount}">
+                                <span class="pn-category-filter__amount hidden" aria-hidden="true">
+                                    0
+                                </span>
+                            </f:if>
+                            <f:comment><!-- Result-count badge (deduplicated rollup for this parent) — toggled by showResultCount. The visible badge is decorative (aria-hidden); the adjacent .assistive span carries the screenreader phrase "{count} results" and is read as part of the summary. JS patches both on data-result-count / data-result-count-value after an AJAX swap. --></f:comment>
+                            <f:if condition="{settings.showResultCount}">
+                                <span class="pn-category-filter__result-count" data-result-count aria-hidden="true">{category.count}</span>
+                                <span class="assistive" data-result-count-sr><span data-result-count-value>{category.count}</span> <f:translate key="LLL:EXT:pn_category_filter/Resources/Private/Language/locallang.xlf:filter.resultCountUnit" /></span>
+                            </f:if>
+                            <span class="pn-category-filter__toggle-icon" aria-hidden="true">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" class="icon-chevron">
+                                    <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" class="icon-plus">
+                                    <path d="M7.99998 3.33325V12.6666M3.33331 7.99992H12.6666" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" class="icon-minus">
+                                    <path d="M3.33331 7.99992H12.6666" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                            </span>
+                        </summary>
+
+                        <f:comment><!-- Nested children - initially hidden --></f:comment>
+                        <f:if condition="{category.childCategories}">
+                            <f:render partial="FilterMenu/CategoryListChildren" arguments="{categoryTree: category.childCategories, level: '{level} + 1', ttContentUid: ttContentUid, settings: settings}" />
+                        </f:if>
+                    </details>
+                </f:then>
+                <f:else>
+                    <f:comment><!-- 0-count leaf is disabled (grey, not clickable) — only when result counts are shown --></f:comment>
+                    <f:variable name="resultCountEmpty" value="{f:if(condition: '{settings.showResultCount} && {category.count} == 0', then: 1, else: 0)}" />
+                    <div class="pn-category-filter__category-item{f:if(condition: resultCountEmpty, then: ' pn-category-filter__category-item--empty')}" data-category-uid="{category.uid}">
+
+                        <div class="pn-category-filter__category-checkbox-wrapper">
+                            <input type="checkbox" id="category-{category.uid}" name="tx_pncategoryfilter_categoryfilterlist[selectedCategories][]" value="{category.uid}" class="pn-category-filter__category-checkbox" data-category-filter="{category.uid}" data-ajax-url="{f:uri.action(action: 'ajaxLoadResults', pageType: settings.pageType.ajaxLoadResults, arguments: {ttContentUid: ttContentUid})}" {f:if(condition: resultCountEmpty, then: 'disabled')}{f:if(condition: settings.showResultCount, then: ' aria-describedby=pn-cf-count-{category.uid}')} />
+                            <label for="category-{category.uid}" class="pn-category-filter__category-label">
+                                <f:format.htmlspecialchars>{category.title}</f:format.htmlspecialchars>
+                            </label>
+                            <f:comment><!-- Result-count badge for this leaf — toggled by showResultCount. The visible badge is decorative (aria-hidden); the .assistive span (referenced by the checkbox aria-describedby) carries the screenreader phrase "{count} results". JS patches both on data-result-count / data-result-count-value. --></f:comment>
+                            <f:if condition="{settings.showResultCount}">
+                                <span class="pn-category-filter__result-count" data-result-count aria-hidden="true">{category.count}</span>
+                                <span class="assistive" id="pn-cf-count-{category.uid}" data-result-count-sr><span data-result-count-value>{category.count}</span> <f:translate key="LLL:EXT:pn_category_filter/Resources/Private/Language/locallang.xlf:filter.resultCountUnit" /></span>
+                            </f:if>
+                        </div>
+                    </div>
+                </f:else>
+            </f:if>
+        </f:for>
+    </div>
+</f:if>
+
+</html>

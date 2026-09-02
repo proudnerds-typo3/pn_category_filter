@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<xliff version="1.0">
+    <file source-language="en" target-language="de" datatype="plaintext" original="EXT:pn_category_filter/Resources/Private/Language/locallang_be.xlf" date="2026-01-16T00:00:00Z" product-name="pn_category_filter">
+        <header/>
+        <body>
+            <!-- Sheet Titles -->
+            <trans-unit id="sheet.general" resname="sheet.general">
+                <source>General Settings</source>
+                <target>Kategorie-Einstellungen</target>
+            </trans-unit>
+            <trans-unit id="sheet.tableSettings" resname="sheet.tableSettings">
+                <source>Table Settings</source>
+                <target>Tabellen Einstellungen</target>
+            </trans-unit>
+            <trans-unit id="sheet.displaySettings" resname="sheet.displaySettings">
+                <source>Display Settings</source>
+                <target>Anzeigeeinstellungen</target>
+            </trans-unit>
+            <trans-unit id="sheet.paginationSettings" resname="sheet.paginationSettings">
+                <source>Pagination Settings</source>
+                <target>Paginierungseinstellungen</target>
+            </trans-unit>
+
+            <!-- Category Settings -->
+            <trans-unit id="settings.categories" resname="settings.categories">
+                <source>Categories to Filter</source>
+                <target>Zu filternde Kategorien</target>
+            </trans-unit>
+            <trans-unit id="settings.categories.description" resname="settings.categories.description">
+                <source>Select specific categories to filter records by</source>
+                <target>Wählen Sie bestimmte Kategorien zum Filtern von Datensätzen aus</target>
+            </trans-unit>
+
+            <trans-unit id="settings.includeSubcategories" resname="settings.includeSubcategories">
+                <source>Include Subcategories</source>
+                <target>Unterkategorien einschließen</target>
+            </trans-unit>
+            <trans-unit id="settings.includeSubcategories.description" resname="settings.includeSubcategories.description">
+                <source>When checked, records assigned to subcategories of selected categories will also be included</source>
+                <target>Wenn aktiviert, werden auch Datensätze einbezogen, die Unterkategorien der ausgewählten Kategorien zugeordnet sind</target>
+            </trans-unit>
+
+            <trans-unit id="settings.showFilterMenu" resname="settings.showFilterMenu">
+                <source>Show Filter Menu</source>
+                <target>Filtermenü anzeigen</target>
+            </trans-unit>
+            <trans-unit id="settings.showFilterMenu.description" resname="settings.showFilterMenu.description">
+                <source>Display a category filter menu on the frontend, allowing users to filter results by selecting categories and subcategories</source>
+                <target>Zeigt ein Kategorie-Filtermenü im Frontend an, mit dem Benutzer Ergebnisse durch Auswahl von Kategorien und Unterkategorien filtern können</target>
+            </trans-unit>
+
+            <trans-unit id="settings.showOnlyChildrenInFilter" resname="settings.showOnlyChildrenInFilter">
+                <source>Show Only Children in Filter Menu</source>
+                <target>Nur Unterkategorien im Filtermenü anzeigen</target>
+            </trans-unit>
+            <trans-unit id="settings.showOnlyChildrenInFilter.description" resname="settings.showOnlyChildrenInFilter.description">
+                <source>When enabled, only child categories and sub-children of selected categories will be shown in the filter menu. The selected parent categories themselves will be hidden.</source>
+                <target>Wenn aktiviert, werden nur Unterkategorien und Sub-Unterkategorien der ausgewählten Kategorien im Filtermenü angezeigt. Die ausgewählten Hauptkategorien selbst werden ausgeblendet.</target>
+            </trans-unit>
+            <trans-unit id="settings.filterLogic" resname="settings.filterLogic">
+                <source>Filter Combine Logic</source>
+                <target>Filter-Kombinationslogik</target>
+            </trans-unit>
+            <trans-unit id="settings.filterLogic.description" resname="settings.filterLogic.description">
+                <source>How multiple selected filters combine. "Expand" widens results (any selected category matches). "Refine" uses faceted logic: OR within one group, AND across different groups.</source>
+                <target>Wie mehrere ausgewählte Filter kombiniert werden. „Erweitern" erweitert die Ergebnisse (jede ausgewählte Kategorie zählt). „Verfeinern" nutzt Facettenlogik: OR innerhalb einer Gruppe, AND zwischen verschiedenen Gruppen.</target>
+            </trans-unit>
+            <trans-unit id="settings.filterLogic.expand" resname="settings.filterLogic.expand">
+                <source>Expand — each extra filter shows more results</source>
+                <target>Erweitern — jeder zusätzliche Filter zeigt mehr Ergebnisse</target>
+            </trans-unit>
+            <trans-unit id="settings.filterLogic.facet" resname="settings.filterLogic.facet">
+                <source>Refine — OR within a group, AND across groups</source>
+                <target>Verfeinern — OR innerhalb einer Gruppe, AND zwischen Gruppen</target>
+            </trans-unit>
+
+            <!-- Table Settings -->
+            <trans-unit id="settings.tables" resname="settings.tables">
+                <source>Tables to Query</source>
+                <target>Abzufragende Tabellen</target>
+            </trans-unit>
+            <trans-unit id="settings.tables.description" resname="settings.tables.description">
+                <source>Select which database tables to fetch records from</source>
+                <target>Wählen Sie aus, aus welchen Datenbanktabellen Datensätze abgerufen werden sollen</target>
+            </trans-unit>
+
+            <trans-unit id="settings.tables.pages" resname="settings.tables.pages">
+                <source>Pages</source>
+                <target>Seiten</target>
+            </trans-unit>
+            <trans-unit id="settings.tables.tt_content" resname="settings.tables.tt_content">
+                <source>Content Elements</source>
+                <target>Inhaltselemente</target>
+            </trans-unit>
+            <trans-unit id="settings.tables.sys_file_metadata" resname="settings.tables.sys_file_metadata">
+                <source>File Metadata</source>
+                <target>Datei-Metadaten</target>
+            </trans-unit>
+
+            <trans-unit id="settings.recordPids" resname="settings.recordPids">
+                <source>Record Storage PIDs</source>
+                <target>Datensatz Speicher PIDs</target>
+            </trans-unit>
+            <trans-unit id="settings.recordPids.description" resname="settings.recordPids.description">
+                <source>Select one or more storage folders to fetch records from. Leave empty to search all pages.</source>
+                <target>Wählen Sie einen oder mehrere Speicherordner aus, aus denen Datensätze abgerufen werden sollen. Leer lassen, um alle Seiten zu durchsuchen.</target>
+            </trans-unit>
+
+            <!-- Display Settings -->
+            <trans-unit id="settings.showResultCount" resname="settings.showResultCount">
+                <source>Show result count behind each filter</source>
+                <target>Ergebnisanzahl hinter Filtern anzeigen</target>
+            </trans-unit>
+            <trans-unit id="settings.showResultCount.description" resname="settings.showResultCount.description">
+                <source>Display the number of matching results behind each filter option (Solr-style facet counts). Counts update with the search term and other active filters. Options with 0 results are shown greyed-out and cannot be selected.</source>
+                <target>Zeigt hinter jeder Filteroption die Anzahl der passenden Ergebnisse an (Solr-artige Facettenzählung). Die Anzahl passt sich dem Suchbegriff und anderen aktiven Filtern an. Optionen mit 0 Ergebnissen werden ausgegraut und sind nicht auswählbar.</target>
+            </trans-unit>
+
+            <trans-unit id="settings.showActiveFilterCount" resname="settings.showActiveFilterCount">
+                <source>Show Active Sub-filter Count</source>
+                <target>Anzahl aktiver Unterfilter anzeigen</target>
+            </trans-unit>
+            <trans-unit id="settings.showActiveFilterCount.description" resname="settings.showActiveFilterCount.description">
+                <source>Display a badge on parent categories showing how many of their sub-filters are currently active.</source>
+                <target>Zeigt an Oberkategorien ein Abzeichen mit der Anzahl der aktiven Unterfilter an.</target>
+            </trans-unit>
+
+            <trans-unit id="settings.limit" resname="settings.limit">
+                <source>Maximum Number of Records</source>
+                <target>Maximale Anzahl von Datensätzen</target>
+            </trans-unit>
+            <trans-unit id="settings.limit.description" resname="settings.limit.description">
+                <source>Set maximum number of records to display (0 = unlimited)</source>
+                <target>Maximale Anzahl der anzuzeigenden Datensätze festlegen (0 = unbegrenzt)</target>
+            </trans-unit>
+
+            <trans-unit id="settings.enablePushState" resname="settings.enablePushState">
+                <source>Enable URL Updates (pushState)</source>
+                <target>URL-Aktualisierungen aktivieren (pushState)</target>
+            </trans-unit>
+            <trans-unit id="settings.enablePushState.description" resname="settings.enablePushState.description">
+				<source>When enabled, the browser URL will be updated when filtering or paginating. This allows users to bookmark or share filtered results.</source>
+                <target>Wenn aktiviert, wird die Browser-URL beim Filtern oder Paginieren aktualisiert. Dadurch können Benutzer gefilterte Ergebnisse als Lesezeichen speichern oder teilen.</target>
+            </trans-unit>
+
+            <trans-unit id="settings.sorting" resname="settings.sorting">
+                <source>Sort Order</source>
+                <target>Sortierreihenfolge</target>
+            </trans-unit>
+            <trans-unit id="settings.sorting.description" resname="settings.sorting.description">
+                <source>Choose the default sort order for filtered results</source>
+                <target>Wählen Sie die Standard-Sortierreihenfolge für die gefilterten Ergebnisse</target>
+            </trans-unit>
+            <trans-unit id="settings.sorting.none" resname="settings.sorting.none">
+                <source>None</source>
+                <target>Keine</target>
+            </trans-unit>
+            <trans-unit id="settings.sorting.desc" resname="settings.sorting.desc">
+                <source>Descending (newest/Z-A first)</source>
+                <target>Absteigend (neueste/Z-A zuerst)</target>
+            </trans-unit>
+            <trans-unit id="settings.sorting.asc" resname="settings.sorting.asc">
+                <source>Ascending (oldest/A-Z first)</source>
+                <target>Aufsteigend (älteste/A-Z zuerst)</target>
+            </trans-unit>
+
+            <trans-unit id="settings.sortField" resname="settings.sortField">
+                <source>Sort Field</source>
+                <target>Sortierfeld</target>
+            </trans-unit>
+            <trans-unit id="settings.sortField.description" resname="settings.sortField.description">
+                <source>Default field name to use for sorting (e.g., tstamp, crdate, title, header). Multiple fields can be comma-separated for fallback (e.g., "title,header" tries title first, then header).</source>
+                <target>Standard-Feldname für Sortierung (z.B. tstamp, crdate, title, header). Mehrere Felder können durch Kommas getrennt werden für Fallback (z.B. "title,header" versucht zuerst title, dann header).</target>
+            </trans-unit>
+
+            <trans-unit id="settings.boostFields" resname="settings.boostFields">
+                <source>Boost Fields</source>
+                <target>Boost-Felder</target>
+            </trans-unit>
+            <trans-unit id="settings.boostFields.description" resname="settings.boostFields.description">
+                <source>Comma-separated list of boolean field names that pin matching records to the top of the results, regardless of the active sort order. Only applies to the default sort order — when a visitor manually sorts the results, boost is ignored. Example: "istopnews" for ext:news.</source>
+                <target>Kommagetrennte Liste boolescher Feldnamen, die übereinstimmende Datensätze unabhängig von der aktiven Sortierreihenfolge an die Spitze der Ergebnisse setzen. Gilt nur für die Standardsortierung — wenn ein Besucher manuell sortiert, wird der Boost ignoriert. Beispiel: "istopnews" für ext:news.</target>
+            </trans-unit>
+
+            <!-- Pagination Settings -->
+            <trans-unit id="settings.pagination.itemsPerPage" resname="settings.pagination.itemsPerPage">
+                <source>Items Per Page</source>
+                <target>Elemente pro Seite</target>
+            </trans-unit>
+            <trans-unit id="settings.pagination.itemsPerPage.description" resname="settings.pagination.itemsPerPage.description">
+                <source>Number of items to display per page</source>
+                <target>Anzahl der pro Seite anzuzeigenden Elemente</target>
+            </trans-unit>
+
+            <trans-unit id="settings.pagination.maxLinks" resname="settings.pagination.maxLinks">
+                <source>Maximum Page Links</source>
+                <target>Maximale Seitenlinks</target>
+            </trans-unit>
+            <trans-unit id="settings.pagination.maxLinks.description" resname="settings.pagination.maxLinks.description">
+                <source>Maximum number of page links to display in pagination</source>
+                <target>Maximale Anzahl der in der Paginierung anzuzeigenden Seitenlinks</target>
+            </trans-unit>
+
+            <!-- Search Settings -->
+            <trans-unit id="sheet.searchSettings" resname="sheet.searchSettings">
+                <source>Search Settings</source>
+                <target>Sucheinstellungen</target>
+            </trans-unit>
+
+            <trans-unit id="settings.showSearchForm" resname="settings.showSearchForm">
+                <source>Show Search Form</source>
+                <target>Suchformular anzeigen</target>
+            </trans-unit>
+            <trans-unit id="settings.showSearchForm.description" resname="settings.showSearchForm.description">
+                <source>Display a search form on the frontend, allowing users to search through filtered results</source>
+                <target>Zeigt ein Suchformular im Frontend an, mit dem Benutzer die gefilterten Ergebnisse durchsuchen können</target>
+            </trans-unit>
+
+            <trans-unit id="settings.searchFields" resname="settings.searchFields">
+                <source>Fieldnames to Search</source>
+                <target>Zu durchsuchende Feldnamen</target>
+            </trans-unit>
+            <trans-unit id="settings.searchFields.description" resname="settings.searchFields.description">
+                <source>Comma-separated list of field names to search in (e.g., title,description,content). The search will look for matches in any of these fields.</source>
+                <target>Durch Kommas getrennte Liste von Feldnamen, in denen gesucht werden soll (z.B. title,description,content). Die Suche sucht nach Übereinstimmungen in jedem dieser Felder.</target>
+            </trans-unit>
+
+            <trans-unit id="settings.searchPlaceholder" resname="settings.searchPlaceholder">
+                <source>Search Placeholder Text</source>
+                <target>Such-Platzhalter Text</target>
+            </trans-unit>
+            <trans-unit id="settings.searchPlaceholder.description" resname="settings.searchPlaceholder.description">
+                <source>Optional placeholder text to display in the search input field</source>
+                <target>Optionaler Platzhaltertext für das Sucheingabefeld</target>
+            </trans-unit>
+
+            <trans-unit id="settings.searchMinChars" resname="settings.searchMinChars">
+                <source>Minimum Characters for Search</source>
+                <target>Mindestanzahl Zeichen für Suche</target>
+            </trans-unit>
+            <trans-unit id="settings.searchMinChars.description" resname="settings.searchMinChars.description">
+                <source>Minimum number of characters required before search is triggered. Default is 3 to prevent performance issues with very short search terms. Range: 1-10 characters.</source>
+                <target>Mindestanzahl erforderlicher Zeichen, bevor die Suche ausgelöst wird. Standard ist 3, um Leistungsprobleme bei sehr kurzen Suchbegriffen zu vermeiden. Bereich: 1-10 Zeichen.</target>
+            </trans-unit>
+
+            <trans-unit id="settings.useSolrSynonyms" resname="settings.useSolrSynonyms">
+                <source>Use Solr Synonyms</source>
+                <target>Solr-Synonyme Verwenden</target>
+            </trans-unit>
+            <trans-unit id="settings.useSolrSynonyms.description" resname="settings.useSolrSynonyms.description">
+                <source>When enabled, synonyms configured in the Solr backend module (Search → Core Optimization → Synonyms) are used to expand search terms. For example, searching for "cursus" will also match records containing "opleiding" or "training". Requires EXT:solr to be installed and connected.</source>
+                <target>Wenn aktiviert, werden Synonyme aus dem Solr-Backend-Modul (Suche → Core-Optimierung → Synonyme) zur Erweiterung von Suchbegriffen verwendet. Zum Beispiel findet eine Suche nach "Kurs" auch Datensätze mit "Schulung" oder "Training". Erfordert eine installierte und verbundene EXT:solr.</target>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>
+

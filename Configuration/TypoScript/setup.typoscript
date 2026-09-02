@@ -1,0 +1,93 @@
+plugin.tx_pncategoryfilter {
+  view {
+    templateRootPaths {
+      0 = EXT:pn_category_filter/Resources/Private/Templates/
+      10 = {$plugin.tx_pncategoryfilter.view.templateRootPath}
+    }
+
+    partialRootPaths {
+      0 = EXT:pn_category_filter/Resources/Private/Partials/
+      10 = {$plugin.tx_pncategoryfilter.view.partialRootPath}
+    }
+
+    layoutRootPaths {
+      0 = EXT:pn_category_filter/Resources/Private/Layouts/
+      10 = {$plugin.tx_pncategoryfilter.view.layoutRootPath}
+    }
+  }
+
+  settings {
+    textCropLength = {$plugin.tx_pncategoryfilter.settings.textCropLength}
+    displayMode = {$plugin.tx_pncategoryfilter.settings.displayMode}
+    showResultCount = {$plugin.tx_pncategoryfilter.settings.showResultCount}
+    showActiveFilterCount = {$plugin.tx_pncategoryfilter.settings.showActiveFilterCount}
+
+    pageType {
+      ajaxLoadResults = {$plugin.tx_pncategoryfilter.settings.pageType.ajaxLoadResults}
+    }
+
+    pageContent {
+      enabled = {$plugin.tx_pncategoryfilter.settings.pageContent.enabled}
+
+      teaser {
+        colPos = {$plugin.tx_pncategoryfilter.settings.pageContent.teaser.colPos}
+        fields = {$plugin.tx_pncategoryfilter.settings.pageContent.teaser.fields}
+        cTypes = {$plugin.tx_pncategoryfilter.settings.pageContent.teaser.cTypes}
+      }
+
+      search {
+        colPos = {$plugin.tx_pncategoryfilter.settings.pageContent.search.colPos}
+        fields = {$plugin.tx_pncategoryfilter.settings.pageContent.search.fields}
+        cTypes = {$plugin.tx_pncategoryfilter.settings.pageContent.search.cTypes}
+      }
+    }
+
+    frontendSortingOptions {
+      10 {
+        label = {$plugin.tx_pncategoryfilter.settings.frontendSortingOptions.10.label}
+        field = {$plugin.tx_pncategoryfilter.settings.frontendSortingOptions.10.field}
+      }
+
+      20 {
+        label = {$plugin.tx_pncategoryfilter.settings.frontendSortingOptions.20.label}
+        field = {$plugin.tx_pncategoryfilter.settings.frontendSortingOptions.20.field}
+      }
+    }
+  }
+}
+
+ajaxLoadResults = PAGE
+ajaxLoadResults {
+  typeNum = {$plugin.tx_pncategoryfilter.settings.pageType.ajaxLoadResults}
+
+  config {
+    disableAllHeaderCode = 1
+    xhtml_cleaning = 0
+    admPanel = 0
+    no_cache = 1
+  }
+
+  10 = USER
+  10 {
+    userFunc = TYPO3\CMS\Extbase\Core\Bootstrap->run
+    extensionName = PnCategoryFilter
+    pluginName = CategoryFilterList
+    vendorName = ProudNerds
+    controller = CategoryFilter
+    action = ajaxLoadResults
+  }
+}
+
+
+#page {
+#  includeCSS {
+#    # Example CSS
+#    pnCategoryFilter = EXT:pn_category_filter/Resources/Public/Css/style.css
+#  }
+#
+#
+#  includeJSFooter {
+#    # Vite use pn_category_filter/Resources/Private/Assets/PnCategoryFilter.entry.js
+#    pnCategoryFilter = EXT:pn_category_filter/Resources/Public/JavaScript/PnCategoryFilter.js
+#  }
+#}

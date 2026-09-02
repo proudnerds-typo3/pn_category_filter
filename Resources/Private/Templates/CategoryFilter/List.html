@@ -1,0 +1,55 @@
+<html xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers" data-namespace-typo3-fluid="true">
+<f:layout name="Default" />
+
+<f:section name="content">
+    <div class="pn-category-filter pn-category-filter--{settings.displayMode -> f:if(condition: settings.displayMode, else: 'horizontal')}">
+        <f:if condition="{settings.showFilterMenu}">
+            <aside class="pn-category-filter__menu" aria-label="{f:translate(key: 'LLL:EXT:pn_category_filter/Resources/Private/Language/locallang.xlf:filter.title')}">
+                <h2 class="pn-category-filter__menu-title">
+                    <f:translate key="LLL:EXT:pn_category_filter/Resources/Private/Language/locallang.xlf:filter.title" />
+                </h2>
+
+                <button class="pn-category-filter__toggle button primary mobile-only" aria-expanded="false" aria-controls="pn-category-filter-categories">
+                    <svg class="icon-filter" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M7.00006 6H17.0001L11.9901 12.3L7.00006 6ZM4.25006 5.61C6.27006 8.2 10.0001 13 10.0001 13V19C10.0001 19.55 10.4501 20 11.0001 20H13.0001C13.5501 20 14.0001 19.55 14.0001 19V13C14.0001 13 17.7201 8.2 19.7401 5.61C19.8547 5.46237 19.9255 5.28553 19.9445 5.09961C19.9636 4.91368 19.93 4.72615 19.8477 4.55837C19.7654 4.39059 19.6376 4.24929 19.4789 4.15058C19.3202 4.05186 19.137 3.99969 18.9501 4H5.04006C4.21006 4 3.74006 4.95 4.25006 5.61Z" fill="white" />
+                    </svg>
+
+                    <f:translate key="LLL:EXT:pn_category_filter/Resources/Private/Language/locallang.xlf:filter.title" />
+
+                    <svg class="icon-close" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                        <path d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12L19 6.41Z" fill="currentColor"></path>
+                    </svg>
+                </button>
+
+                <f:if condition="{categoryTree}">
+                    <nav id="pn-category-filter-categories" class="pn-category-filter__categories" aria-label="{f:translate(key: 'LLL:EXT:pn_category_filter/Resources/Private/Language/locallang.xlf:filter.navigation')}">
+                        <f:render partial="FilterMenu/CategoryList" arguments="{categoryTree: categoryTree, level: 0, ttContentUid: ttContentUid, settings: settings}" />
+                    </nav>
+
+                    <f:if condition="{settings.displayMode} == 'horizontal'">
+                        <f:render partial="FilterMenu/Actions" arguments="{_all}" />
+                    </f:if>
+                </f:if>
+            </aside>
+        </f:if>
+
+        <f:if condition="{settings.displayMode} == 'vertical'">
+            <f:then>
+                <f:comment><!-- Vertical mode: actions + results share a column; actions sit outside results so they survive AJAX updates --></f:comment>
+                <div class="pn-category-filter__main">
+                    <f:render partial="FilterMenu/Actions" arguments="{_all}" />
+                    <div class="pn-category-filter__results">
+                        <f:render partial="Results" arguments="{_all}" />
+                    </div>
+                </div>
+            </f:then>
+            <f:else>
+                <div class="pn-category-filter__results">
+                    <f:render partial="Results" arguments="{_all}" />
+                </div>
+            </f:else>
+        </f:if>
+    </div>
+</f:section>
+
+</html>
