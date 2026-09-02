@@ -17,7 +17,7 @@ mode.
 Vertical display mode
 =====================
 
-..  figure:: /Images/example-vertical.png
+..  figure:: Images/example-vertical.png
     :alt: A sidebar with category checkboxes and result counts next to a grid of art works
 
     An art collection filter in :ref:`vertical mode <confval-flexform-displaymode>`.
@@ -38,7 +38,7 @@ What is visible here:
 Horizontal display mode
 =======================
 
-..  figure:: /Images/example-horizontal.png
+..  figure:: Images/example-horizontal.png
     :alt: A row of dropdown filter buttons above a grid of activity cards with pagination
 
     An activities listing in :ref:`horizontal mode <confval-flexform-displaymode>`.
