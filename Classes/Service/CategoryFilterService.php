@@ -11,7 +11,6 @@ use ProudNerds\PnCategoryFilter\Event\AfterRecordsFetchedEvent;
 use ProudNerds\PnCategoryFilter\Utility\CategoryUtility;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
-use TYPO3\CMS\Core\Category\Collection\CategoryCollection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Site\Entity\Site;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -41,6 +40,8 @@ class CategoryFilterService
      */
     public const string COMBINE_EXPAND = 'expand';
     public const string COMBINE_FACET = 'facet';
+
+    private const string CATEGORY_UID_ALIAS = '_pnCategoryFilterCategoryUid';
 
     /**
      * Fetch records filtered by categories from multiple tables
@@ -150,17 +151,19 @@ class CategoryFilterService
             $allRecords = $this->restrictRecordsToKeys($unionRecords, $selectedKeys);
         }
 
-        // Apply search filter if search term is provided. The synonym map is resolved once here so
-        // it can be reused for the count-side search over the full union (facet mode) below.
-        $synonymMap = [];
+        // Search once over the union; the displayed set is a subset of it, so it is derived from the
+        // survivors instead of being searched a second time.
         if (!empty($searchTerm)) {
             // Fetch synonym map from Solr (empty array when synonyms are disabled or Solr is unavailable)
             $synonymMap = $solrSynonymsActive && $site !== null
                 ? $this->synonymService->getSynonymsForSite($site, $language)
                 : [];
 
-            $allRecords = $this->searchService->filterRecordsBySearch($allRecords, $searchTerm, $settings, $synonymMap);
             $unionRecords = $this->searchService->filterRecordsBySearch($unionRecords, $searchTerm, $settings, $synonymMap);
+        }
+        $survivorKeys = $this->extractRecordKeys($unionRecords);
+        if (!empty($searchTerm)) {
+            $allRecords = $this->restrictRecordsToKeys($allRecords, $survivorKeys);
         }
 
         // Count matches per category on the COMPLETE set (before limit/pagination), search-aware.
@@ -171,14 +174,14 @@ class CategoryFilterService
                 $categoryKeys,
                 $facetData['facetKeysets'],
                 $facetData['facetByCategory'],
-                $this->extractRecordKeys($unionRecords)
+                $survivorKeys
             );
         } else {
             // Expand (union): each category's count is its attribution intersected with the surviving
             // records. Counting runs over the FULL-tree union ($unionRecords) so unselected options keep
             // their own totals. Leaf counts derive directly; attachCountsToTree() rolls parents up with
             // deduplication.
-            $survivingCategoryKeys = $this->intersectSurvivingKeys($categoryKeys, $this->extractRecordKeys($unionRecords));
+            $survivingCategoryKeys = $this->intersectSurvivingKeys($categoryKeys, $survivorKeys);
         }
         $counts = array_map('count', $survivingCategoryKeys);
 
@@ -336,30 +339,32 @@ class CategoryFilterService
      */
     protected function fetchRecordsForCategories(array $categoryUids, array $tables, array $recordPids): array
     {
+        $categoryUids = array_values(array_unique(array_map('intval', $categoryUids)));
+        if ($categoryUids === []) {
+            return ['records' => [], 'categoryKeys' => []];
+        }
+
+        $recordsByTable = [];
+        foreach ($tables as $tableName) {
+            try {
+                $recordsByTable[$tableName] = $this->fetchRecordsByCategoryForTable($categoryUids, $tableName, $recordPids);
+            } catch (\Exception $e) {
+                $this->logger->warning('CategoryFilterService: failed to fetch records', [
+                    'table' => $tableName,
+                    'exception' => $e->getMessage(),
+                ]);
+            }
+        }
+
+        // Assemble category by category, then table by table, so records keep the order they had
+        // when each category was fetched on its own (visible when sorting is 'none').
         $records = [];
         $categoryKeys = [];
-
-        foreach ($categoryUids as $categoryUid) {
-            $catUid = (int)$categoryUid;
+        foreach ($categoryUids as $catUid) {
             foreach ($tables as $tableName) {
-                try {
-                    $fetched = $this->fetchRecordsFromCategoryCollection(
-                        $catUid,
-                        $tableName,
-                        $recordPids
-                    );
-
-                    foreach ($fetched as $key => $record) {
-                        $records[$key] = $record;
-                        // Remember which category this record matched via (attribution for counts).
-                        $categoryKeys[$catUid][$key] = true;
-                    }
-                } catch (\Exception $e) {
-                    $this->logger->warning('CategoryFilterService: failed to fetch records', [
-                        'categoryUid' => $categoryUid,
-                        'table' => $tableName,
-                        'exception' => $e->getMessage(),
-                    ]);
+                foreach ($recordsByTable[$tableName][$catUid] ?? [] as $key => $record) {
+                    $records[$key] = $record;
+                    $categoryKeys[$catUid][$key] = true;
                 }
             }
         }
@@ -522,64 +527,68 @@ class CategoryFilterService
     }
 
     /**
-     * Fetch records from a category collection for a specific table
+     * Fetch the records of one table for all given categories in a single MM query.
      *
-     * @param int $categoryUid
+     * @param array<int> $categoryUids
      * @param string $tableName
-     * @param array $recordPids
-     * @return array
+     * @param array<int> $recordPids
+     * @return array<int,array<string,array<string,mixed>>> categoryUid => records keyed by "{table}_{uid}"
+     * @throws Exception
      */
-    protected function fetchRecordsFromCategoryCollection(
-        int $categoryUid,
-        string $tableName,
-        array $recordPids
-    ): array {
-        $records = [];
+    protected function fetchRecordsByCategoryForTable(array $categoryUids, string $tableName, array $recordPids): array
+    {
+        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
+            ->getQueryBuilderForTable($tableName);
 
-        // Load category collection
-        $collection = CategoryCollection::load(
-            $categoryUid,
-            true, // Create if doesn't exist
-            $tableName
-        );
+        $queryBuilder
+            ->select($tableName . '.*')
+            ->addSelect('sys_category_record_mm.uid_local AS ' . self::CATEGORY_UID_ALIAS)
+            ->from($tableName)
+            ->join(
+                $tableName,
+                'sys_category_record_mm',
+                'sys_category_record_mm',
+                $queryBuilder->expr()->eq(
+                    'sys_category_record_mm.uid_foreign',
+                    $queryBuilder->quoteIdentifier($tableName . '.uid')
+                )
+            )
+            ->where(
+                $queryBuilder->expr()->in(
+                    'sys_category_record_mm.uid_local',
+                    $queryBuilder->createNamedParameter($categoryUids, ArrayParameterType::INTEGER)
+                ),
+                $queryBuilder->expr()->eq(
+                    'sys_category_record_mm.tablenames',
+                    $queryBuilder->createNamedParameter($tableName)
+                ),
+                $queryBuilder->expr()->eq(
+                    'sys_category_record_mm.fieldname',
+                    $queryBuilder->createNamedParameter('categories')
+                )
+            )
+            ->orderBy('sys_category_record_mm.sorting', 'ASC')
+            ->addOrderBy('sys_category_record_mm.uid_foreign', 'ASC');
 
-        // Load items from collection
-        $collection->loadContents();
-
-        // Get records from collection
-        $now = time();
-        foreach ($collection as $record) {
-            // Check if record matches PID filter (if set)
-            if (!empty($recordPids)) {
-                $recordPid = (int)($record['pid'] ?? 0);
-                if (!in_array($recordPid, $recordPids, true)) {
-                    continue;
-                }
-            }
-
-            // CategoryCollection::loadContents() removes all query restrictions, so we
-            // must enforce frontend visibility manually: deleted, hidden, starttime, endtime.
-            if (!empty($record['deleted']) || !empty($record['hidden'])) {
-                continue;
-            }
-            $starttime = (int)($record['starttime'] ?? 0);
-            if ($starttime > 0 && $now < $starttime) {
-                continue;
-            }
-            $endtime = (int)($record['endtime'] ?? 0);
-            if ($endtime > 0 && $now >= $endtime) {
-                continue;
-            }
-
-            // Add table name to record for template usage
-            $record['_tableName'] = $tableName;
-
-            // Use uid + table as unique key to avoid duplicates
-            $key = $tableName . '_' . ($record['uid'] ?? 0);
-            $records[$key] = $record;
+        if ($recordPids !== []) {
+            $queryBuilder->andWhere(
+                $queryBuilder->expr()->in(
+                    $tableName . '.pid',
+                    $queryBuilder->createNamedParameter($recordPids, ArrayParameterType::INTEGER)
+                )
+            );
         }
 
-        return $records;
+        $recordsByCategory = [];
+        $result = $queryBuilder->executeQuery();
+        while ($record = $result->fetchAssociative()) {
+            $categoryUid = (int)$record[self::CATEGORY_UID_ALIAS];
+            unset($record[self::CATEGORY_UID_ALIAS]);
+            $record['_tableName'] = $tableName;
+            $recordsByCategory[$categoryUid][$tableName . '_' . $record['uid']] = $record;
+        }
+
+        return $recordsByCategory;
     }
 
     /**
@@ -748,22 +757,10 @@ class CategoryFilterService
 
         if ($showOnlyChildren) {
             // Only get children and sub-children, exclude the parent categories themselves
-            $childCategoryUids = [];
-
-            foreach ($categoryUids as $parentUid) {
-                $children = CategoryUtility::getChildCategoryUids($parentUid);
-                $childCategoryUids = array_merge($childCategoryUids, $children);
-
-                // If includeSubcategories is enabled, get all descendants
-                if ($includeSubcategories) {
-                    foreach ($children as $childUid) {
-                        $descendants = CategoryUtility::getAllSubcategoryUids($childUid);
-                        $childCategoryUids = array_merge($childCategoryUids, $descendants);
-                    }
-                }
-            }
-
-            $allCategoryUids = array_unique($childCategoryUids);
+            $childCategoryUids = CategoryUtility::getChildCategoryUidsBulk($categoryUids);
+            $allCategoryUids = $includeSubcategories
+                ? CategoryUtility::expandCategoryList($childCategoryUids)
+                : array_values(array_unique($childCategoryUids));
         } else {
             // Get all category UIDs (including subcategories if needed)
             $allCategoryUids = $includeSubcategories

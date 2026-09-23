@@ -7,6 +7,7 @@ namespace ProudNerds\PnCategoryFilter\Utility;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\ParameterType;
+use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -21,6 +22,8 @@ class CategoryUtility
      * Maximum tree depth to guard against circular references in category data.
      */
     private const int MAX_DEPTH = 10;
+
+    private const string CHILDREN_CACHE_IDENTIFIER = 'pn_category_filter_children_by_parent';
 
     /**
      * Get all direct child category UIDs for a given parent category.
@@ -99,7 +102,7 @@ class CategoryUtility
         $visited       = array_flip($rootUids); // O(1) lookup, prevents cycles
 
         for ($depth = 0; $depth < self::MAX_DEPTH && !empty($currentLevel); $depth++) {
-            $children = self::getChildUidsBulk($currentLevel);
+            $children = self::getChildCategoryUidsBulk($currentLevel);
 
             if (empty($children)) {
                 break;
@@ -123,32 +126,60 @@ class CategoryUtility
     /**
      * Fetch all direct children for multiple parent UIDs in a single IN() query.
      *
+     * Children are kept in the runtime cache per parent, because one request expands
+     * overlapping parts of the same tree several times.
+     *
      * @param array<int> $parentUids
      * @return array<int>
      * @throws Exception
      */
-    private static function getChildUidsBulk(array $parentUids): array
+    public static function getChildCategoryUidsBulk(array $parentUids): array
     {
         if (empty($parentUids)) {
             return [];
         }
 
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
-            ->getQueryBuilderForTable('sys_category');
+        $parentUids = array_values(array_unique(array_map('intval', $parentUids)));
+        $runtimeCache = GeneralUtility::makeInstance(CacheManager::class)->getCache('runtime');
+        $childrenByParent = $runtimeCache->get(self::CHILDREN_CACHE_IDENTIFIER) ?: [];
 
-        $rows = $queryBuilder
-            ->select('uid')
-            ->from('sys_category')
-            ->where(
-                $queryBuilder->expr()->in(
-                    'parent',
-                    $queryBuilder->createNamedParameter($parentUids, ArrayParameterType::INTEGER)
+        $unknownParents = array_values(array_filter(
+            $parentUids,
+            static fn(int $uid): bool => !isset($childrenByParent[$uid])
+        ));
+        if ($unknownParents !== []) {
+            foreach ($unknownParents as $uid) {
+                $childrenByParent[$uid] = [];
+            }
+
+            $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
+                ->getQueryBuilderForTable('sys_category');
+
+            $rows = $queryBuilder
+                ->select('uid', 'parent')
+                ->from('sys_category')
+                ->where(
+                    $queryBuilder->expr()->in(
+                        'parent',
+                        $queryBuilder->createNamedParameter($unknownParents, ArrayParameterType::INTEGER)
+                    )
                 )
-            )
-            ->executeQuery()
-            ->fetchAllAssociative();
+                ->orderBy('uid')
+                ->executeQuery()
+                ->fetchAllAssociative();
 
-        return array_map(static fn(array $row): int => (int)$row['uid'], $rows);
+            foreach ($rows as $row) {
+                $childrenByParent[(int)$row['parent']][] = (int)$row['uid'];
+            }
+            $runtimeCache->set(self::CHILDREN_CACHE_IDENTIFIER, $childrenByParent);
+        }
+
+        $children = [];
+        foreach ($parentUids as $uid) {
+            array_push($children, ...$childrenByParent[$uid]);
+        }
+
+        return $children;
     }
 
     /**
