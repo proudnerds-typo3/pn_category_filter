@@ -44,9 +44,9 @@ Contributing
 Pull requests are welcome. See
 `CONTRIBUTING.md <https://github.com/proudnerds-typo3/pn_category_filter/blob/main/CONTRIBUTING.md>`__
 in the repository for the conventions, and note in particular that the frontend
-JavaScript exists twice: as ES module sources and as a hand-maintained IIFE
-bundle for sites without a build step. A change to one must be applied to the
-other.
+JavaScript exists twice: as ES module sources and as an IIFE bundle for sites
+without a build step. The bundle is generated from the sources with esbuild, so
+never edit it by hand; ``CONTRIBUTING.md`` has the command.
 
 License
 =======

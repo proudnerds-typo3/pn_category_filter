@@ -14,7 +14,8 @@ because patch releases never introduce breaking changes or new features.
 1.1.0
 =====
 
-Performance, search quality and display-only enrichment. No breaking changes.
+Performance, search quality and display-only enrichment. No breaking changes;
+see :ref:`upgrading-1-1` for the defaults that change what visitors see.
 
 -   One category-relation query per table instead of one per category and table;
     the category tree is resolved in bulk (see :ref:`performance`)
@@ -27,6 +28,8 @@ Performance, search quality and display-only enrichment. No breaking changes.
 -   :ref:`Suggestions while typing <search-suggestions>`, on by default
 -   Faster search feedback: 250 ms debounce, 100 ms fade, no fade with
     ``prefers-reduced-motion``
+-   The IIFE bundle ``PnCategoryFilter.js`` for sites without a build step is
+    generated from the ES module sources and includes all of the above
 -   Fixed: boost fields and relevance were switched off after the first AJAX
     update
 -   Fixed: sorting options on a field the table does not have are hidden, and an

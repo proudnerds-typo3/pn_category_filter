@@ -5,7 +5,7 @@
  *
  * @module CategoryFilterManager
  * @author ProudNerds
- * @version 1.0.0
+ * @version 1.1.0
  */
 
 import ContentLoader from '../Utils/ContentLoader.js'

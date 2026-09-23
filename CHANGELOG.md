@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.1.0] – 2026-09-23
+
+No database changes; clear caches after the update. Suggestions while typing,
+relevance ordering and accent-insensitive search are on by default. See
+"Upgrading to 1.1" in `Documentation/Installation.rst`.
+
 ### Added
 
 - `AfterRecordsPaginatedEvent`, dispatched with only the records of the current
@@ -35,6 +41,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - Faster search feedback: 250 ms debounce instead of 400 ms, a 100 ms fade
   instead of 150 ms, and the request starts while the old results fade out;
   with `prefers-reduced-motion` there is no fade at all
+- `Resources/Public/JavaScript/PnCategoryFilter.js` (the IIFE bundle for sites
+  without a build step) is now generated from the ES module sources with
+  esbuild and contains all changes of this release; in 1.0.x it was maintained
+  by hand
 - Search and highlighting ignore accents ("cafe" finds and marks "café") and
   decode HTML entities, so "allergie&euml;n" matches "allergieën"
 
@@ -97,5 +107,6 @@ First public release.
   skip the `pushState` update but also skipped the `SearchManager`
   re-initialisation. Only the `pushState` call is conditional now.
 
-[Unreleased]: https://github.com/proudnerds-typo3/pn_category_filter/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/proudnerds-typo3/pn_category_filter/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/proudnerds-typo3/pn_category_filter/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/proudnerds-typo3/pn_category_filter/releases/tag/v1.0.0

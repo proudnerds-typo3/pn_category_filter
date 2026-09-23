@@ -119,3 +119,40 @@ Clear caches
 ..  code-block:: bash
 
     vendor/bin/typo3 cache:flush
+
+..  _upgrading-1-1:
+
+Upgrading to 1.1
+================
+
+There are no database changes and no FlexForm migration: existing plugin
+instances keep working without being saved again. After the update:
+
+#.  Clear caches.
+#.  If you bundle the ES module sources yourself (option B), rebuild your
+    frontend assets. The IIFE bundle (option A) is replaced by the update.
+
+Three defaults change what visitors see:
+
+-   **Suggestions while typing** are on wherever the search form is shown. To
+    switch them off, uncheck
+    :ref:`showSearchSuggestions <confval-flexform-showsearchsuggestions>` in the
+    plugin instance. The
+    :ref:`constant <confval-constant-showsearchsuggestions>` only applies to
+    instances that have not been saved since the update: saving stores the
+    checkbox, which then wins over the constant.
+-   **Search results are ordered by relevance** (:ref:`search-order`). Set the
+    :ref:`relevanceSorting <confval-constant-relevancesorting>` constant to ``0``
+    to keep the configured sort order.
+-   **Search ignores accents**, so ``een`` also finds ``één``.
+
+Sorting options whose field exists in none of the queried tables are no longer
+shown in the frontend.
+
+If you have your own listener on ``AfterRecordsFetchedEvent`` that only adds
+data for display, such as images or related names, consider moving it to
+:ref:`AfterRecordsPaginatedEvent <events-after-records-paginated>` or replacing
+it with a :ref:`file <configuration-file-resolvers>` or
+:ref:`category resolver <configuration-category-resolvers>`: it then runs for
+one page of results instead of the whole result set. Existing listeners keep
+working unchanged.
