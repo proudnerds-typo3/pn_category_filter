@@ -93,10 +93,12 @@ by default, switch it off per plugin instance) a list appears below the search
 input once the term reaches
 :ref:`searchMinChars <confval-flexform-searchminchars>`:
 
--   up to three categories whose title matches the term, with their result
-    count; choosing one checks it in the filter;
--   up to five titles of the best matching records, taken from the first field
-    of :ref:`searchFields <confval-flexform-searchfields>`; choosing one searches
+-   up to three selectable categories (the ones with a checkbox, so no parent
+    categories) whose title matches the term, with their result count; choosing
+    one checks it in the filter;
+-   up to five titles of the best matching records that contain the term
+    themselves, taken from the first field of
+    :ref:`searchFields <confval-flexform-searchfields>`; choosing one searches
     for that title.
 
 The suggestions arrive with the results of the same request, as JSON in a

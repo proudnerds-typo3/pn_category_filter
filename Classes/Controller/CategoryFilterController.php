@@ -117,17 +117,6 @@ class CategoryFilterController extends ActionController
             // SECURITY: Validate ttContentUid belongs to current page
             $this->validateContentElementAccess($ttContentUid);
             $this->loadFlexFormSettings($ttContentUid);
-
-            // Override sorting settings from POST if provided (frontend sorting)
-            if (isset($pluginParamsPost['sorting']) && in_array($pluginParamsPost['sorting'], ['asc', 'desc', 'none'], true)) {
-                $this->settings['sorting'] = $pluginParamsPost['sorting'];
-            }
-            if (!empty($pluginParamsPost['sortField'])) {
-                // Validate sortField contains only allowed characters (alphanumeric, underscore, comma)
-                if (preg_match('/^[a-zA-Z0-9_,]+$/', $pluginParamsPost['sortField'])) {
-                    $this->settings['sortField'] = $pluginParamsPost['sortField'];
-                }
-            }
         } else {
             throw new InvalidArgumentValueException(
                 'The ttContentUid parameter is missing or invalid. Please provide a valid content element UID in the Ajax URL.',
@@ -228,6 +217,8 @@ class CategoryFilterController extends ActionController
      */
     protected function processFilteredRecords(): void
     {
+        $this->removeUnsortableSortingOptions();
+
         // Get categories for filtering records (uses selected categories if available)
         $filterCategories = $this->getCategoryListForFiltering();
 
@@ -376,7 +367,7 @@ class CategoryFilterController extends ActionController
             // Suggestions while typing; only when enabled and the term is long enough to search.
             'searchSuggestionsJson' => $searchSuggestions === null
                 ? ''
-                : json_encode($searchSuggestions, JSON_THROW_ON_ERROR | JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE),
+                : json_encode($searchSuggestions, JSON_THROW_ON_ERROR | JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE),
             'totalRecords' => count($records),
             'settings' => $this->settings,
             'selectedCategories' => $filterCategories,
@@ -767,7 +758,7 @@ class CategoryFilterController extends ActionController
         if (
             isset($pluginParamsPost['sortField'])
             && is_string($pluginParamsPost['sortField'])
-            && preg_match('/^[a-zA-Z0-9_,]+$/', $pluginParamsPost['sortField'])
+            && $this->isAllowedSortField($pluginParamsPost['sortField'])
         ) {
             $sortField = $pluginParamsPost['sortField'];
             $userHasSorted = true;
@@ -790,7 +781,7 @@ class CategoryFilterController extends ActionController
             !isset($pluginParamsPost['sortField'])
             && isset($pluginParamsQuery['sortField'])
             && is_string($pluginParamsQuery['sortField'])
-            && preg_match('/^[a-zA-Z0-9_,]+$/', $pluginParamsQuery['sortField'])
+            && $this->isAllowedSortField($pluginParamsQuery['sortField'])
         ) {
             $sortField = $pluginParamsQuery['sortField'];
             $userHasSorted = true;
@@ -801,5 +792,60 @@ class CategoryFilterController extends ActionController
             'sortField' => $sortField,
             'userHasSorted' => $userHasSorted,
         ];
+    }
+
+    /**
+     * Drops frontendSortingOptions whose field exists in none of the queried tables, so the
+     * sort UI never offers an option that cannot sort (e.g. "title" on a table without one).
+     */
+    private function removeUnsortableSortingOptions(): void
+    {
+        $tables = $this->getTableList();
+        $options = (array)($this->settings['frontendSortingOptions'] ?? []);
+        foreach ($options as $key => $option) {
+            if (!is_array($option) || !$this->isSortableField(trim((string)($option['field'] ?? '')), $tables)) {
+                unset($options[$key]);
+            }
+        }
+        $this->settings['frontendSortingOptions'] = $options;
+    }
+
+    /**
+     * A comma-separated list is a fallback chain, so one sortable field in one table is enough.
+     *
+     * @param array<string> $tables
+     */
+    private function isSortableField(string $fieldList, array $tables): bool
+    {
+        foreach (GeneralUtility::trimExplode(',', $fieldList, true) as $field) {
+            foreach ($tables as $table) {
+                $ctrl = $GLOBALS['TCA'][$table]['ctrl'] ?? [];
+                if (
+                    in_array($field, ['uid', 'pid'], true)
+                    || isset($GLOBALS['TCA'][$table]['columns'][$field])
+                    || in_array($field, [$ctrl['tstamp'] ?? null, $ctrl['crdate'] ?? null, $ctrl['sortby'] ?? null], true)
+                ) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * A visitor may only sort on the configured default or on a frontendSortingOptions field;
+     * anything else is ignored instead of reaching the sort as an unknown column.
+     */
+    private function isAllowedSortField(string $sortField): bool
+    {
+        $allowed = [(string)($this->settings['sortField'] ?? '')];
+        foreach ((array)($this->settings['frontendSortingOptions'] ?? []) as $option) {
+            if (is_array($option)) {
+                $allowed[] = trim((string)($option['field'] ?? ''));
+            }
+        }
+
+        return $sortField !== '' && in_array($sortField, $allowed, true);
     }
 }

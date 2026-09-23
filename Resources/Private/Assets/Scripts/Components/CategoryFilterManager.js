@@ -176,9 +176,13 @@ class CategoryFilterManager {
         // (vertical displayMode renders FilterMenu/Actions in Results.html).
         const newSortContainer = this.resultsContainer.querySelector('.pn-category-filter__sort')
         if (newSortContainer) {
+          const userHasSorted = this.sortingManager?.hasUserSorted() ?? false
           this.sortingManager = new SortingManager(newSortContainer, (sortData) => {
             this.handleSortChange(sortData)
           })
+          if (userHasSorted) {
+            this.sortingManager.setUserHasSorted(true)
+          }
         }
 
         // Update category amount badges after content update
@@ -198,7 +202,10 @@ class CategoryFilterManager {
   #createSuggestionManager(searchForm) {
     this.suggestionManager = SuggestionManager.isEnabled(searchForm)
       ? new SuggestionManager(searchForm, {
-          onSelectTitle: (title) => this.handleSearchChange(title),
+          onSelectTitle: (title) => {
+            this.searchManager?.clearDebounce()
+            this.handleSearchChange(title)
+          },
           onSelectCategory: (categoryUid) => this.#selectCategory(categoryUid),
         })
       : null

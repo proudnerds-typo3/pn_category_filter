@@ -216,6 +216,16 @@ class SortingManager {
   }
 
   /**
+   * Carries the visitor's choice over to a new instance after the sort UI was re-rendered
+   *
+   * @param {boolean} userHasSorted
+   * @returns {void}
+   */
+  setUserHasSorted(userHasSorted) {
+    this.#userHasSorted = userHasSorted
+  }
+
+  /**
    * Gets current sorting state
    *
    * @returns {{sortField: string, sortOrder: string}}

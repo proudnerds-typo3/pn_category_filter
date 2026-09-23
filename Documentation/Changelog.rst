@@ -29,6 +29,8 @@ Performance, search quality and display-only enrichment. No breaking changes.
     ``prefers-reduced-motion``
 -   Fixed: boost fields and relevance were switched off after the first AJAX
     update
+-   Fixed: sorting options on a field the table does not have are hidden, and an
+    unknown sort field in the request no longer throws an exception
 -   Fixed: a search field present in only one of several tables threw an
     exception
 -   Fixed: the script now also initialises when loaded after

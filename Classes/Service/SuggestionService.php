@@ -27,17 +27,19 @@ final class SuggestionService
     public function build(array $records, array $categoryTree, array $categoryCounts, string $searchTerm, array $settings): array
     {
         return [
-            'titles' => $this->collectTitles($records, $settings),
+            'titles' => $this->collectTitles($records, $settings, $searchTerm),
             'categories' => $this->collectCategories($categoryTree, $categoryCounts, $searchTerm),
         ];
     }
 
     /**
      * @param array<int,array<string,mixed>> $records
+     * Only titles that contain the term themselves, so choosing one keeps the search meaningful.
+     *
      * @param array<string,mixed> $settings
      * @return list<string>
      */
-    private function collectTitles(array $records, array $settings): array
+    private function collectTitles(array $records, array $settings, string $searchTerm): array
     {
         $fields = array_values(array_filter(array_map('trim', explode(',', (string)($settings['searchFields'] ?? 'title')))));
         $titleField = $fields[0] ?? 'title';
@@ -45,7 +47,7 @@ final class SuggestionService
         $titles = [];
         foreach ($records as $record) {
             $title = trim(html_entity_decode(strip_tags((string)($record[$titleField] ?? '')), ENT_QUOTES | ENT_HTML5, 'UTF-8'));
-            if ($title !== '' && !in_array($title, $titles, true)) {
+            if ($title !== '' && !in_array($title, $titles, true) && $this->searchService->matchesText($title, $searchTerm)) {
                 $titles[] = $title;
                 if (count($titles) === self::MAX_TITLES) {
                     break;
@@ -69,7 +71,9 @@ final class SuggestionService
                 $uid = (int)($node['uid'] ?? 0);
                 $title = (string)($node['title'] ?? '');
                 $count = $categoryCounts[$uid] ?? 0;
-                if ($count > 0 && $this->searchService->matchesText($title, $searchTerm)) {
+                // Parent categories have no checkbox in the filter menu, so choosing one would do nothing
+                $isLeaf = empty($node['childCategories']);
+                if ($isLeaf && $count > 0 && $this->searchService->matchesText($title, $searchTerm)) {
                     $matches[] = ['uid' => $uid, 'title' => $title, 'count' => $count];
                 }
                 $walk((array)($node['childCategories'] ?? []));

@@ -15,6 +15,7 @@ class SuggestionManager {
   #activeIndex = -1
   // After a choice the list stays closed until the visitor types again
   #waitForInput = false
+  #minChars
   #onSelectTitle
   #onSelectCategory
 
@@ -28,6 +29,7 @@ class SuggestionManager {
     this.#status = searchForm.querySelector('[data-search-suggestions-status]')
     this.#onSelectTitle = onSelectTitle
     this.#onSelectCategory = onSelectCategory
+    this.#minChars = parseInt(searchForm.dataset.searchMinChars || '3', 10)
 
     if (this.#input && this.#listbox) {
       this.#init(searchForm)
@@ -53,6 +55,10 @@ class SuggestionManager {
     this.#input.addEventListener('blur', () => this.close())
     this.#input.addEventListener('input', () => {
       this.#waitForInput = false
+      // Below the minimum no new suggestions arrive, so the old ones must not stay choosable
+      if (this.#input.value.trim().length < this.#minChars) {
+        this.update(null)
+      }
     })
 
     // Keep focus in the input while choosing with the mouse
@@ -88,9 +94,14 @@ class SuggestionManager {
 
     if (this.#options.length === 0 || this.#waitForInput || document.activeElement !== this.#input) {
       this.close()
+      if (this.#status && this.#options.length === 0) this.#status.textContent = ''
       return
     }
 
+    this.#open()
+  }
+
+  #open() {
     this.#listbox.hidden = false
     this.#input.setAttribute('aria-expanded', 'true')
     this.#input.removeAttribute('aria-activedescendant')
@@ -129,7 +140,17 @@ class SuggestionManager {
   }
 
   #handleKeydown(event) {
-    if (event.target !== this.#input || !this.#isOpen()) return
+    if (event.target !== this.#input) return
+
+    // A closed list with suggestions reopens on ArrowDown, as a combobox should
+    if (!this.#isOpen()) {
+      if (event.key === 'ArrowDown' && this.#options.length > 0) {
+        event.preventDefault()
+        this.#open()
+        this.#setActive(0)
+      }
+      return
+    }
 
     switch (event.key) {
       case 'ArrowDown':

@@ -40,6 +40,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- A sort field that does not exist in the queried tables no longer throws an
+  exception: frontend sorting options without such a field are hidden, and an
+  unknown `sortField` in the request is ignored
 - Boost fields were ignored after the first AJAX update: the frontend always
   sent the pre-checked default sort order, so the server treated it as a
   visitor's choice. Sorting is now only sent, and kept in the pagination links,
