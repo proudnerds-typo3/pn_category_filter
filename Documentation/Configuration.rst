@@ -503,6 +503,111 @@ The difference with the FlexForm:
         -   Interactive re-sorting; overrides the default and disables
             :ref:`boosting <boost-fields>`
 
+..  _configuration-file-resolvers:
+
+Resolving file fields
+---------------------
+
+The records reach the template as raw database rows, so a FAL field such as
+``fal_media`` only holds the number of relations. ``fileResolvers`` turns such a
+field into file UIDs that :html:`<f:image src="…">` can render. Each entry runs
+one query, for the records of the current page only:
+
+..  code-block:: typoscript
+
+    plugin.tx_pncategoryfilter.settings {
+        fileResolvers {
+            news {
+                table = tx_news_domain_model_news
+                field = fal_media
+                as = _previewImageUid
+                mode = first
+                fileTypes = image
+            }
+        }
+    }
+
+..  list-table::
+    :header-rows: 1
+
+    -   -   Key
+        -   Default
+        -   Meaning
+    -   -   ``table``
+        -   —
+        -   The table whose records are resolved
+    -   -   ``field``
+        -   —
+        -   The FAL field of that table, as defined in the TCA
+    -   -   ``as``
+        -   —
+        -   The record key that receives the result; may be the field itself
+    -   -   ``mode``
+        -   ``first``
+        -   ``first`` sets one file UID (``0`` when there is none), ``all`` sets a
+            list of file UIDs in the order of the relation
+    -   -   ``fileTypes``
+        -   all types
+        -   Comma-separated list of ``text``, ``image``, ``audio``, ``video`` and
+            ``application``
+
+Files that FAL marks as missing are skipped. An entry with an unknown table,
+field, mode or file type is ignored and logged as a warning.
+
+..  code-block:: html
+    :caption: Partials/Results.html
+
+    <f:if condition="{record._previewImageUid}">
+        <f:image src="{record._previewImageUid}" alt="{record.title}" width="640c" height="480c" />
+    </f:if>
+
+..  _configuration-category-resolvers:
+
+Attaching categories
+--------------------
+
+``categoryResolvers`` attaches the categories of each record as a list of rows
+with ``uid`` and ``title``, for example to show labels on a result card. Like the
+file resolvers it runs one query per entry, for the records of the current page
+only:
+
+..  code-block:: typoscript
+
+    plugin.tx_pncategoryfilter.settings {
+        categoryResolvers {
+            ads {
+                table = tx_myext_domain_model_ad
+            }
+        }
+    }
+
+..  list-table::
+    :header-rows: 1
+
+    -   -   Key
+        -   Default
+        -   Meaning
+    -   -   ``table``
+        -   —
+        -   The table whose records get their categories
+    -   -   ``field``
+        -   ``categories``
+        -   The category field of that table, as defined in the TCA
+    -   -   ``as``
+        -   ``_categories``
+        -   The record key that receives the list
+
+..  code-block:: html
+    :caption: Partials/Results.html
+
+    <f:for each="{record._categories}" as="category" iteration="iter">
+        {category.title}<f:if condition="{iter.isLast}"><f:else>, </f:else></f:if>
+    </f:for>
+
+Both resolvers run before the :ref:`AfterRecordsPaginatedEvent
+<events-after-records-paginated>`, so a listener on that event already sees
+their results.
+
 The AJAX PAGE object
 --------------------
 

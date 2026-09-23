@@ -118,6 +118,89 @@ The extension registers one listener on this event itself:
 implements :ref:`page-content`. It returns immediately when the feature is
 disabled or :sql:`pages` is not among the queried tables.
 
+..  _events-after-records-paginated:
+
+AfterRecordsPaginatedEvent
+==========================
+
+:php:`ProudNerds\PnCategoryFilter\Event\AfterRecordsPaginatedEvent`
+
+Dispatched with only the records of the current page, right before they are
+rendered. Use it for enrichment that is only needed for display, such as related
+names or a computed label: it runs for one page of results instead of the whole
+result set.
+
+..  list-table::
+    :header-rows: 1
+
+    -   -   Method
+        -   Returns
+        -   Purpose
+    -   -   :php:`getRecords()`
+        -   :php:`array`
+        -   The records of the current page, in display order
+    -   -   :php:`setRecords(array $records)`
+        -   :php:`void`
+        -   Replace the records; keep their number and order, because the
+            pagination has already been computed
+    -   -   :php:`getTables()`
+        -   :php:`array`
+        -   The queried table names
+    -   -   :php:`getSettings()`
+        -   :php:`array`
+        -   The merged plugin settings
+    -   -   :php:`getRequest()`
+        -   :php:`ServerRequestInterface`
+        -   The current request (site, language, arguments)
+
+The :ref:`file <configuration-file-resolvers>` and :ref:`category resolvers
+<configuration-category-resolvers>` run before this event. For images and
+categories, configure those instead of writing a listener.
+
+Example listener
+----------------
+
+..  code-block:: php
+    :caption: EXT:my_extension/Classes/EventListener/AddAuthorNames.php
+
+    <?php
+
+    declare(strict_types=1);
+
+    namespace Vendor\Extension\EventListener;
+
+    use ProudNerds\PnCategoryFilter\Event\AfterRecordsPaginatedEvent;
+    use TYPO3\CMS\Core\Attribute\AsEventListener;
+
+    #[AsEventListener(identifier: 'vendor/add-author-names')]
+    final class AddAuthorNames
+    {
+        public function __invoke(AfterRecordsPaginatedEvent $event): void
+        {
+            $records = $event->getRecords();
+            $uids = array_column($records, 'uid');
+            // Fetch the names for all $uids in one query, then:
+            foreach ($records as $key => $record) {
+                $records[$key]['_authorName'] = '';
+            }
+            $event->setRecords($records);
+        }
+    }
+
+Which event to use
+==================
+
+..  list-table::
+    :header-rows: 1
+
+    -   -   You want to
+        -   Use
+    -   -   Remove records, or add a field that search, sorting or the result
+            counts depend on
+        -   :php:`AfterRecordsFetchedEvent`
+    -   -   Add data that is only shown in the result list
+        -   :php:`AfterRecordsPaginatedEvent`, or a resolver
+
 ViewHelper
 ==========
 
@@ -144,6 +227,10 @@ injection:
         -   Reading and expanding EXT:solr synonyms
     -   -   :php:`Service\PageContentHydrationService`
         -   Enriching :sql:`pages` records with :sql:`tt_content`
+    -   -   :php:`Service\FileResolverService`
+        -   Resolving FAL fields to file UIDs (:ref:`configuration-file-resolvers`)
+    -   -   :php:`Service\CategoryResolverService`
+        -   Attaching categories to records (:ref:`configuration-category-resolvers`)
     -   -   :php:`Dto\FilteredRecordsResult`
         -   The result object holding the records and the category counts
 

@@ -5,7 +5,10 @@ declare(strict_types=1);
 namespace ProudNerds\PnCategoryFilter\Controller;
 
 use Doctrine\DBAL\Exception;
+use ProudNerds\PnCategoryFilter\Event\AfterRecordsPaginatedEvent;
 use ProudNerds\PnCategoryFilter\Service\CategoryFilterService;
+use ProudNerds\PnCategoryFilter\Service\CategoryResolverService;
+use ProudNerds\PnCategoryFilter\Service\FileResolverService;
 use ProudNerds\PnCategoryFilter\Service\SearchService;
 use ProudNerds\PnCategoryFilter\Utility\CategoryUtility;
 use ProudNerds\PnCategoryFilter\Utility\Typo3Utility;
@@ -54,7 +57,9 @@ class CategoryFilterController extends ActionController
     ];
 
     public function __construct(
-        private readonly CategoryFilterService $categoryFilterService
+        private readonly CategoryFilterService $categoryFilterService,
+        private readonly FileResolverService $fileResolverService,
+        private readonly CategoryResolverService $categoryResolverService,
     ) {}
 
     public function initializeView(): void
@@ -323,9 +328,24 @@ class CategoryFilterController extends ActionController
         $this->settings['sorting'] = $sorting;
         $this->settings['sortField'] = $sortField;
 
+        $paginatedRecords = $this->fileResolverService->resolve(
+            array_values([...$paginator->getPaginatedItems()]),
+            (array)($this->settings['fileResolvers'] ?? [])
+        );
+        $paginatedRecords = $this->categoryResolverService->resolve(
+            $paginatedRecords,
+            (array)($this->settings['categoryResolvers'] ?? [])
+        );
+        $paginatedEvent = $this->eventDispatcher->dispatch(new AfterRecordsPaginatedEvent(
+            $paginatedRecords,
+            array_values($tables),
+            $this->settings,
+            $this->request,
+        ));
+
         // Expose active sorting state to Fluid and pagination
         $this->view->assignMultiple([
-            'records' => $paginator->getPaginatedItems(),
+            'records' => $paginatedEvent->getRecords(),
             'paginator' => $paginator,
             'pagination' => $pagination,
             // categoryTree is used to render the filter menu

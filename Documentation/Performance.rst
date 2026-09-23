@@ -57,7 +57,14 @@ What keeps it fast
 
 -   Early-exit matching stops at the first hit per record.
 -   The 400 ms search debounce cuts the number of requests dramatically.
--   No N+1 queries: category relations and page content are fetched in batches.
+-   No N+1 queries: one category-relation query per table, whatever the number
+    of categories, and page content is fetched in batches.
+-   The category tree is resolved one level per query, and each category's
+    children are cached for the rest of the request.
+-   The search filter runs once per request.
+-   Files and categories for display are only resolved for the current page
+    (:ref:`configuration-file-resolvers`,
+    :ref:`configuration-category-resolvers`).
 -   Client-side validation of ``searchMinChars`` prevents pointless AJAX calls.
 -   Only the current page of results is rendered.
 -   :php:`mb_*` functions are used throughout, so multibyte input costs nothing

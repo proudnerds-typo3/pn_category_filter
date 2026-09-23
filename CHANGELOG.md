@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- `AfterRecordsPaginatedEvent`, dispatched with only the records of the current
+  page, for enrichment that is only needed for display
+- `fileResolvers` TypoScript setting: resolves FAL fields of the displayed
+  records to file UIDs, one query per configured table and field
+- `categoryResolvers` TypoScript setting: attaches the categories of the
+  displayed records as `uid` + `title` rows
+- `CategoryUtility::getChildCategoryUidsBulk()` as public API
+
+### Changed
+
+- Records are fetched with one `sys_category_record_mm` query per table instead
+  of a `CategoryCollection` per category and table
+- Record visibility is checked through each table's TCA enable columns instead
+  of fixed `hidden`, `starttime` and `endtime` column names
+- Child categories are resolved in bulk and cached per request, and the search
+  filter runs once per request
+
 ## [1.0.0] – 2026-09-02
 
 First public release.
