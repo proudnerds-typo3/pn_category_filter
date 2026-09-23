@@ -26,6 +26,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - Child categories are resolved in bulk and cached per request, and the search
   filter runs once per request
 
+### Fixed
+
+- `PnCategoryFilter.js` now also initialises when it is loaded after
+  `DOMContentLoaded`, for example through a dynamic `import()`
+
 ## [1.0.0] – 2026-09-02
 
 First public release.
