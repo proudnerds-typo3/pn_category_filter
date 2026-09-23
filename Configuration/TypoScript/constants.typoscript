@@ -21,6 +21,12 @@ plugin.tx_pncategoryfilter {
     # cat=plugin.tx_pncategoryfilter/display; type=boolean; label=Show active-sub-filter count badge on parent categories (FlexForm overrides this). Default on (existing behaviour).
     showActiveFilterCount = 1
 
+    # cat=plugin.tx_pncategoryfilter/search; type=boolean; label=Sort search results by relevance (a match in an earlier search field ranks higher; boost fields still come first, a visitor-chosen sort order overrides it)
+    relevanceSorting = 1
+
+    # cat=plugin.tx_pncategoryfilter/search; type=boolean; label=Show title and category suggestions while typing (FlexForm overrides this). Default on.
+    showSearchSuggestions = 1
+
     pageType {
       # cat=plugin.tx_pncategoryfilter/pageType; type=int; label=Page type for AJAX loading of filtered results
       ajaxLoadResults = 1769081246

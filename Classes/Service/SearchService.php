@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace ProudNerds\PnCategoryFilter\Service;
 
+use ProudNerds\PnCategoryFilter\Utility\TextNormalizer;
+
 /**
  * SearchService
  *
@@ -80,7 +82,7 @@ class SearchService
         $searchFieldsConfig = $settings['searchFields'] ?? 'title,description';
         $searchFields = array_map('trim', explode(',', $searchFieldsConfig));
 
-        // Validate search fields: check which fields exist across all records
+        // A field only has to exist in one of the queried tables; records without it skip it
         $availableFields = $this->getAvailableFieldsFromRecords($records);
 
         $missingFields = [];
@@ -101,86 +103,138 @@ class SearchService
             );
         }
 
-        // All fields validated, use them for searching
-        $searchFieldsToUse = $searchFields;
+        $compiledPatterns = $this->compilePatterns($searchTerm, $synonymMap);
 
-        // Split search term into words for AND logic
-        // "fonds cultuur" becomes ["fonds", "cultuur"]
-        $searchWords = array_filter(
-            array_map('trim', explode(' ', $searchTerm)),
-            fn($word) => !empty($word)
-        );
-
-        // Normalize all search words for case-insensitive matching
-        $searchWordsLower = array_map(
-            fn($word) => mb_strtolower($word, 'UTF-8'),
-            $searchWords
-        );
-
-        // PERFORMANCE OPTIMIZATION: Pre-compile regex patterns ONCE for all records.
-        //
-        // Synonym expansion uses OR logic per word group:
-        //   "cursus" expands to (cursus|opleiding|training|workshop)
-        //
-        // AND logic across groups: ALL groups must match (each word / synonym-group).
-        //
-        // Each $compiledPatterns entry is ONE pattern that matches the word OR any synonym.
-        $compiledPatterns = [];
-        foreach ($searchWordsLower as $searchWord) {
-            // Collect this word + its synonyms (if a synonym map was provided)
-            $terms = [$searchWord];
-            if (!empty($synonymMap) && isset($synonymMap[$searchWord])) {
-                foreach ($synonymMap[$searchWord] as $synonym) {
-                    $synonym = mb_strtolower(trim($synonym), 'UTF-8');
-                    if ($synonym !== '' && !in_array($synonym, $terms, true)) {
-                        $terms[] = $synonym;
-                    }
-                }
-            }
-
-            // Build word-boundary alternatives: (?:^|[\s\-...])(word1|word2|...)
-            $alternatives = implode('|', array_map(fn($t) => preg_quote($t, '/'), $terms));
-            $compiledPatterns[] = '/(?:^|[\s\-.,;:!?()\[\]{}])(?:' . $alternatives . ')/u';
-        }
-
-        // Filter records
-        return array_filter($records, function ($record) use ($compiledPatterns, $searchFieldsToUse) {
-            // PERFORMANCE: Build array of field values first, then join once
-            // More efficient than string concatenation in loop
-            $fieldValues = [];
-
-            foreach ($searchFieldsToUse as $fieldName) {
-                if (empty($fieldName)) {
-                    continue;
-                }
-
-                if (isset($record[$fieldName]) && is_string($record[$fieldName])) {
-                    // Strip HTML tags so fields like bodytext don't break word-boundary
-                    // matching and don't leak markup into the search string
-                    $fieldValues[] = strip_tags($record[$fieldName]);
-                }
-            }
-
-            // If no searchable fields found in this record, exclude it from results
-            if (empty($fieldValues)) {
+        return array_filter($records, function ($record) use ($compiledPatterns, $searchFields): bool {
+            $fieldTexts = $this->getNormalizedFieldTexts($record, $searchFields);
+            if ($fieldTexts === []) {
                 return false;
             }
 
-            // PERFORMANCE: Join array once instead of concatenating in loop
-            // Convert to lowercase once for all comparisons
-            $concatenatedFieldsLower = mb_strtolower(implode(' ', $fieldValues), 'UTF-8');
-
             // Check if ALL word groups (word OR its synonyms) are present (AND logic across groups)
-            // Using pre-compiled patterns for performance
+            $concatenated = implode(' ', $fieldTexts);
             foreach ($compiledPatterns as $pattern) {
-                if (preg_match($pattern, $concatenatedFieldsLower) !== 1) {
-                    return false; // EARLY EXIT: word group not found = no match
+                if (preg_match($pattern, $concatenated) !== 1) {
+                    return false;
                 }
             }
 
-            // All word groups found with proper word boundaries!
             return true;
         });
+    }
+
+    /**
+     * Relevance per record: for every word group, the weight of the first search field it matches in.
+     * The first configured field weighs most, so with "title,teaser,description" a title match wins.
+     *
+     * @param array<int|string,array<string,mixed>> $records Records that passed filterRecordsBySearch()
+     * @param array<string,mixed> $settings Plugin settings containing searchFields
+     * @param array<string,string[]> $synonymMap
+     * @return array<string,int> "{table}_{uid}" => score; empty when the term is too short to search
+     */
+    public function scoreRecords(array $records, string $searchTerm, array $settings, array $synonymMap = []): array
+    {
+        $searchTerm = mb_substr(trim($searchTerm), 0, self::MAX_SEARCH_LENGTH, 'UTF-8');
+        if ($searchTerm === '' || $records === [] || mb_strlen($searchTerm, 'UTF-8') < (int)($settings['searchMinChars'] ?? 3)) {
+            return [];
+        }
+
+        $searchFields = array_values(array_filter(array_map('trim', explode(',', (string)($settings['searchFields'] ?? 'title,description')))));
+        $compiledPatterns = $this->compilePatterns($searchTerm, $synonymMap);
+        $fieldCount = count($searchFields);
+
+        $scores = [];
+        foreach ($records as $record) {
+            $fieldTexts = $this->getNormalizedFieldTexts($record, $searchFields);
+            $score = 0;
+            foreach ($compiledPatterns as $pattern) {
+                foreach ($searchFields as $position => $fieldName) {
+                    if (isset($fieldTexts[$fieldName]) && preg_match($pattern, $fieldTexts[$fieldName]) === 1) {
+                        $score += $fieldCount - $position;
+                        break;
+                    }
+                }
+            }
+            $scores[($record['_tableName'] ?? '') . '_' . ($record['uid'] ?? 0)] = $score;
+        }
+
+        return $scores;
+    }
+
+    /**
+     * Whether a single text (for example a category title) matches every word of the term,
+     * with the same word-start, accent and entity rules as filterRecordsBySearch().
+     */
+    public function matchesText(string $text, string $searchTerm): bool
+    {
+        $searchTerm = mb_substr(trim($searchTerm), 0, self::MAX_SEARCH_LENGTH, 'UTF-8');
+        if ($searchTerm === '') {
+            return false;
+        }
+
+        $normalized = $this->getNormalizedFieldTexts(['text' => $text], ['text'])['text'];
+        foreach ($this->compilePatterns($searchTerm, []) as $pattern) {
+            if (preg_match($pattern, $normalized) !== 1) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * One pattern per search word: the word OR any of its synonyms, at a word start.
+     * AND logic across the patterns, OR logic within one.
+     *
+     * @param array<string,string[]> $synonymMap
+     * @return array<int,string>
+     */
+    private function compilePatterns(string $searchTerm, array $synonymMap): array
+    {
+        $searchWords = array_filter(
+            array_map('trim', explode(' ', $searchTerm)),
+            static fn($word) => $word !== ''
+        );
+
+        $compiledPatterns = [];
+        foreach ($searchWords as $searchWord) {
+            // Word and synonyms are normalized like the record text: case- and accent-insensitive.
+            // The synonym map is keyed by the lowercased word as Solr spells it, accents included.
+            $terms = [TextNormalizer::normalize($searchWord)];
+            foreach ($synonymMap[mb_strtolower($searchWord, 'UTF-8')] ?? [] as $synonym) {
+                $synonym = TextNormalizer::normalize(trim($synonym));
+                if ($synonym !== '' && !in_array($synonym, $terms, true)) {
+                    $terms[] = $synonym;
+                }
+            }
+
+            $alternatives = implode('|', array_map(static fn($t) => preg_quote($t, '/'), $terms));
+            $compiledPatterns[] = '/(?:^|[\s\-.,;:!?()\[\]{}])(?:' . $alternatives . ')/u';
+        }
+
+        return $compiledPatterns;
+    }
+
+    /**
+     * The searchable text of each configured field, as a visitor reads it: tags stripped,
+     * entities decoded, case and accents normalized. Non-string fields are left out.
+     *
+     * @param array<string,mixed> $record
+     * @param array<int,string> $searchFields
+     * @return array<string,string> field name => normalized text
+     */
+    private function getNormalizedFieldTexts(array $record, array $searchFields): array
+    {
+        $texts = [];
+        foreach ($searchFields as $fieldName) {
+            if ($fieldName !== '' && isset($record[$fieldName]) && is_string($record[$fieldName])) {
+                $texts[$fieldName] = TextNormalizer::normalize(
+                    html_entity_decode(strip_tags($record[$fieldName]), ENT_QUOTES | ENT_HTML5, 'UTF-8')
+                );
+            }
+        }
+
+        return $texts;
     }
 
     /**
@@ -222,7 +276,8 @@ class SearchService
     }
 
     /**
-     * Get list of available field names from records
+     * Field names present in any record, so every queried table contributes its columns
+     * (and added keys such as _pageContent).
      *
      * @param array $records
      * @return array List of unique field names
@@ -230,16 +285,12 @@ class SearchService
     protected function getAvailableFieldsFromRecords(array $records): array
     {
         $availableFields = [];
-
-        // Sample first 10 records to get field names (performance optimization)
-        $sampleRecords = array_slice($records, 0, 10);
-
-        foreach ($sampleRecords as $record) {
+        foreach ($records as $record) {
             if (is_array($record)) {
-                $availableFields = array_merge($availableFields, array_keys($record));
+                $availableFields += array_flip(array_keys($record));
             }
         }
 
-        return array_unique($availableFields);
+        return array_map('strval', array_keys($availableFields));
     }
 }

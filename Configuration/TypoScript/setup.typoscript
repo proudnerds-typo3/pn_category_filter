@@ -21,6 +21,8 @@ plugin.tx_pncategoryfilter {
     displayMode = {$plugin.tx_pncategoryfilter.settings.displayMode}
     showResultCount = {$plugin.tx_pncategoryfilter.settings.showResultCount}
     showActiveFilterCount = {$plugin.tx_pncategoryfilter.settings.showActiveFilterCount}
+    relevanceSorting = {$plugin.tx_pncategoryfilter.settings.relevanceSorting}
+    showSearchSuggestions = {$plugin.tx_pncategoryfilter.settings.showSearchSuggestions}
 
     pageType {
       ajaxLoadResults = {$plugin.tx_pncategoryfilter.settings.pageType.ajaxLoadResults}

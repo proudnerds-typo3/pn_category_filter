@@ -53,6 +53,15 @@
             <trans-unit id="search.minChars" resname="search.minChars">
                 <source>Minimum %s characters required</source>
             </trans-unit>
+            <trans-unit id="suggestions.label" resname="suggestions.label">
+                <source>Suggestions</source>
+            </trans-unit>
+            <trans-unit id="suggestions.count" resname="suggestions.count">
+                <source>%s suggestions available, use the arrow keys to choose</source>
+            </trans-unit>
+            <trans-unit id="suggestions.category" resname="suggestions.category">
+                <source>Category</source>
+            </trans-unit>
 
             <!-- Sort Options -->
             <trans-unit id="sort.title" resname="sort.title">

@@ -2,6 +2,16 @@
  * @classDesc Ajax helper class: load content from a URL and insert it into a target element
  */
 class ContentLoader {
+  static #FADE_DURATION = 100
+
+  /**
+   * No fade when the visitor asked for reduced motion
+   * @returns {number}
+   */
+  static get fadeDuration() {
+    return window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : ContentLoader.#FADE_DURATION
+  }
+
   /**
    * @param {string} url - The URL to fetch content from
    * @param {HTMLElement} targetElement - The element to insert the content into
@@ -16,6 +26,11 @@ class ContentLoader {
       const spinner = document.createElement('div')
       spinner.className = 'pn-category-filter__spinner'
 
+      // Request while fading out; the empty catch only prevents an unhandled-rejection
+      // warning, the await below still throws into the catch of this method.
+      const contentPromise = this.fetchContent(url, method, data)
+      contentPromise.catch(() => {})
+
       if (!append) {
         if (showSpinner) {
           await this.fadeOutContent(targetElement)
@@ -29,7 +44,7 @@ class ContentLoader {
         }
       }
 
-      const content = await this.fetchContent(url, method, data)
+      const content = await contentPromise
 
       if (append) {
         targetElement.insertAdjacentHTML('beforeend', content)
@@ -57,10 +72,11 @@ class ContentLoader {
    * @returns {Promise<void>}
    */
   static async fadeOutContent(targetElement) {
-    targetElement.classList.add('fade-out')
     const originalHeight = targetElement.offsetHeight
     targetElement.style.height = `${originalHeight}px`
-    await new Promise((resolve) => setTimeout(resolve, 150))
+    if (this.fadeDuration === 0) return
+    targetElement.classList.add('fade-out')
+    await new Promise((resolve) => setTimeout(resolve, this.fadeDuration))
   }
 
   /**
@@ -110,9 +126,11 @@ class ContentLoader {
    */
   static async replaceContent(targetElement, content) {
     targetElement.innerHTML = content
-    targetElement.classList.add('fade-in')
-    await new Promise((resolve) => setTimeout(resolve, 150))
-    targetElement.classList.remove('fade-in')
+    if (this.fadeDuration > 0) {
+      targetElement.classList.add('fade-in')
+      await new Promise((resolve) => setTimeout(resolve, this.fadeDuration))
+      targetElement.classList.remove('fade-in')
+    }
     targetElement.style.height = ''
   }
 

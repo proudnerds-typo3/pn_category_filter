@@ -10,6 +10,7 @@ use ProudNerds\PnCategoryFilter\Service\CategoryFilterService;
 use ProudNerds\PnCategoryFilter\Service\CategoryResolverService;
 use ProudNerds\PnCategoryFilter\Service\FileResolverService;
 use ProudNerds\PnCategoryFilter\Service\SearchService;
+use ProudNerds\PnCategoryFilter\Service\SuggestionService;
 use ProudNerds\PnCategoryFilter\Utility\CategoryUtility;
 use ProudNerds\PnCategoryFilter\Utility\Typo3Utility;
 use Psr\Http\Message\ResponseInterface;
@@ -60,6 +61,7 @@ class CategoryFilterController extends ActionController
         private readonly CategoryFilterService $categoryFilterService,
         private readonly FileResolverService $fileResolverService,
         private readonly CategoryResolverService $categoryResolverService,
+        private readonly SuggestionService $suggestionService,
     ) {}
 
     public function initializeView(): void
@@ -239,6 +241,7 @@ class CategoryFilterController extends ActionController
         $categoryTree = [];
         $categoryCounts = [];
         $categoryCountsMap = [];
+        $searchSuggestions = null;
 
         // Get sorting with URL override priority
         $activeSortingState = $this->getActiveSortingStateFromRequest();
@@ -288,6 +291,8 @@ class CategoryFilterController extends ActionController
                 $languageUid,
                 $filterLogic,
                 $this->getCategoryListFromFlexForm(),
+                // A visitor-chosen sort order wins over relevance, as it does over boost.
+                !$userHasSorted && (bool)($this->settings['relevanceSorting'] ?? true),
             );
 
             $records = $filteredResult->records;
@@ -311,6 +316,16 @@ class CategoryFilterController extends ActionController
                 // Built from the annotated tree — NOT from the flat $categoryCounts, which omits
                 // zero-count categories. JavaScript patches badges on data-category-uid from this map.
                 $categoryCountsMap = $this->categoryFilterService->flattenTreeCounts($categoryTree);
+            }
+
+            if ($this->suggestionsActive($searchTerm)) {
+                $searchSuggestions = $this->suggestionService->build(
+                    $records,
+                    $categoryTree,
+                    $categoryCountsMap,
+                    $searchTerm,
+                    $this->settings
+                );
             }
         }
 
@@ -358,6 +373,10 @@ class CategoryFilterController extends ActionController
             'categoryCountsJson' => $categoryCountsMap === []
                 ? ''
                 : json_encode($categoryCountsMap, JSON_THROW_ON_ERROR | JSON_HEX_TAG | JSON_HEX_AMP),
+            // Suggestions while typing; only when enabled and the term is long enough to search.
+            'searchSuggestionsJson' => $searchSuggestions === null
+                ? ''
+                : json_encode($searchSuggestions, JSON_THROW_ON_ERROR | JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE),
             'totalRecords' => count($records),
             'settings' => $this->settings,
             'selectedCategories' => $filterCategories,
@@ -371,10 +390,20 @@ class CategoryFilterController extends ActionController
             $filterCategories,
             $this->getTtContentUidFromRequest(),
             $sorting,
-            $sortField
+            $sortField,
+            $userHasSorted
         );
 
         $this->view->assign('paginationArguments', $paginationArguments);
+    }
+
+    private function suggestionsActive(string $searchTerm): bool
+    {
+        $minChars = (int)($this->settings['searchMinChars'] ?? 3);
+
+        return !empty($this->settings['showSearchForm'])
+            && !empty($this->settings['showSearchSuggestions'])
+            && mb_strlen($searchTerm, 'UTF-8') >= max(1, $minChars);
     }
 
     /**
@@ -596,13 +625,16 @@ class CategoryFilterController extends ActionController
      * @param int $ttContentUid
      * @param string $sorting
      * @param string $sortField
+     * @param bool $userHasSorted Only a visitor-chosen sort order travels along; the default must
+     *                            not, or page 2 would lose boost and relevance ordering
      * @return array
      */
     protected function buildPaginationArguments(
         array $selectedCategories,
         int $ttContentUid = 0,
         string $sorting = 'desc',
-        string $sortField = 'tstamp'
+        string $sortField = 'tstamp',
+        bool $userHasSorted = true
     ): array {
         $arguments = [
             'tx_pncategoryfilter_categoryfilterlist' => [],
@@ -617,11 +649,11 @@ class CategoryFilterController extends ActionController
             }
         }
 
-        if (!empty($sorting) && $sorting !== 'none') {
+        if ($userHasSorted && !empty($sorting) && $sorting !== 'none') {
             $arguments['tx_pncategoryfilter_categoryfilterlist']['sorting'] = $sorting;
         }
 
-        if (!empty($sortField)) {
+        if ($userHasSorted && !empty($sortField)) {
             $arguments['tx_pncategoryfilter_categoryfilterlist']['sortField'] = $sortField;
         }
 

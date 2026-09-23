@@ -18,7 +18,7 @@ class SearchManager {
    * Debounce delay in milliseconds for search input
    * @type {number}
    */
-  static DEBOUNCE_DELAY = 400
+  static DEBOUNCE_DELAY = 250
 
   /**
    * Default minimum characters for search

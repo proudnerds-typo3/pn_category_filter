@@ -181,6 +181,12 @@
             <trans-unit id="settings.showSearchForm.description" resname="settings.showSearchForm.description">
                 <source>Display a search form on the frontend, allowing users to search through filtered results</source>
             </trans-unit>
+            <trans-unit id="settings.showSearchSuggestions" resname="settings.showSearchSuggestions">
+                <source>Show suggestions while typing</source>
+            </trans-unit>
+            <trans-unit id="settings.showSearchSuggestions.description" resname="settings.showSearchSuggestions.description">
+                <source>Shows up to five matching titles and three matching categories with their result count below the search field</source>
+            </trans-unit>
 
             <trans-unit id="settings.searchFields" resname="settings.searchFields">
                 <source>Fieldnames to Search</source>

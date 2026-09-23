@@ -17,4 +17,8 @@
 <f:if condition="{categoryCountsJson}">
     <script type="application/json" data-category-counts><f:format.raw>{categoryCountsJson}</f:format.raw></script>
 </f:if>
+<f:comment><!-- Search suggestions for the combobox; json_encode with JSON_HEX_TAG|JSON_HEX_AMP, safe raw. --></f:comment>
+<f:if condition="{searchSuggestionsJson}">
+    <script type="application/json" data-suggestions-json><f:format.raw>{searchSuggestionsJson}</f:format.raw></script>
+</f:if>
 </html>

@@ -264,6 +264,16 @@
                         </config>
                     </settings.showSearchForm>
 
+                    <settings.showSearchSuggestions>
+                        <label>LLL:EXT:pn_category_filter/Resources/Private/Language/locallang_be.xlf:settings.showSearchSuggestions</label>
+                        <description>LLL:EXT:pn_category_filter/Resources/Private/Language/locallang_be.xlf:settings.showSearchSuggestions.description</description>
+                        <displayCond>FIELD:settings.showSearchForm:REQ:true</displayCond>
+                        <config>
+                            <type>check</type>
+                            <default>1</default>
+                        </config>
+                    </settings.showSearchSuggestions>
+
                     <settings.searchFields>
                         <label>LLL:EXT:pn_category_filter/Resources/Private/Language/locallang_be.xlf:settings.searchFields</label>
                         <description>LLL:EXT:pn_category_filter/Resources/Private/Language/locallang_be.xlf:settings.searchFields.description</description>

@@ -15,10 +15,12 @@ How matching works
 
 -   **Multi-word AND**: ``fonds cultuur`` matches records containing both words,
     in any order and possibly in different fields.
--   **Substring matching**: ``activ`` matches *Activiteit*, and so does ``tiv``.
--   **Case-insensitive** and **UTF-8 safe**: ``FONDS`` finds *fonds*, and
-    *café*, *naïef* and *über* behave correctly, thanks to :php:`mb_strtolower()`
-    and :php:`mb_strlen()`.
+-   **Word start**: ``activ`` matches *Activiteit* and *basis-activiteit*, but
+    ``tiv`` does not. Hyphens and punctuation count as word boundaries.
+-   **Case- and accent-insensitive**: ``FONDS`` finds *fonds*, and ``cafe``
+    finds *café*. As a side effect ``een`` and ``één`` are the same word.
+-   **As the visitor reads it**: HTML tags are stripped and entities decoded, so
+    *allergie&euml;n* in an RTE field matches ``allergieën``.
 -   **Cross-field**: the first word may match the title while the second matches
     a keyword field.
 -   All input is escaped; the search never builds SQL from user input and the
@@ -26,6 +28,21 @@ How matching works
 
 Searching runs on the records that survived the category filter, so search and
 filters always combine.
+
+..  _search-order:
+
+Result order
+============
+
+With a search term, results are ordered by relevance: a match in an earlier
+field of :ref:`searchFields <confval-flexform-searchfields>` ranks higher. With
+``title,teaser,description`` a title match comes before a teaser match, which
+comes before a match in the description. The configured sort order breaks ties.
+
+-   :ref:`Boost fields <boost-fields>` still come first.
+-   A sort order the visitor picks in the frontend overrides relevance and boost.
+-   Switch relevance off with the
+    :ref:`relevanceSorting <confval-constant-relevancesorting>` constant.
 
 Which fields are searched
 =========================
@@ -60,8 +77,35 @@ Typing behaviour
             (1–10, default 3)
         -   Nothing is searched below this length. Validated both in JavaScript
             and in PHP.
-    -   -   400 ms debounce (fixed)
+    -   -   250 ms debounce (fixed)
         -   The AJAX request only fires once typing pauses.
+    -   -   100 ms fade (fixed)
+        -   The request starts while the old results fade out. With
+            ``prefers-reduced-motion`` there is no fade.
+
+..  _search-suggestions:
+
+Suggestions while typing
+========================
+
+With :ref:`showSearchSuggestions <confval-flexform-showsearchsuggestions>` (on
+by default, switch it off per plugin instance) a list appears below the search
+input once the term reaches
+:ref:`searchMinChars <confval-flexform-searchminchars>`:
+
+-   up to three categories whose title matches the term, with their result
+    count; choosing one checks it in the filter;
+-   up to five titles of the best matching records, taken from the first field
+    of :ref:`searchFields <confval-flexform-searchfields>`; choosing one searches
+    for that title.
+
+The suggestions arrive with the results of the same request, as JSON in a
+:html:`<script type="application/json" data-suggestions-json>` element, so they
+cost no extra request.
+
+The input becomes an ARIA 1.2 combobox: arrow keys move through the list, Enter
+chooses, Escape and Tab close it, and the number of suggestions is announced
+through a live region. Without JavaScript the input stays a plain search field.
 
 Highlighting
 ============
@@ -92,8 +136,9 @@ Matched terms are wrapped by the ``HighlightSearchTermViewHelper``:
     Strip existing HTML from the content before highlighting. Useful for RTE
     content.
 
-Words shorter than three characters are skipped, and existing HTML tags are
-never broken open — only text nodes are wrapped.
+Words of three characters or shorter are skipped, and existing HTML tags are
+never broken open — only text nodes are wrapped. Matching ignores case and
+accents like the search does, so ``cafe`` marks *Café* as it is written.
 
 Every match is wrapped in :html:`<span class="result-highlight">`, which you
 style yourself:

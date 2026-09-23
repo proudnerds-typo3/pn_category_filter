@@ -14,6 +14,10 @@
  * @class
  */
 class SortingManager {
+  // The default sort order is pre-checked in the markup; only a visitor's own choice may reach
+  // the server as sorting, or boost and relevance ordering would be switched off.
+  #userHasSorted = new URLSearchParams(window.location.search).has('tx_pncategoryfilter_categoryfilterlist[sortField]')
+
   /**
    * Creates an instance of SortingManager
    *
@@ -88,6 +92,7 @@ class SortingManager {
    * @returns {void}
    */
   handleCheckboxChange(event) {
+    this.#userHasSorted = true
     const checkbox = event.target
     const sortField = checkbox.dataset.sortField
     const isChecked = checkbox.checked
@@ -126,6 +131,7 @@ class SortingManager {
    * @returns {void}
    */
   handleSelectChange(event) {
+    this.#userHasSorted = true
     const select = event.target
     const sortField = select.dataset.sortField
     const sortOrder = select.value
@@ -201,6 +207,15 @@ class SortingManager {
   }
 
   /**
+   * Whether the visitor chose a sort order, as opposed to the pre-checked default
+   *
+   * @returns {boolean}
+   */
+  hasUserSorted() {
+    return this.#userHasSorted
+  }
+
+  /**
    * Gets current sorting state
    *
    * @returns {{sortField: string, sortOrder: string}}
@@ -234,8 +249,9 @@ class SortingManager {
       this.hideSelectForField(cb.dataset.sortField)
     })
 
-    // If no sorting, we're done
+    // If no sorting, we're done; a reset also forgets the visitor's choice
     if (!sortField || sortOrder === 'none') {
+      this.#userHasSorted = false
       return
     }
 

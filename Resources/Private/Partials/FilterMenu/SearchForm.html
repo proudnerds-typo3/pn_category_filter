@@ -24,6 +24,19 @@
                 autocomplete="off"
                 minlength="{settings.searchMinChars -> f:if(then: settings.searchMinChars, else: '3')}"
             />
+            <f:if condition="{settings.showSearchSuggestions}">
+                <f:comment><!-- Listbox for the combobox; the script adds the ARIA state to the input, so
+                    without JavaScript the search field stays a plain field. --></f:comment>
+                <ul id="pn-category-filter-suggestions-{ttContentUid}"
+                    class="pn-category-filter__suggestions"
+                    role="listbox"
+                    aria-label="{f:translate(key: 'LLL:EXT:pn_category_filter/Resources/Private/Language/locallang.xlf:suggestions.label')}"
+                    data-search-suggestions
+                    data-count-label="{f:translate(key: 'LLL:EXT:pn_category_filter/Resources/Private/Language/locallang.xlf:suggestions.count')}"
+                    data-category-label="{f:translate(key: 'LLL:EXT:pn_category_filter/Resources/Private/Language/locallang.xlf:suggestions.category')}"
+                    hidden></ul>
+                <div class="pn-category-filter__suggestions-status assistive" role="status" aria-live="polite" data-search-suggestions-status></div>
+            </f:if>
         </div>
 
         <div id="pn-category-filter-search-description-{ttContentUid}" class="pn-category-filter__search-description invisible assistive">

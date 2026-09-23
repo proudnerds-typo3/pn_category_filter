@@ -56,7 +56,7 @@ What keeps it fast
 ==================
 
 -   Early-exit matching stops at the first hit per record.
--   The 400 ms search debounce cuts the number of requests dramatically.
+-   The 250 ms search debounce cuts the number of requests dramatically.
 -   No N+1 queries: one category-relation query per table, whatever the number
     of categories, and page content is fetched in batches.
 -   The category tree is resolved one level per query, and each category's

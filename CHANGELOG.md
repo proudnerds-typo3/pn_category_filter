@@ -16,6 +16,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - `categoryResolvers` TypoScript setting: attaches the categories of the
   displayed records as `uid` + `title` rows
 - `CategoryUtility::getChildCategoryUidsBulk()` as public API
+- Search results are sorted by relevance: a match in an earlier `searchFields`
+  field ranks higher. Boost fields still come first and a visitor-chosen sort
+  order overrides it; switch it off with the `relevanceSorting` constant
+- Suggestions while typing (`showSearchSuggestions`, on by default wherever the
+  search form is shown, switch it off per plugin instance): up to five matching
+  titles and three matching categories with their count, as an accessible
+  combobox; they arrive with the results, so no extra request
 
 ### Changed
 
@@ -25,9 +32,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   of fixed `hidden`, `starttime` and `endtime` column names
 - Child categories are resolved in bulk and cached per request, and the search
   filter runs once per request
+- Faster search feedback: 250 ms debounce instead of 400 ms, a 100 ms fade
+  instead of 150 ms, and the request starts while the old results fade out;
+  with `prefers-reduced-motion` there is no fade at all
+- Search and highlighting ignore accents ("cafe" finds and marks "café") and
+  decode HTML entities, so "allergie&euml;n" matches "allergieën"
 
 ### Fixed
 
+- Boost fields were ignored after the first AJAX update: the frontend always
+  sent the pre-checked default sort order, so the server treated it as a
+  visitor's choice. Sorting is now only sent, and kept in the pagination links,
+  after the visitor picked one
+- A search field that exists in only one of several queried tables no longer
+  throws "Search field(s) … do not exist"; the check used to look at the first
+  ten records only
 - `PnCategoryFilter.js` now also initialises when it is loaded after
   `DOMContentLoaded`, for example through a dynamic `import()`
 

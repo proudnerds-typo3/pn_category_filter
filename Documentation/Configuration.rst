@@ -273,6 +273,14 @@ Tab: Search Settings
 
     Render the search input.
 
+..  confval:: settings.showSearchSuggestions
+    :name: flexform-showSearchSuggestions
+    :type: boolean
+    :Default: 1
+
+    Show title and category suggestions below the search input while typing.
+    Only shown when ``showSearchForm`` is on. See :ref:`search-suggestions`.
+
 ..  confval:: settings.searchFields
     :name: flexform-searchFields
     :type: string
@@ -366,6 +374,21 @@ General settings
     :Default: 1
 
     The default for the active-sub-filter badge.
+
+..  confval:: settings.relevanceSorting
+    :name: constant-relevanceSorting
+    :type: boolean
+    :Default: 1
+
+    Sort search results by relevance. See :ref:`search-order`. This setting is
+    **not** available in the FlexForm.
+
+..  confval:: settings.showSearchSuggestions
+    :name: constant-showSearchSuggestions
+    :type: boolean
+    :Default: 1
+
+    The default for the suggestions while typing.
 
 ..  confval:: settings.pageType.ajaxLoadResults
     :name: constant-pageType

@@ -232,6 +232,14 @@
                 <source>Display a search form on the frontend, allowing users to search through filtered results</source>
                 <target>Toon een zoekformulier op de frontend, waarmee gebruikers door de gefilterde resultaten kunnen zoeken</target>
             </trans-unit>
+            <trans-unit id="settings.showSearchSuggestions" resname="settings.showSearchSuggestions">
+                <source>Show suggestions while typing</source>
+                <target>Toon suggesties tijdens het typen</target>
+            </trans-unit>
+            <trans-unit id="settings.showSearchSuggestions.description" resname="settings.showSearchSuggestions.description">
+                <source>Shows up to five matching titles and three matching categories with their result count below the search field</source>
+                <target>Toont onder het zoekveld tot vijf passende titels en drie passende categorieën met hun aantal resultaten</target>
+            </trans-unit>
 
             <trans-unit id="settings.searchFields" resname="settings.searchFields">
                 <source>Fieldnames to Search</source>

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ProudNerds\PnCategoryFilter\ViewHelpers;
 
+use ProudNerds\PnCategoryFilter\Utility\TextNormalizer;
 use TYPO3Fluid\Fluid\Core\Rendering\RenderingContextInterface;
 use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
 
@@ -100,32 +101,76 @@ class HighlightSearchTermViewHelper extends AbstractViewHelper
             return $text;
         }
 
+        $searchWords = array_map(static fn(string $word): string => TextNormalizer::normalize($word), $searchWords);
+
         // Apply highlighting based on mode
         return $stripTags
-            ? self::highlightInPlainText($text, $searchWords)
+            ? self::highlightSegment($text, $searchWords)
             : self::highlightPreservingHtml($text, $searchWords);
     }
 
     /**
-     * Highlight search words in plain text (HTML tags already stripped)
+     * Highlight search words in a piece of text without tags.
      *
-     * @param string $text The plain text to process
-     * @param array<int, string> $searchWords Array of words to highlight
-     * @return string Text with highlighted search terms
+     * Matching runs on a normalized copy (case and accents ignored) while the original characters
+     * are kept; an entity such as &eacute; counts as one character, so no span can split it.
+     *
+     * @param array<int, string> $searchWords Normalized words to highlight
      */
-    private static function highlightInPlainText(string $text, array $searchWords): string
+    private static function highlightSegment(string $text, array $searchWords): string
     {
-        foreach ($searchWords as $word) {
-            $escapedWord = preg_quote($word, '/');
-            $replacement = sprintf(self::HIGHLIGHT_WRAPPER, '$1');
-            $text = (string)preg_replace(
-                '/(' . $escapedWord . ')/iu',
-                $replacement,
-                $text
-            );
+        if (preg_match_all('/&#?[a-z0-9]+;|./isu', $text, $matches) === false) {
+            return $text;
+        }
+        $units = $matches[0];
+
+        // Normalized text plus, per normalized character, the index of the unit it came from.
+        $normalized = '';
+        $unitByPosition = [];
+        foreach ($units as $index => $unit) {
+            $plain = $unit[0] === '&' && strlen($unit) > 1
+                ? html_entity_decode($unit, ENT_QUOTES | ENT_HTML5, 'UTF-8')
+                : $unit;
+            $normalizedUnit = TextNormalizer::normalize($plain);
+            $normalized .= $normalizedUnit;
+            for ($i = mb_strlen($normalizedUnit, 'UTF-8'); $i > 0; $i--) {
+                $unitByPosition[] = $index;
+            }
         }
 
-        return $text;
+        $marked = [];
+        foreach ($searchWords as $word) {
+            $length = mb_strlen($word, 'UTF-8');
+            $offset = 0;
+            while ($length > 0 && ($position = mb_strpos($normalized, $word, $offset, 'UTF-8')) !== false) {
+                for ($i = $position; $i < $position + $length; $i++) {
+                    $marked[$unitByPosition[$i]] = true;
+                }
+                $offset = $position + $length;
+            }
+        }
+        if ($marked === []) {
+            return $text;
+        }
+
+        $result = '';
+        $run = '';
+        foreach ($units as $index => $unit) {
+            if (isset($marked[$index])) {
+                $run .= $unit;
+                continue;
+            }
+            if ($run !== '') {
+                $result .= sprintf(self::HIGHLIGHT_WRAPPER, $run);
+                $run = '';
+            }
+            $result .= $unit;
+        }
+        if ($run !== '') {
+            $result .= sprintf(self::HIGHLIGHT_WRAPPER, $run);
+        }
+
+        return $result;
     }
 
     /**
@@ -135,41 +180,25 @@ class HighlightSearchTermViewHelper extends AbstractViewHelper
      * by the highlighting process. Only text content between tags is highlighted.
      *
      * @param string $text The HTML text to process
-     * @param array<int, string> $searchWords Array of words to highlight
+     * @param array<int, string> $searchWords Normalized words to highlight
      * @return string HTML text with highlighted search terms
      */
     private static function highlightPreservingHtml(string $text, array $searchWords): string
     {
-        foreach ($searchWords as $word) {
-            // Escape the search word for safe use in regex
-            $escapedWord = preg_quote($word, '/');
-            $replacement = sprintf(self::HIGHLIGHT_WRAPPER, '$1');
+        // Split content into HTML tags (left unchanged) and the text between them
+        return (string)preg_replace_callback(
+            '/(<[^>]*>)|([^<]+)/ius',
+            static function (array $matches) use ($searchWords): string {
+                if (!empty($matches[1])) {
+                    return $matches[1];
+                }
+                if (!empty($matches[2])) {
+                    return self::highlightSegment($matches[2], $searchWords);
+                }
 
-            // Split content into HTML tags and text content
-            // This regex matches either HTML tags (including attributes) OR text content between tags
-            $text = (string)preg_replace_callback(
-                '/(<[^>]*>)|([^<]+)/ius',
-                static function (array $matches) use ($escapedWord, $replacement): string {
-                    // $matches[1] contains HTML tags (including attributes) - leave unchanged
-                    if (!empty($matches[1])) {
-                        return $matches[1];
-                    }
-
-                    // $matches[2] contains text content - apply highlighting
-                    if (!empty($matches[2])) {
-                        return (string)preg_replace(
-                            '/(' . $escapedWord . ')/iu',
-                            $replacement,
-                            $matches[2]
-                        );
-                    }
-
-                    return $matches[0];
-                },
-                $text
-            );
-        }
-
-        return $text;
+                return $matches[0];
+            },
+            $text
+        );
     }
 }

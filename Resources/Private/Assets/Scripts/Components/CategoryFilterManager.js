@@ -12,6 +12,7 @@ import ContentLoader from '../Utils/ContentLoader.js'
 import LoadingManager from '../Utils/LoadingManager.js'
 import SortingManager from './SortingManager.js'
 import SearchManager from './SearchManager.js'
+import SuggestionManager from './SuggestionManager.js'
 
 /**
  * Manages category filtering with AJAX
@@ -53,6 +54,7 @@ class CategoryFilterManager {
       this.searchManager = new SearchManager(searchForm, (searchTerm) => {
         this.handleSearchChange(searchTerm)
       })
+      this.#createSuggestionManager(searchForm)
     }
 
     this.init()
@@ -165,7 +167,10 @@ class CategoryFilterManager {
           if (previousTerm) {
             this.searchManager.setSearchTerm(previousTerm)
           }
+          this.#createSuggestionManager(newSearchForm)
         }
+
+        this.suggestionManager?.update(this.#readSuggestions())
 
         // Re-attach SortingManager when sort UI is inside the replaced results container
         // (vertical displayMode renders FilterMenu/Actions in Results.html).
@@ -184,6 +189,44 @@ class CategoryFilterManager {
         this.applyResultCounts()
       }
     })
+  }
+
+  /**
+   * @param {HTMLFormElement} searchForm
+   * @returns {void}
+   */
+  #createSuggestionManager(searchForm) {
+    this.suggestionManager = SuggestionManager.isEnabled(searchForm)
+      ? new SuggestionManager(searchForm, {
+          onSelectTitle: (title) => this.handleSearchChange(title),
+          onSelectCategory: (categoryUid) => this.#selectCategory(categoryUid),
+        })
+      : null
+  }
+
+  /**
+   * @returns {Object|null} Suggestions shipped with the latest results update
+   */
+  #readSuggestions() {
+    const element = this.resultsContainer.querySelector('[data-suggestions-json]')
+    if (!element) return null
+    try {
+      return JSON.parse(element.textContent)
+    } catch {
+      return null
+    }
+  }
+
+  /**
+   * @param {string} categoryUid
+   * @returns {void}
+   */
+  #selectCategory(categoryUid) {
+    const checkbox = Array.from(this.checkboxes).find((cb) => cb.value === categoryUid)
+    if (checkbox && !checkbox.checked) {
+      checkbox.checked = true
+      this.handleFilterChange()
+    }
   }
 
   /**
@@ -301,7 +344,7 @@ class CategoryFilterManager {
     // This tells the server to use default behavior (show all records from FlexForm categories)
 
     // Add sorting parameters if SortingManager is available
-    if (this.sortingManager) {
+    if (this.sortingManager?.hasUserSorted()) {
       const { sortField, sortOrder } = this.sortingManager.getCurrentSorting()
       if (sortField && sortOrder !== 'none') {
         formData['tx_pncategoryfilter_categoryfilterlist[sorting]'] = sortOrder

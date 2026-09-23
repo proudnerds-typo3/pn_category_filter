@@ -61,6 +61,7 @@ class CategoryFilterService
      * @param int $language Language UID for Solr synonym lookup (default 0)
      * @param string $combineMode How selected categories combine: 'expand' (union) or 'facet' (OR within facet, AND across facets)
      * @param array $rootCategories Configured root category UIDs from FlexForm (required to resolve facets in 'facet' mode)
+     * @param bool $relevanceSorting Order search results by relevance before the sort field (boost still first)
      * @return FilteredRecordsResult Filtered records plus per-category match counts
      * @throws Exception
      */
@@ -80,6 +81,7 @@ class CategoryFilterService
         int $language = 0,
         string $combineMode = self::COMBINE_EXPAND,
         array $rootCategories = [],
+        bool $relevanceSorting = false,
     ): FilteredRecordsResult {
         // Build the matched record set according to the combine mode.
         // Both branches produce the COMPLETE set (no slicing) — limit/pagination run later.
@@ -162,8 +164,12 @@ class CategoryFilterService
             $unionRecords = $this->searchService->filterRecordsBySearch($unionRecords, $searchTerm, $settings, $synonymMap);
         }
         $survivorKeys = $this->extractRecordKeys($unionRecords);
+        $relevanceScores = [];
         if (!empty($searchTerm)) {
             $allRecords = $this->restrictRecordsToKeys($allRecords, $survivorKeys);
+            if ($relevanceSorting) {
+                $relevanceScores = $this->searchService->scoreRecords($allRecords, $searchTerm, $settings, $synonymMap);
+            }
         }
 
         // Count matches per category on the COMPLETE set (before limit/pagination), search-aware.
@@ -186,8 +192,8 @@ class CategoryFilterService
         $counts = array_map('count', $survivingCategoryKeys);
 
         // Apply sorting and boost in a single combined pass for performance
-        if ($sorting !== self::SORT_NONE || !empty($boostFields)) {
-            $allRecords = $this->sortAndBoostRecords($allRecords, $sorting, $sortField, $boostFields);
+        if ($sorting !== self::SORT_NONE || !empty($boostFields) || $relevanceScores !== []) {
+            $allRecords = $this->sortAndBoostRecords($allRecords, $sorting, $sortField, $boostFields, $relevanceScores);
         }
 
         // Apply limit if set
@@ -601,6 +607,7 @@ class CategoryFilterService
      * @param string $sorting 'asc', 'desc', or 'none'
      * @param string $sortField Field name(s) to use for sorting (comma-separated)
      * @param string $boostFields Comma-separated boolean field names that float records to the top
+     * @param array<string,int> $relevanceScores "{table}_{uid}" => score; a higher score sorts first, the sort field breaks ties
      * @return array
      * @throws \RuntimeException If sort field doesn't exist in any of the records
      */
@@ -608,7 +615,8 @@ class CategoryFilterService
         array $records,
         string $sorting,
         string $sortField = 'tstamp',
-        string $boostFields = ''
+        string $boostFields = '',
+        array $relevanceScores = []
     ): array {
         if (empty($records)) {
             return $records;
@@ -623,6 +631,8 @@ class CategoryFilterService
         $failedRecords = [];
 
         foreach ($records as $key => $record) {
+            $records[$key]['_relevance'] = $relevanceScores[($record['_tableName'] ?? '') . '_' . ($record['uid'] ?? 0)] ?? 0;
+
             // Boost detection
             $records[$key]['_boosted'] = false;
             foreach ($boostFieldList as $field) {
@@ -662,13 +672,17 @@ class CategoryFilterService
             );
         }
 
-        // Sort if needed
-        if ($sorting !== self::SORT_NONE) {
-            if ($sorting === self::SORT_ASC) {
-                usort($records, fn($a, $b) => $a['_sortKey'] <=> $b['_sortKey']);
-            } else {
-                usort($records, fn($a, $b) => $b['_sortKey'] <=> $a['_sortKey']);
-            }
+        // Sort if needed; usort() is stable, so SORT_NONE keeps the fetch order within equal relevance
+        if ($sorting !== self::SORT_NONE || $relevanceScores !== []) {
+            $direction = $sorting === self::SORT_ASC ? 1 : -1;
+            usort($records, static function (array $a, array $b) use ($sorting, $direction): int {
+                $byRelevance = $b['_relevance'] <=> $a['_relevance'];
+                if ($byRelevance !== 0 || $sorting === self::SORT_NONE) {
+                    return $byRelevance;
+                }
+
+                return $direction * ($a['_sortKey'] <=> $b['_sortKey']);
+            });
         }
 
         // Stable partition: boosted records first, preserving order within each group.
@@ -680,7 +694,7 @@ class CategoryFilterService
             $boosted = [];
             $normal = [];
             foreach ($records as $record) {
-                unset($record['_sortKey']);
+                unset($record['_sortKey'], $record['_relevance']);
                 if ($record['_boosted']) {
                     unset($record['_boosted']);
                     $boosted[] = $record;
@@ -694,7 +708,7 @@ class CategoryFilterService
 
         // No boost: just clean up temp keys
         foreach ($records as $key => $record) {
-            unset($records[$key]['_sortKey'], $records[$key]['_boosted']);
+            unset($records[$key]['_sortKey'], $records[$key]['_boosted'], $records[$key]['_relevance']);
         }
 
         return $records;
