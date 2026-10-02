@@ -17,7 +17,6 @@ ExtensionUtility::configurePlugin(
     [
         CategoryFilterController::class => 'ajaxLoadResults',
     ],
-    ExtensionUtility::PLUGIN_TYPE_CONTENT_ELEMENT,
 );
 
 // Register cache for Solr synonyms (used by SynonymService)

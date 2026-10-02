@@ -14,9 +14,9 @@ use ProudNerds\PnCategoryFilter\Service\SuggestionService;
 use ProudNerds\PnCategoryFilter\Utility\CategoryUtility;
 use ProudNerds\PnCategoryFilter\Utility\Typo3Utility;
 use Psr\Http\Message\ResponseInterface;
+use TYPO3\CMS\Core\Configuration\FlexForm\FlexFormTools;
 use TYPO3\CMS\Core\Pagination\ArrayPaginator;
 use TYPO3\CMS\Core\Pagination\SlidingWindowPagination;
-use TYPO3\CMS\Core\Service\FlexFormService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 use TYPO3\CMS\Extbase\Mvc\Exception\InvalidArgumentValueException;
@@ -62,6 +62,7 @@ class CategoryFilterController extends ActionController
         private readonly FileResolverService $fileResolverService,
         private readonly CategoryResolverService $categoryResolverService,
         private readonly SuggestionService $suggestionService,
+        private readonly FlexFormTools $flexFormTools,
     ) {}
 
     public function initializeView(): void
@@ -128,7 +129,6 @@ class CategoryFilterController extends ActionController
 
         // Generate URL for pushState with selected categories (if enabled)
         $pageId = $this->request->getAttribute('routing')->getPageId();
-        $selectedCategories = $this->getCategoryListForFiltering();
         $pushStateBaseUrl = '';
 
         $activeSortingState = $this->getActiveSortingStateFromRequest();
@@ -378,8 +378,6 @@ class CategoryFilterController extends ActionController
 
         // Base arguments for pagination links
         $paginationArguments = $this->buildPaginationArguments(
-            $filterCategories,
-            $this->getTtContentUidFromRequest(),
             $sorting,
             $sortField,
             $userHasSorted
@@ -612,8 +610,6 @@ class CategoryFilterController extends ActionController
     /**
      * Build pagination arguments
      *
-     * @param array $selectedCategories
-     * @param int $ttContentUid
      * @param string $sorting
      * @param string $sortField
      * @param bool $userHasSorted Only a visitor-chosen sort order travels along; the default must
@@ -621,8 +617,6 @@ class CategoryFilterController extends ActionController
      * @return array
      */
     protected function buildPaginationArguments(
-        array $selectedCategories,
-        int $ttContentUid = 0,
         string $sorting = 'desc',
         string $sortField = 'tstamp',
         bool $userHasSorted = true
@@ -721,8 +715,7 @@ class CategoryFilterController extends ActionController
 
         $piFlexform = $rows[0]['pi_flexform'] ?? null;
         if (!empty($piFlexform)) {
-            $flexFormService = GeneralUtility::makeInstance(FlexFormService::class);
-            $flexformSettings = $flexFormService->convertFlexFormContentToArray($piFlexform);
+            $flexformSettings = $this->flexFormTools->convertFlexFormContentToArray($piFlexform);
             $this->settings = array_merge($this->settings, $flexformSettings['settings'] ?? []);
         }
     }

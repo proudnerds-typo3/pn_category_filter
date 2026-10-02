@@ -5,7 +5,7 @@
  *
  * @module SortingManager
  * @author ProudNerds
- * @version 1.1.0
+ * @version 2.0.0
  */
 
 /**
@@ -16,7 +16,9 @@
 class SortingManager {
   // The default sort order is pre-checked in the markup; only a visitor's own choice may reach
   // the server as sorting, or boost and relevance ordering would be switched off.
-  #userHasSorted = new URLSearchParams(window.location.search).has('tx_pncategoryfilter_categoryfilterlist[sortField]')
+  #userHasSorted = new URLSearchParams(window.location.search).has(
+    'tx_pncategoryfilter_categoryfilterlist[sortField]'
+  )
 
   /**
    * Creates an instance of SortingManager
@@ -28,8 +30,12 @@ class SortingManager {
   constructor(sortContainer, onSortChange) {
     this.sortContainer = sortContainer
     this.onSortChange = onSortChange
-    this.checkboxes = sortContainer.querySelectorAll('.pn-category-filter__sort-checkbox')
-    this.selects = sortContainer.querySelectorAll('.pn-category-filter__sort-select')
+    this.checkboxes = sortContainer.querySelectorAll(
+      '.pn-category-filter__sort-checkbox'
+    )
+    this.selects = sortContainer.querySelectorAll(
+      '.pn-category-filter__sort-select'
+    )
 
     this.init()
   }
@@ -180,7 +186,9 @@ class SortingManager {
    * @returns {HTMLSelectElement|null}
    */
   getSelectForField(sortField) {
-    return this.sortContainer.querySelector(`.pn-category-filter__sort-select[data-sort-field="${sortField}"]`)
+    return this.sortContainer.querySelector(
+      `.pn-category-filter__sort-select[data-sort-field="${sortField}"]`
+    )
   }
 
   /**
@@ -190,7 +198,9 @@ class SortingManager {
    * @returns {HTMLInputElement|null}
    */
   getCheckboxForField(sortField) {
-    return this.sortContainer.querySelector(`.pn-category-filter__sort-checkbox[data-sort-field="${sortField}"]`)
+    return this.sortContainer.querySelector(
+      `.pn-category-filter__sort-checkbox[data-sort-field="${sortField}"]`
+    )
   }
 
   /**

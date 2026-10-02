@@ -51,7 +51,11 @@ class SuggestionManager {
     this.#input.setAttribute('aria-controls', this.#listbox.id)
 
     // Capture on the form so these keys are handled before the search input's own Enter/Escape handling
-    searchForm.addEventListener('keydown', (event) => this.#handleKeydown(event), true)
+    searchForm.addEventListener(
+      'keydown',
+      (event) => this.#handleKeydown(event),
+      true
+    )
     this.#input.addEventListener('blur', () => this.close())
     this.#input.addEventListener('input', () => {
       this.#waitForInput = false
@@ -62,7 +66,9 @@ class SuggestionManager {
     })
 
     // Keep focus in the input while choosing with the mouse
-    this.#listbox.addEventListener('mousedown', (event) => event.preventDefault())
+    this.#listbox.addEventListener('mousedown', (event) =>
+      event.preventDefault()
+    )
     this.#listbox.addEventListener('click', (event) => {
       const option = event.target.closest('[role="option"]')
       if (option) {
@@ -88,13 +94,22 @@ class SuggestionManager {
 
     const categoryLabel = this.#listbox.dataset.categoryLabel || 'Category'
     categories.forEach((category) => {
-      this.#addOption('category', String(category.uid), `${categoryLabel}: ${category.title} (${category.count})`)
+      this.#addOption(
+        'category',
+        String(category.uid),
+        `${categoryLabel}: ${category.title} (${category.count})`
+      )
     })
     titles.forEach((title) => this.#addOption('title', title, title))
 
-    if (this.#options.length === 0 || this.#waitForInput || document.activeElement !== this.#input) {
+    if (
+      this.#options.length === 0 ||
+      this.#waitForInput ||
+      document.activeElement !== this.#input
+    ) {
       this.close()
-      if (this.#status && this.#options.length === 0) this.#status.textContent = ''
+      if (this.#status && this.#options.length === 0)
+        this.#status.textContent = ''
       return
     }
 
@@ -106,7 +121,9 @@ class SuggestionManager {
     this.#input.setAttribute('aria-expanded', 'true')
     this.#input.removeAttribute('aria-activedescendant')
     if (this.#status) {
-      this.#status.textContent = (this.#listbox.dataset.countLabel || '%s').replace('%s', String(this.#options.length))
+      this.#status.textContent = (
+        this.#listbox.dataset.countLabel || '%s'
+      ).replace('%s', String(this.#options.length))
     }
   }
 
@@ -159,7 +176,11 @@ class SuggestionManager {
         break
       case 'ArrowUp':
         event.preventDefault()
-        this.#setActive(this.#activeIndex <= 0 ? this.#options.length - 1 : this.#activeIndex - 1)
+        this.#setActive(
+          this.#activeIndex <= 0
+            ? this.#options.length - 1
+            : this.#activeIndex - 1
+        )
         break
       case 'Enter':
         if (this.#activeIndex >= 0) {
@@ -183,7 +204,9 @@ class SuggestionManager {
   }
 
   #setActive(index) {
-    this.#options.forEach((option, i) => option.setAttribute('aria-selected', String(i === index)))
+    this.#options.forEach((option, i) =>
+      option.setAttribute('aria-selected', String(i === index))
+    )
     this.#activeIndex = index
     if (index >= 0) {
       this.#input.setAttribute('aria-activedescendant', this.#options[index].id)

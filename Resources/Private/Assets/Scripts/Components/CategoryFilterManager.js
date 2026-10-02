@@ -5,7 +5,7 @@
  *
  * @module CategoryFilterManager
  * @author ProudNerds
- * @version 1.1.0
+ * @version 2.0.0
  */
 
 import ContentLoader from '../Utils/ContentLoader.js'
@@ -28,13 +28,19 @@ class CategoryFilterManager {
    */
   constructor(filterContainer) {
     this.filterContainer = filterContainer
-    this.resultsContainer = document.querySelector('.pn-category-filter__results')
-    this.checkboxes = filterContainer.querySelectorAll('.pn-category-filter__category-checkbox')
+    this.resultsContainer = document.querySelector(
+      '.pn-category-filter__results'
+    )
+    this.checkboxes = filterContainer.querySelectorAll(
+      '.pn-category-filter__category-checkbox'
+    )
     this.isResetting = false
     this.pendingReload = false
 
     // Look up the root container to find elements placed outside the menu aside (vertical mode)
-    this.filterRoot = filterContainer.closest('.pn-category-filter') ?? filterContainer.parentElement
+    this.filterRoot =
+      filterContainer.closest('.pn-category-filter') ??
+      filterContainer.parentElement
     const filterRoot = this.filterRoot
 
     // Initialize SortingManager if sort container exists
@@ -42,8 +48,8 @@ class CategoryFilterManager {
       filterContainer.querySelector('.pn-category-filter__sort') ??
       filterRoot?.querySelector('.pn-category-filter__sort')
     if (sortContainer) {
-      this.sortingManager = new SortingManager(sortContainer, (sortData) => {
-        this.handleSortChange(sortData)
+      this.sortingManager = new SortingManager(sortContainer, () => {
+        this.handleSortChange()
       })
     }
 
@@ -51,8 +57,8 @@ class CategoryFilterManager {
       filterContainer.querySelector('.pn-category-filter__search-form') ??
       filterRoot?.querySelector('.pn-category-filter__search-form')
     if (searchForm) {
-      this.searchManager = new SearchManager(searchForm, (searchTerm) => {
-        this.handleSearchChange(searchTerm)
+      this.searchManager = new SearchManager(searchForm, () => {
+        this.handleSearchChange()
       })
       this.#createSuggestionManager(searchForm)
     }
@@ -148,21 +154,27 @@ class CategoryFilterManager {
         // but always re-attach SearchManager and update badges.
         if (!this.isResetting) {
           // Look for pushstate URL in the updated content
-          const pushStateElement = this.resultsContainer.querySelector('[data-pushstate-url]')
+          const pushStateElement = this.resultsContainer.querySelector(
+            '[data-pushstate-url]'
+          )
           if (pushStateElement && pushStateElement.dataset.pushstateUrl) {
             // Decode the URL to make it readable in the browser address bar
-            const decodedUrl = decodeURIComponent(pushStateElement.dataset.pushstateUrl)
+            const decodedUrl = decodeURIComponent(
+              pushStateElement.dataset.pushstateUrl
+            )
             window.history.pushState({}, '', decodedUrl)
           }
         }
 
         // Re-attach SearchManager to the new form element if the form is inside the
         // results container (it gets replaced on every AJAX update).
-        const newSearchForm = this.resultsContainer.querySelector('.pn-category-filter__search-form')
+        const newSearchForm = this.resultsContainer.querySelector(
+          '.pn-category-filter__search-form'
+        )
         if (newSearchForm && this.searchManager) {
           const previousTerm = this.searchManager.getSearchTerm()
-          this.searchManager = new SearchManager(newSearchForm, (searchTerm) => {
-            this.handleSearchChange(searchTerm)
+          this.searchManager = new SearchManager(newSearchForm, () => {
+            this.handleSearchChange()
           })
           if (previousTerm) {
             this.searchManager.setSearchTerm(previousTerm)
@@ -174,11 +186,13 @@ class CategoryFilterManager {
 
         // Re-attach SortingManager when sort UI is inside the replaced results container
         // (vertical displayMode renders FilterMenu/Actions in Results.html).
-        const newSortContainer = this.resultsContainer.querySelector('.pn-category-filter__sort')
+        const newSortContainer = this.resultsContainer.querySelector(
+          '.pn-category-filter__sort'
+        )
         if (newSortContainer) {
           const userHasSorted = this.sortingManager?.hasUserSorted() ?? false
-          this.sortingManager = new SortingManager(newSortContainer, (sortData) => {
-            this.handleSortChange(sortData)
+          this.sortingManager = new SortingManager(newSortContainer, () => {
+            this.handleSortChange()
           })
           if (userHasSorted) {
             this.sortingManager.setUserHasSorted(true)
@@ -202,11 +216,11 @@ class CategoryFilterManager {
   #createSuggestionManager(searchForm) {
     this.suggestionManager = SuggestionManager.isEnabled(searchForm)
       ? new SuggestionManager(searchForm, {
-          onSelectTitle: (title) => {
+          onSelectTitle: () => {
             this.searchManager?.clearDebounce()
-            this.handleSearchChange(title)
+            this.handleSearchChange()
           },
-          onSelectCategory: (categoryUid) => this.#selectCategory(categoryUid),
+          onSelectCategory: (categoryUid) => this.#selectCategory(categoryUid)
         })
       : null
   }
@@ -215,7 +229,9 @@ class CategoryFilterManager {
    * @returns {Object|null} Suggestions shipped with the latest results update
    */
   #readSuggestions() {
-    const element = this.resultsContainer.querySelector('[data-suggestions-json]')
+    const element = this.resultsContainer.querySelector(
+      '[data-suggestions-json]'
+    )
     if (!element) return null
     try {
       return JSON.parse(element.textContent)
@@ -229,7 +245,9 @@ class CategoryFilterManager {
    * @returns {void}
    */
   #selectCategory(categoryUid) {
-    const checkbox = Array.from(this.checkboxes).find((cb) => cb.value === categoryUid)
+    const checkbox = Array.from(this.checkboxes).find(
+      (cb) => cb.value === categoryUid
+    )
     if (checkbox && !checkbox.checked) {
       checkbox.checked = true
       this.handleFilterChange()
@@ -246,22 +264,20 @@ class CategoryFilterManager {
   }
 
   /**
-   * Handles sort change event from SortingManager
+   * Handles sort change event from SortingManager; the reload reads the current sorting from it
    *
-   * @param {Object} _sortData - Sort data (unused, kept for interface consistency)
    * @returns {Promise<void>}
    */
-  async handleSortChange(_sortData) {
+  async handleSortChange() {
     await this.queueResultsReload()
   }
 
   /**
-   * Handles search change event from SearchManager
+   * Handles search change event from SearchManager; the reload reads the current term from it
    *
-   * @param {string} _searchTerm - Search term (unused, kept for interface consistency)
    * @returns {Promise<void>}
    */
-  async handleSearchChange(_searchTerm) {
+  async handleSearchChange() {
     await this.queueResultsReload()
   }
 
@@ -339,12 +355,16 @@ class CategoryFilterManager {
     })
 
     // Add selected categories (sorted by ID to ensure consistent URL parameter order)
-    const selectedCategories = checkedBoxes.map((cb) => cb.value).sort((a, b) => parseInt(a, 10) - parseInt(b, 10))
+    const selectedCategories = checkedBoxes
+      .map((cb) => cb.value)
+      .sort((a, b) => parseInt(a, 10) - parseInt(b, 10))
 
     if (selectedCategories.length > 0) {
       // Add each selected category
       selectedCategories.forEach((categoryId, index) => {
-        formData[`tx_pncategoryfilter_categoryfilterlist[selectedCategories][${index}]`] = categoryId
+        formData[
+          `tx_pncategoryfilter_categoryfilterlist[selectedCategories][${index}]`
+        ] = categoryId
       })
     }
     // When no categories selected (reset), don't add selectedCategories key at all
@@ -355,7 +375,8 @@ class CategoryFilterManager {
       const { sortField, sortOrder } = this.sortingManager.getCurrentSorting()
       if (sortField && sortOrder !== 'none') {
         formData['tx_pncategoryfilter_categoryfilterlist[sorting]'] = sortOrder
-        formData['tx_pncategoryfilter_categoryfilterlist[sortField]'] = sortField
+        formData['tx_pncategoryfilter_categoryfilterlist[sortField]'] =
+          sortField
       }
     }
 
@@ -405,7 +426,11 @@ class CategoryFilterManager {
     // Parse selected categories from URL - URLSearchParams handles the [] in parameter names
     urlParams.forEach((value, key) => {
       // Match both formats: [selectedCategories][] and [selectedCategories][0], [selectedCategories][1], etc.
-      if (key.includes('tx_pncategoryfilter_categoryfilterlist[selectedCategories]')) {
+      if (
+        key.includes(
+          'tx_pncategoryfilter_categoryfilterlist[selectedCategories]'
+        )
+      ) {
         selectedCategories.push(parseInt(value, 10))
       }
     })
@@ -430,22 +455,30 @@ class CategoryFilterManager {
    * @returns {void}
    */
   updateCategoryAmounts() {
-    const parentCategories = this.filterContainer.querySelectorAll('[data-has-children="true"]')
+    const parentCategories = this.filterContainer.querySelectorAll(
+      '[data-has-children="true"]'
+    )
 
     parentCategories.forEach((parentItem) => {
-      const amountBadge = parentItem.querySelector('.pn-category-filter__amount')
+      const amountBadge = parentItem.querySelector(
+        '.pn-category-filter__amount'
+      )
 
       if (!amountBadge) {
         return
       }
 
-      const childCheckboxes = parentItem.querySelectorAll('.pn-category-filter__category-checkbox')
+      const childCheckboxes = parentItem.querySelectorAll(
+        '.pn-category-filter__category-checkbox'
+      )
 
       // Count how many children are checked
-      const activeChildCount = Array.from(childCheckboxes).filter((cb) => cb.checked).length
+      const activeChildCount = Array.from(childCheckboxes).filter(
+        (cb) => cb.checked
+      ).length
 
       if (activeChildCount > 0) {
-        amountBadge.textContent = activeChildCount
+        amountBadge.textContent = String(activeChildCount)
         amountBadge.classList.remove('hidden')
       } else {
         amountBadge.classList.add('hidden')
@@ -475,7 +508,9 @@ class CategoryFilterManager {
       return
     }
 
-    const countsScript = this.resultsContainer.querySelector('script[data-category-counts]')
+    const countsScript = this.resultsContainer.querySelector(
+      'script[data-category-counts]'
+    )
     if (!countsScript) {
       return
     }
@@ -533,12 +568,16 @@ class CategoryFilterManager {
    * @private
    */
   #toggleLeafEmptyState(node, isEmpty) {
-    const emptyModifier = node.classList.contains('pn-category-filter__category-child')
+    const emptyModifier = node.classList.contains(
+      'pn-category-filter__category-child'
+    )
       ? 'pn-category-filter__category-child--empty'
       : 'pn-category-filter__category-item--empty'
     node.classList.toggle(emptyModifier, isEmpty)
 
-    const checkbox = node.querySelector('.pn-category-filter__category-checkbox')
+    const checkbox = node.querySelector(
+      '.pn-category-filter__category-checkbox'
+    )
     if (checkbox) {
       // Never disable a checked leaf: disabling it would trap the selection (WCAG 2.1.2) —
       // the user could no longer uncheck it. A checked-but-empty leaf keeps its --empty
@@ -581,7 +620,10 @@ class CategoryFilterManager {
           )
 
           // Scroll to results container after pagination
-          this.resultsContainer.scrollIntoView({ behavior: 'smooth', block: 'start' })
+          this.resultsContainer.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+          })
         } catch (error) {
           console.error('Error loading paginated results:', error)
         } finally {
@@ -605,7 +647,9 @@ class CategoryFilterManager {
    * @returns {void}
    */
   attachMobileToggleListener() {
-    const toggleButtons = this.filterContainer.querySelectorAll('.pn-category-filter__toggle')
+    const toggleButtons = this.filterContainer.querySelectorAll(
+      '.pn-category-filter__toggle'
+    )
 
     if (toggleButtons.length === 0) {
       return
@@ -641,7 +685,8 @@ class CategoryFilterManager {
     document.addEventListener('click', (e) => {
       const isOverlayOpen = targetElement.classList.contains('is-open')
       const clickedOutside =
-        !targetElement.contains(e.target) && !Array.from(toggleButtons).some((btn) => btn.contains(e.target))
+        !targetElement.contains(e.target) &&
+        !Array.from(toggleButtons).some((btn) => btn.contains(e.target))
 
       if (isOverlayOpen && clickedOutside) {
         this.#closeMobileOverlay(toggleButtons[0], targetElement)
@@ -656,7 +701,9 @@ class CategoryFilterManager {
    * @private
    */
   #openMobileOverlay(toggleButton, targetElement) {
-    const toggleButtons = this.filterContainer.querySelectorAll('.pn-category-filter__toggle')
+    const toggleButtons = this.filterContainer.querySelectorAll(
+      '.pn-category-filter__toggle'
+    )
     toggleButtons.forEach((btn) => btn.setAttribute('aria-expanded', 'true'))
     targetElement.classList.add('is-open')
     this.filterContainer.classList.add('is-open')
@@ -676,7 +723,9 @@ class CategoryFilterManager {
    * @private
    */
   #closeMobileOverlay(toggleButton, targetElement) {
-    const toggleButtons = this.filterContainer.querySelectorAll('.pn-category-filter__toggle')
+    const toggleButtons = this.filterContainer.querySelectorAll(
+      '.pn-category-filter__toggle'
+    )
     toggleButtons.forEach((btn) => btn.setAttribute('aria-expanded', 'false'))
     targetElement.classList.remove('is-open')
     this.filterContainer.classList.remove('is-open')
@@ -754,7 +803,9 @@ class CategoryFilterManager {
    * @private
    */
   #attachAccordionListener() {
-    const details = this.filterContainer.querySelectorAll('details.pn-category-filter__category-item')
+    const details = this.filterContainer.querySelectorAll(
+      'details.pn-category-filter__category-item'
+    )
 
     document.addEventListener('click', (e) => {
       details.forEach((detail) => {

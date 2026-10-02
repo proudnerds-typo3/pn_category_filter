@@ -13,6 +13,9 @@
             <trans-unit id="results.empty" resname="results.empty">
                 <source>No results found.</source>
             </trans-unit>
+            <trans-unit id="results.error" resname="results.error">
+                <source>The results could not be loaded. Please try again later.</source>
+            </trans-unit>
 
             <!-- Filter Menu -->
             <trans-unit id="filter.title" resname="filter.title">
@@ -72,6 +75,9 @@
             </trans-unit>
             <trans-unit id="sort.descending" resname="sort.descending">
                 <source>Descending</source>
+            </trans-unit>
+            <trans-unit id="sort.directionFor" resname="sort.directionFor">
+                <source>Sort direction for %s</source>
             </trans-unit>
             <trans-unit id="sort.iconAlt" resname="sort.iconAlt">
                 <source>Sort</source>

@@ -16,6 +16,10 @@
                 <source>No results found.</source>
                 <target>Geen resultaten gevonden.</target>
             </trans-unit>
+            <trans-unit id="results.error" resname="results.error">
+                <source>The results could not be loaded. Please try again later.</source>
+                <target>De resultaten konden niet worden geladen. Probeer het later opnieuw.</target>
+            </trans-unit>
 
             <!-- Filter Menu -->
             <trans-unit id="filter.title" resname="filter.title">
@@ -93,6 +97,10 @@
             <trans-unit id="sort.descending" resname="sort.descending">
                 <source>Descending</source>
                 <target>Aflopend</target>
+            </trans-unit>
+            <trans-unit id="sort.directionFor" resname="sort.directionFor">
+                <source>Sort direction for %s</source>
+                <target>Sorteervolgorde voor %s</target>
             </trans-unit>
             <trans-unit id="sort.iconAlt" resname="sort.iconAlt">
                 <source>Sort</source>

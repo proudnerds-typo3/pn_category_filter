@@ -44,9 +44,12 @@
         } else {
           await this.replaceContent(targetElement, content);
         }
-        const contentLoaderUpdatedEvent = new CustomEvent("ContentLoaderUpdated", {
-          detail: { targetElement }
-        });
+        const contentLoaderUpdatedEvent = new CustomEvent(
+          "ContentLoaderUpdated",
+          {
+            detail: { targetElement }
+          }
+        );
         document.dispatchEvent(contentLoaderUpdatedEvent);
         if (showSpinner) {
           this.removeSpinner(targetElement, spinner);
@@ -129,12 +132,16 @@
       }
     }
     /**
-     * Show an error message in the target element
+     * Show the translated error message from the target's data-error-message attribute
      * @param {HTMLElement} targetElement - The element to show the error message in
      */
     static showError(targetElement) {
-      const errorMessage = `<p class="mt-4 p-2 pn-social-ads-loading__error">Fout bij het laden van de inhoud. Als deze fout blijft optreden, neem dan svp contact op.</p>`;
-      targetElement.innerHTML = errorMessage;
+      const message = document.createElement("p");
+      message.className = "pn-category-filter__error";
+      message.setAttribute("role", "alert");
+      message.textContent = targetElement.dataset.errorMessage || "The results could not be loaded.";
+      targetElement.replaceChildren(message);
+      targetElement.style.height = "";
     }
   };
   var ContentLoader_default = ContentLoader;
@@ -170,7 +177,9 @@
   var SortingManager = class {
     // The default sort order is pre-checked in the markup; only a visitor's own choice may reach
     // the server as sorting, or boost and relevance ordering would be switched off.
-    #userHasSorted = new URLSearchParams(window.location.search).has("tx_pncategoryfilter_categoryfilterlist[sortField]");
+    #userHasSorted = new URLSearchParams(window.location.search).has(
+      "tx_pncategoryfilter_categoryfilterlist[sortField]"
+    );
     /**
      * Creates an instance of SortingManager
      *
@@ -181,8 +190,12 @@
     constructor(sortContainer, onSortChange) {
       this.sortContainer = sortContainer;
       this.onSortChange = onSortChange;
-      this.checkboxes = sortContainer.querySelectorAll(".pn-category-filter__sort-checkbox");
-      this.selects = sortContainer.querySelectorAll(".pn-category-filter__sort-select");
+      this.checkboxes = sortContainer.querySelectorAll(
+        ".pn-category-filter__sort-checkbox"
+      );
+      this.selects = sortContainer.querySelectorAll(
+        ".pn-category-filter__sort-select"
+      );
       this.init();
     }
     /**
@@ -308,7 +321,9 @@
      * @returns {HTMLSelectElement|null}
      */
     getSelectForField(sortField) {
-      return this.sortContainer.querySelector(`.pn-category-filter__sort-select[data-sort-field="${sortField}"]`);
+      return this.sortContainer.querySelector(
+        `.pn-category-filter__sort-select[data-sort-field="${sortField}"]`
+      );
     }
     /**
      * Gets checkbox element for a field
@@ -317,7 +332,9 @@
      * @returns {HTMLInputElement|null}
      */
     getCheckboxForField(sortField) {
-      return this.sortContainer.querySelector(`.pn-category-filter__sort-checkbox[data-sort-field="${sortField}"]`);
+      return this.sortContainer.querySelector(
+        `.pn-category-filter__sort-checkbox[data-sort-field="${sortField}"]`
+      );
     }
     /**
      * Triggers sort change callback
@@ -413,10 +430,15 @@
      */
     constructor(searchForm, onSearchCallback) {
       this.searchForm = searchForm;
-      this.searchInput = searchForm.querySelector(".pn-category-filter__search-input");
+      this.searchInput = searchForm.querySelector(
+        ".pn-category-filter__search-input"
+      );
       this.onSearchCallback = onSearchCallback;
       this.debounceTimer = null;
-      this.minChars = parseInt(searchForm.dataset.searchMinChars || _SearchManager.DEFAULT_MIN_CHARS, 10);
+      this.minChars = parseInt(
+        searchForm.dataset.searchMinChars || _SearchManager.DEFAULT_MIN_CHARS,
+        10
+      );
       this.init();
     }
     /**
@@ -509,7 +531,9 @@
      */
     applySearchFromUrl() {
       const urlParams = new URLSearchParams(window.location.search);
-      const searchTerm = urlParams.get("tx_pncategoryfilter_categoryfilterlist[search]");
+      const searchTerm = urlParams.get(
+        "tx_pncategoryfilter_categoryfilterlist[search]"
+      );
       if (searchTerm) {
         this.setSearchTerm(searchTerm);
       }
@@ -572,7 +596,11 @@
       this.#input.setAttribute("aria-autocomplete", "list");
       this.#input.setAttribute("aria-expanded", "false");
       this.#input.setAttribute("aria-controls", this.#listbox.id);
-      searchForm.addEventListener("keydown", (event) => this.#handleKeydown(event), true);
+      searchForm.addEventListener(
+        "keydown",
+        (event) => this.#handleKeydown(event),
+        true
+      );
       this.#input.addEventListener("blur", () => this.close());
       this.#input.addEventListener("input", () => {
         this.#waitForInput = false;
@@ -580,7 +608,10 @@
           this.update(null);
         }
       });
-      this.#listbox.addEventListener("mousedown", (event) => event.preventDefault());
+      this.#listbox.addEventListener(
+        "mousedown",
+        (event) => event.preventDefault()
+      );
       this.#listbox.addEventListener("click", (event) => {
         const option = event.target.closest('[role="option"]');
         if (option) {
@@ -603,12 +634,17 @@
       this.#activeIndex = -1;
       const categoryLabel = this.#listbox.dataset.categoryLabel || "Category";
       categories.forEach((category) => {
-        this.#addOption("category", String(category.uid), `${categoryLabel}: ${category.title} (${category.count})`);
+        this.#addOption(
+          "category",
+          String(category.uid),
+          `${categoryLabel}: ${category.title} (${category.count})`
+        );
       });
       titles.forEach((title) => this.#addOption("title", title, title));
       if (this.#options.length === 0 || this.#waitForInput || document.activeElement !== this.#input) {
         this.close();
-        if (this.#status && this.#options.length === 0) this.#status.textContent = "";
+        if (this.#status && this.#options.length === 0)
+          this.#status.textContent = "";
         return;
       }
       this.#open();
@@ -663,7 +699,9 @@
           break;
         case "ArrowUp":
           event.preventDefault();
-          this.#setActive(this.#activeIndex <= 0 ? this.#options.length - 1 : this.#activeIndex - 1);
+          this.#setActive(
+            this.#activeIndex <= 0 ? this.#options.length - 1 : this.#activeIndex - 1
+          );
           break;
         case "Enter":
           if (this.#activeIndex >= 0) {
@@ -685,7 +723,9 @@
       }
     }
     #setActive(index) {
-      this.#options.forEach((option, i) => option.setAttribute("aria-selected", String(i === index)));
+      this.#options.forEach(
+        (option, i) => option.setAttribute("aria-selected", String(i === index))
+      );
       this.#activeIndex = index;
       if (index >= 0) {
         this.#input.setAttribute("aria-activedescendant", this.#options[index].id);
@@ -720,22 +760,26 @@
      */
     constructor(filterContainer) {
       this.filterContainer = filterContainer;
-      this.resultsContainer = document.querySelector(".pn-category-filter__results");
-      this.checkboxes = filterContainer.querySelectorAll(".pn-category-filter__category-checkbox");
+      this.resultsContainer = document.querySelector(
+        ".pn-category-filter__results"
+      );
+      this.checkboxes = filterContainer.querySelectorAll(
+        ".pn-category-filter__category-checkbox"
+      );
       this.isResetting = false;
       this.pendingReload = false;
       this.filterRoot = filterContainer.closest(".pn-category-filter") ?? filterContainer.parentElement;
       const filterRoot = this.filterRoot;
       const sortContainer = filterContainer.querySelector(".pn-category-filter__sort") ?? filterRoot?.querySelector(".pn-category-filter__sort");
       if (sortContainer) {
-        this.sortingManager = new SortingManager_default(sortContainer, (sortData) => {
-          this.handleSortChange(sortData);
+        this.sortingManager = new SortingManager_default(sortContainer, () => {
+          this.handleSortChange();
         });
       }
       const searchForm = filterContainer.querySelector(".pn-category-filter__search-form") ?? filterRoot?.querySelector(".pn-category-filter__search-form");
       if (searchForm) {
-        this.searchManager = new SearchManager_default(searchForm, (searchTerm) => {
-          this.handleSearchChange(searchTerm);
+        this.searchManager = new SearchManager_default(searchForm, () => {
+          this.handleSearchChange();
         });
         this.#createSuggestionManager(searchForm);
       }
@@ -810,17 +854,23 @@
       document.addEventListener("ContentLoaderUpdated", (event) => {
         if (event.detail.targetElement === this.resultsContainer) {
           if (!this.isResetting) {
-            const pushStateElement = this.resultsContainer.querySelector("[data-pushstate-url]");
+            const pushStateElement = this.resultsContainer.querySelector(
+              "[data-pushstate-url]"
+            );
             if (pushStateElement && pushStateElement.dataset.pushstateUrl) {
-              const decodedUrl = decodeURIComponent(pushStateElement.dataset.pushstateUrl);
+              const decodedUrl = decodeURIComponent(
+                pushStateElement.dataset.pushstateUrl
+              );
               window.history.pushState({}, "", decodedUrl);
             }
           }
-          const newSearchForm = this.resultsContainer.querySelector(".pn-category-filter__search-form");
+          const newSearchForm = this.resultsContainer.querySelector(
+            ".pn-category-filter__search-form"
+          );
           if (newSearchForm && this.searchManager) {
             const previousTerm = this.searchManager.getSearchTerm();
-            this.searchManager = new SearchManager_default(newSearchForm, (searchTerm) => {
-              this.handleSearchChange(searchTerm);
+            this.searchManager = new SearchManager_default(newSearchForm, () => {
+              this.handleSearchChange();
             });
             if (previousTerm) {
               this.searchManager.setSearchTerm(previousTerm);
@@ -828,11 +878,13 @@
             this.#createSuggestionManager(newSearchForm);
           }
           this.suggestionManager?.update(this.#readSuggestions());
-          const newSortContainer = this.resultsContainer.querySelector(".pn-category-filter__sort");
+          const newSortContainer = this.resultsContainer.querySelector(
+            ".pn-category-filter__sort"
+          );
           if (newSortContainer) {
             const userHasSorted = this.sortingManager?.hasUserSorted() ?? false;
-            this.sortingManager = new SortingManager_default(newSortContainer, (sortData) => {
-              this.handleSortChange(sortData);
+            this.sortingManager = new SortingManager_default(newSortContainer, () => {
+              this.handleSortChange();
             });
             if (userHasSorted) {
               this.sortingManager.setUserHasSorted(true);
@@ -849,9 +901,9 @@
      */
     #createSuggestionManager(searchForm) {
       this.suggestionManager = SuggestionManager_default.isEnabled(searchForm) ? new SuggestionManager_default(searchForm, {
-        onSelectTitle: (title) => {
+        onSelectTitle: () => {
           this.searchManager?.clearDebounce();
-          this.handleSearchChange(title);
+          this.handleSearchChange();
         },
         onSelectCategory: (categoryUid) => this.#selectCategory(categoryUid)
       }) : null;
@@ -860,7 +912,9 @@
      * @returns {Object|null} Suggestions shipped with the latest results update
      */
     #readSuggestions() {
-      const element = this.resultsContainer.querySelector("[data-suggestions-json]");
+      const element = this.resultsContainer.querySelector(
+        "[data-suggestions-json]"
+      );
       if (!element) return null;
       try {
         return JSON.parse(element.textContent);
@@ -873,7 +927,9 @@
      * @returns {void}
      */
     #selectCategory(categoryUid) {
-      const checkbox = Array.from(this.checkboxes).find((cb) => cb.value === categoryUid);
+      const checkbox = Array.from(this.checkboxes).find(
+        (cb) => cb.value === categoryUid
+      );
       if (checkbox && !checkbox.checked) {
         checkbox.checked = true;
         this.handleFilterChange();
@@ -888,21 +944,19 @@
       await this.queueResultsReload();
     }
     /**
-     * Handles sort change event from SortingManager
+     * Handles sort change event from SortingManager; the reload reads the current sorting from it
      *
-     * @param {Object} _sortData - Sort data (unused, kept for interface consistency)
      * @returns {Promise<void>}
      */
-    async handleSortChange(_sortData) {
+    async handleSortChange() {
       await this.queueResultsReload();
     }
     /**
-     * Handles search change event from SearchManager
+     * Handles search change event from SearchManager; the reload reads the current term from it
      *
-     * @param {string} _searchTerm - Search term (unused, kept for interface consistency)
      * @returns {Promise<void>}
      */
-    async handleSearchChange(_searchTerm) {
+    async handleSearchChange() {
       await this.queueResultsReload();
     }
     /**
@@ -1014,7 +1068,9 @@
       const urlParams = new URLSearchParams(window.location.search);
       const selectedCategories = [];
       urlParams.forEach((value, key) => {
-        if (key.includes("tx_pncategoryfilter_categoryfilterlist[selectedCategories]")) {
+        if (key.includes(
+          "tx_pncategoryfilter_categoryfilterlist[selectedCategories]"
+        )) {
           selectedCategories.push(parseInt(value, 10));
         }
       });
@@ -1034,16 +1090,24 @@
      * @returns {void}
      */
     updateCategoryAmounts() {
-      const parentCategories = this.filterContainer.querySelectorAll('[data-has-children="true"]');
+      const parentCategories = this.filterContainer.querySelectorAll(
+        '[data-has-children="true"]'
+      );
       parentCategories.forEach((parentItem) => {
-        const amountBadge = parentItem.querySelector(".pn-category-filter__amount");
+        const amountBadge = parentItem.querySelector(
+          ".pn-category-filter__amount"
+        );
         if (!amountBadge) {
           return;
         }
-        const childCheckboxes = parentItem.querySelectorAll(".pn-category-filter__category-checkbox");
-        const activeChildCount = Array.from(childCheckboxes).filter((cb) => cb.checked).length;
+        const childCheckboxes = parentItem.querySelectorAll(
+          ".pn-category-filter__category-checkbox"
+        );
+        const activeChildCount = Array.from(childCheckboxes).filter(
+          (cb) => cb.checked
+        ).length;
         if (activeChildCount > 0) {
-          amountBadge.textContent = activeChildCount;
+          amountBadge.textContent = String(activeChildCount);
           amountBadge.classList.remove("hidden");
         } else {
           amountBadge.classList.add("hidden");
@@ -1071,7 +1135,9 @@
       if (!this.resultsContainer) {
         return;
       }
-      const countsScript = this.resultsContainer.querySelector("script[data-category-counts]");
+      const countsScript = this.resultsContainer.querySelector(
+        "script[data-category-counts]"
+      );
       if (!countsScript) {
         return;
       }
@@ -1118,9 +1184,13 @@
      * @private
      */
     #toggleLeafEmptyState(node, isEmpty) {
-      const emptyModifier = node.classList.contains("pn-category-filter__category-child") ? "pn-category-filter__category-child--empty" : "pn-category-filter__category-item--empty";
+      const emptyModifier = node.classList.contains(
+        "pn-category-filter__category-child"
+      ) ? "pn-category-filter__category-child--empty" : "pn-category-filter__category-item--empty";
       node.classList.toggle(emptyModifier, isEmpty);
-      const checkbox = node.querySelector(".pn-category-filter__category-checkbox");
+      const checkbox = node.querySelector(
+        ".pn-category-filter__category-checkbox"
+      );
       if (checkbox) {
         checkbox.disabled = isEmpty && !checkbox.checked;
       }
@@ -1152,7 +1222,10 @@
               // showSpinner
               "GET"
             );
-            this.resultsContainer.scrollIntoView({ behavior: "smooth", block: "start" });
+            this.resultsContainer.scrollIntoView({
+              behavior: "smooth",
+              block: "start"
+            });
           } catch (error) {
             console.error("Error loading paginated results:", error);
           } finally {
@@ -1173,7 +1246,9 @@
      * @returns {void}
      */
     attachMobileToggleListener() {
-      const toggleButtons = this.filterContainer.querySelectorAll(".pn-category-filter__toggle");
+      const toggleButtons = this.filterContainer.querySelectorAll(
+        ".pn-category-filter__toggle"
+      );
       if (toggleButtons.length === 0) {
         return;
       }
@@ -1216,7 +1291,9 @@
      * @private
      */
     #openMobileOverlay(toggleButton, targetElement) {
-      const toggleButtons = this.filterContainer.querySelectorAll(".pn-category-filter__toggle");
+      const toggleButtons = this.filterContainer.querySelectorAll(
+        ".pn-category-filter__toggle"
+      );
       toggleButtons.forEach((btn) => btn.setAttribute("aria-expanded", "true"));
       targetElement.classList.add("is-open");
       this.filterContainer.classList.add("is-open");
@@ -1233,7 +1310,9 @@
      * @private
      */
     #closeMobileOverlay(toggleButton, targetElement) {
-      const toggleButtons = this.filterContainer.querySelectorAll(".pn-category-filter__toggle");
+      const toggleButtons = this.filterContainer.querySelectorAll(
+        ".pn-category-filter__toggle"
+      );
       toggleButtons.forEach((btn) => btn.setAttribute("aria-expanded", "false"));
       targetElement.classList.remove("is-open");
       this.filterContainer.classList.remove("is-open");
@@ -1302,7 +1381,9 @@
      * @private
      */
     #attachAccordionListener() {
-      const details = this.filterContainer.querySelectorAll("details.pn-category-filter__category-item");
+      const details = this.filterContainer.querySelectorAll(
+        "details.pn-category-filter__category-item"
+      );
       document.addEventListener("click", (e) => {
         details.forEach((detail) => {
           if (detail.open && !detail.contains(e.target)) {

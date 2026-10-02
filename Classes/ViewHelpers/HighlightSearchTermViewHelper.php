@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace ProudNerds\PnCategoryFilter\ViewHelpers;
 
 use ProudNerds\PnCategoryFilter\Utility\TextNormalizer;
-use TYPO3Fluid\Fluid\Core\Rendering\RenderingContextInterface;
 use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
 
 /**
@@ -59,20 +58,12 @@ class HighlightSearchTermViewHelper extends AbstractViewHelper
 
     /**
      * Highlight search terms in text while optionally preserving HTML markup
-     *
-     * @param array<string, mixed> $arguments ViewHelper arguments
-     * @param \Closure $renderChildrenClosure Closure to render children
-     * @param RenderingContextInterface $renderingContext Rendering context
-     * @return string The text with highlighted search terms
      */
-    public static function renderStatic(
-        array $arguments,
-        \Closure $renderChildrenClosure,
-        RenderingContextInterface $renderingContext
-    ): string {
-        $text = (string)$renderChildrenClosure();
-        $searchTerm = trim((string)($arguments['searchTerm'] ?? ''));
-        $stripTags = (bool)($arguments['stripTags'] ?? false);
+    public function render(): string
+    {
+        $text = (string)$this->renderChildren();
+        $searchTerm = trim((string)($this->arguments['searchTerm'] ?? ''));
+        $stripTags = (bool)($this->arguments['stripTags'] ?? false);
 
         // Early return if empty text
         if ($text === '') {

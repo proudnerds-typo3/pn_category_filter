@@ -5,7 +5,7 @@
  *
  * @module SearchManager
  * @author ProudNerds
- * @version 1.1.0
+ * @version 2.0.0
  */
 
 /**
@@ -35,10 +35,15 @@ class SearchManager {
    */
   constructor(searchForm, onSearchCallback) {
     this.searchForm = searchForm
-    this.searchInput = searchForm.querySelector('.pn-category-filter__search-input')
+    this.searchInput = searchForm.querySelector(
+      '.pn-category-filter__search-input'
+    )
     this.onSearchCallback = onSearchCallback
     this.debounceTimer = null
-    this.minChars = parseInt(searchForm.dataset.searchMinChars || SearchManager.DEFAULT_MIN_CHARS, 10)
+    this.minChars = parseInt(
+      searchForm.dataset.searchMinChars || SearchManager.DEFAULT_MIN_CHARS,
+      10
+    )
 
     this.init()
   }
@@ -152,7 +157,9 @@ class SearchManager {
    */
   applySearchFromUrl() {
     const urlParams = new URLSearchParams(window.location.search)
-    const searchTerm = urlParams.get('tx_pncategoryfilter_categoryfilterlist[search]')
+    const searchTerm = urlParams.get(
+      'tx_pncategoryfilter_categoryfilterlist[search]'
+    )
 
     if (searchTerm) {
       this.setSearchTerm(searchTerm)

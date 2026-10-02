@@ -82,7 +82,7 @@ Each site can therefore have its own category tree, and editors only see the
 categories relevant to their site. In *Refine* mode the direct children of this
 root also define the facet groups — see :ref:`filter-logic`.
 
-To find the UID: open :guilabel:`Web > List` on the page holding your categories
+To find the UID: open :guilabel:`Content > Records` on the page holding your categories
 and look up the record under *System Categories*.
 
 ..  _configuration-tsconfig:
@@ -92,7 +92,7 @@ Page TSconfig
 
 The tables offered in the FlexForm's *Tables to Query* selector come from Page
 TSconfig. The extension ships a default in :file:`Configuration/page.tsconfig`,
-which TYPO3 v13 loads automatically:
+which TYPO3 loads automatically:
 
 ..  code-block:: typoscript
     :caption: EXT:pn_category_filter/Configuration/page.tsconfig
@@ -318,7 +318,7 @@ Tab: Search Settings
 TypoScript constants
 ====================
 
-Editable in :guilabel:`Site Management > TypoScript > Constant Editor`, category
+Editable in :guilabel:`Sites > TypoScript > Constant Editor`, category
 ``plugin.tx_pncategoryfilter``.
 
 Template paths

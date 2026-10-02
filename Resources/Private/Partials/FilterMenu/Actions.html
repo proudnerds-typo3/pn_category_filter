@@ -65,10 +65,10 @@
 
                             <f:if condition="{isChecked} == 1">
                                 <f:then>
-                                    <f:render section="SortSelect" arguments="{sortField: sortOption.field, currentSorting: activeSorting}" />
+                                    <f:render section="SortSelect" arguments="{sortField: sortOption.field, sortLabel: sortOption.label, currentSorting: activeSorting}" />
                                 </f:then>
                                 <f:else>
-                                    <f:render section="SortSelect" arguments="{sortField: sortOption.field, currentSorting: 'desc'}" />
+                                    <f:render section="SortSelect" arguments="{sortField: sortOption.field, sortLabel: sortOption.label, currentSorting: 'desc'}" />
                                 </f:else>
                             </f:if>
                         </div>
@@ -80,7 +80,7 @@
 </div>
 
 <f:section name="SortSelect">
-    <select class="pn-category-filter__sort-select" data-sort-field="{sortField}">
+    <select class="pn-category-filter__sort-select" data-sort-field="{sortField}" aria-label="{f:translate(key: 'LLL:EXT:pn_category_filter/Resources/Private/Language/locallang.xlf:sort.directionFor', arguments: {0: sortLabel})}">
         <f:if condition="{currentSorting} == 'asc'">
             <f:then>
                 <option value="asc" selected="selected">

@@ -11,17 +11,17 @@
                project-issues="https://github.com/proudnerds-typo3/pn_category_filter/issues"
                edit-on-github="proudnerds-typo3/pn_category_filter"
                edit-on-github-branch="main"
-               typo3-core-preferred="13.4"
+               typo3-core-preferred="14.3"
                interlink-shortcode="proudnerds/pn-category-filter"
     />
 
     <project title="Category Filter"
-             release="1.1.0"
-             version="1.1"
+             release="2.0.0"
+             version="2.0"
              copyright="since 2026 by ProudNerds &amp; contributors"
     />
 
-    <inventory id="t3coreapi" url="https://docs.typo3.org/m/typo3/reference-coreapi/13.4/en-us/"/>
-    <inventory id="t3tsref" url="https://docs.typo3.org/m/typo3/reference-typoscript/13.4/en-us/"/>
-    <inventory id="t3viewhelper" url="https://docs.typo3.org/other/typo3/view-helper-reference/13.4/en-us/"/>
+    <inventory id="t3coreapi" url="https://docs.typo3.org/m/typo3/reference-coreapi/14.3/en-us/"/>
+    <inventory id="t3tsref" url="https://docs.typo3.org/m/typo3/reference-typoscript/14.3/en-us/"/>
+    <inventory id="t3viewhelper" url="https://docs.typo3.org/other/typo3/view-helper-reference/14.3/en-us/"/>
 </guides>

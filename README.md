@@ -1,7 +1,7 @@
 # TYPO3 extension `pn_category_filter`
 
 [![Latest Stable Version](https://poser.pugx.org/proudnerds/pn-category-filter/v/stable)](https://packagist.org/packages/proudnerds/pn-category-filter)
-[![TYPO3 13](https://img.shields.io/badge/TYPO3-13.4-orange.svg)](https://get.typo3.org/version/13)
+[![TYPO3 14](https://img.shields.io/badge/TYPO3-14.3-orange.svg)](https://get.typo3.org/version/14)
 [![License](https://poser.pugx.org/proudnerds/pn-category-filter/license)](LICENSE)
 
 Filter and search categorized TYPO3 records in the frontend: AJAX-powered,
@@ -27,7 +27,9 @@ server, an indexer or a queue to maintain.
 
 ## Requirements
 
-TYPO3 v13.4 LTS · PHP 8.3+
+TYPO3 v14.3 LTS · PHP 8.3+
+
+For TYPO3 v13.4 LTS use version 1.x (`composer require proudnerds/pn-category-filter:^1.1`).
 
 ## Installation
 

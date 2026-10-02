@@ -32,6 +32,7 @@ final class PageContentHydrationService
     public function __construct(
         private readonly Context $context,
         private readonly LoggerInterface $logger,
+        private readonly ConnectionPool $connectionPool,
     ) {}
 
     /**
@@ -117,7 +118,7 @@ final class PageContentHydrationService
      */
     private function fetchContentRows(array $pageUids, array $colPositions, array $cTypes, array $fields): array
     {
-        $qb = GeneralUtility::makeInstance(ConnectionPool::class)
+        $qb = $this->connectionPool
             ->getQueryBuilderForTable('tt_content');
 
         $qb->getRestrictions()->removeAll()

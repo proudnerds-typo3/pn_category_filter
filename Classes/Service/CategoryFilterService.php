@@ -13,7 +13,6 @@ use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Site\Entity\Site;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * CategoryFilterService
@@ -27,6 +26,7 @@ class CategoryFilterService
         private readonly SearchService $searchService,
         private readonly SynonymService $synonymService,
         private readonly LoggerInterface $logger,
+        private readonly ConnectionPool $connectionPool,
     ) {}
     /**
      * Sorting options
@@ -543,7 +543,7 @@ class CategoryFilterService
      */
     protected function fetchRecordsByCategoryForTable(array $categoryUids, string $tableName, array $recordPids): array
     {
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
+        $queryBuilder = $this->connectionPool
             ->getQueryBuilderForTable($tableName);
 
         $queryBuilder
@@ -951,7 +951,7 @@ class CategoryFilterService
             return [];
         }
 
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
+        $queryBuilder = $this->connectionPool
             ->getQueryBuilderForTable('sys_category');
 
         return $queryBuilder

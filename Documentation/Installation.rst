@@ -7,10 +7,12 @@ Installation
 Requirements
 ============
 
--   TYPO3 v13.4 LTS
--   PHP 8.3 or 8.4
+-   TYPO3 v14.3 LTS
+-   PHP 8.3, 8.4 or 8.5
 -   Optional: EXT:solr (``apache-solr-for-typo3/solr``), only for
     :ref:`synonym expansion <solr-synonyms>`
+
+For TYPO3 v13.4 LTS, use version 1.x of the extension.
 
 Install the extension
 =====================
@@ -23,12 +25,12 @@ Composer (recommended):
 
 Classic mode: download the ZIP from the
 `TYPO3 Extension Repository <https://extensions.typo3.org/extension/pn_category_filter>`__
-and import it through :guilabel:`Admin Tools > Extensions`.
+and import it through :guilabel:`System > Extensions`.
 
 Load the TypoScript
 ===================
 
-The extension ships a TYPO3 v13 **site set**. Add it to the site's
+The extension ships a **site set**. Add it to the site's
 :file:`config.yaml`:
 
 ..  code-block:: yaml
@@ -106,7 +108,7 @@ Add the plugin to a page
 
 #.  Create a content element of type :guilabel:`Category Filter List View`
     (:guilabel:`Plugins` tab).
-#.  Open the :guilabel:`Configuration` tab and fill in the FlexForm — at minimum
+#.  Open the :guilabel:`Plugin` tab and fill in the FlexForm — at minimum
     the categories and the tables to query.
 #.  Save and view the page.
 
@@ -119,6 +121,30 @@ Clear caches
 ..  code-block:: bash
 
     vendor/bin/typo3 cache:flush
+
+..  _upgrading-2-0:
+
+Upgrading to 2.0
+================
+
+Version 2.0 supports TYPO3 v14.3 LTS only. Upgrade TYPO3 first, then the
+extension:
+
+..  code-block:: bash
+
+    composer require proudnerds/pn-category-filter:^2.0
+    vendor/bin/typo3 cache:flush
+
+There are no database changes and no upgrade wizard. The plugin was already a
+content element of its own (``CType``) in 1.x, so the list type migration of
+TYPO3 v14 does not apply and existing plugin instances keep working.
+
+-   The FlexForm fields moved from the :guilabel:`Configuration` tab to the
+    :guilabel:`Plugin` tab of the content element. The fields and their values
+    are unchanged.
+-   If you extend ``CategoryFilterController``, ``CategoryFilterService``,
+    ``PageContentHydrationService`` or ``SynonymService`` and override the
+    constructor, pass the new constructor arguments on to the parent.
 
 ..  _upgrading-1-1:
 

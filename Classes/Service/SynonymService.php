@@ -58,6 +58,7 @@ class SynonymService
 
     public function __construct(
         private readonly LoggerInterface $logger,
+        private readonly CacheManager $cacheManager,
     ) {}
 
     /**
@@ -175,9 +176,7 @@ class SynonymService
         }
 
         try {
-            /** @var CacheManager $cacheManager */
-            $cacheManager = GeneralUtility::makeInstance(CacheManager::class);
-            $this->cache = $cacheManager->getCache('pn_category_filter');
+            $this->cache = $this->cacheManager->getCache('pn_category_filter');
         } catch (\Throwable) {
             // Cache not configured — run without persistent caching
             return null;

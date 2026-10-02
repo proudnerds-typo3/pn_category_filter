@@ -9,7 +9,9 @@ class ContentLoader {
    * @returns {number}
    */
   static get fadeDuration() {
-    return window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : ContentLoader.#FADE_DURATION
+    return window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      ? 0
+      : ContentLoader.#FADE_DURATION
   }
 
   /**
@@ -21,7 +23,14 @@ class ContentLoader {
    * @param {Object} [data] - The data to send with the request (for POST method)
    * @returns {Promise<void>}
    */
-  static async loadContent(url, targetElement, append = false, showSpinner = true, method = 'GET', data = null) {
+  static async loadContent(
+    url,
+    targetElement,
+    append = false,
+    showSpinner = true,
+    method = 'GET',
+    data = null
+  ) {
     try {
       const spinner = document.createElement('div')
       spinner.className = 'pn-category-filter__spinner'
@@ -52,9 +61,12 @@ class ContentLoader {
         await this.replaceContent(targetElement, content)
       }
 
-      const contentLoaderUpdatedEvent = new CustomEvent('ContentLoaderUpdated', {
-        detail: { targetElement: targetElement },
-      })
+      const contentLoaderUpdatedEvent = new CustomEvent(
+        'ContentLoaderUpdated',
+        {
+          detail: { targetElement: targetElement }
+        }
+      )
       document.dispatchEvent(contentLoaderUpdatedEvent)
 
       if (showSpinner) {
@@ -103,8 +115,8 @@ class ContentLoader {
     const options = {
       method,
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
+        'Content-Type': 'application/x-www-form-urlencoded'
+      }
     }
 
     if (method === 'POST' && data) {
@@ -146,13 +158,18 @@ class ContentLoader {
   }
 
   /**
-   * Show an error message in the target element
+   * Show the translated error message from the target's data-error-message attribute
    * @param {HTMLElement} targetElement - The element to show the error message in
    */
   static showError(targetElement) {
-    const errorMessage = `<p class="mt-4 p-2 pn-social-ads-loading__error">Fout bij het laden van de inhoud. Als deze fout blijft optreden, neem dan svp contact op.</p>`
+    const message = document.createElement('p')
+    message.className = 'pn-category-filter__error'
+    message.setAttribute('role', 'alert')
+    message.textContent =
+      targetElement.dataset.errorMessage || 'The results could not be loaded.'
 
-    targetElement.innerHTML = errorMessage
+    targetElement.replaceChildren(message)
+    targetElement.style.height = ''
   }
 }
 

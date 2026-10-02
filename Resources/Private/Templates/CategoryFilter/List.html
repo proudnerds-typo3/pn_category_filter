@@ -38,13 +38,13 @@
                 <f:comment><!-- Vertical mode: actions + results share a column; actions sit outside results so they survive AJAX updates --></f:comment>
                 <div class="pn-category-filter__main">
                     <f:render partial="FilterMenu/Actions" arguments="{_all}" />
-                    <div class="pn-category-filter__results">
+                    <div class="pn-category-filter__results" data-error-message="{f:translate(key: 'LLL:EXT:pn_category_filter/Resources/Private/Language/locallang.xlf:results.error')}">
                         <f:render partial="Results" arguments="{_all}" />
                     </div>
                 </div>
             </f:then>
             <f:else>
-                <div class="pn-category-filter__results">
+                <div class="pn-category-filter__results" data-error-message="{f:translate(key: 'LLL:EXT:pn_category_filter/Resources/Private/Language/locallang.xlf:results.error')}">
                     <f:render partial="Results" arguments="{_all}" />
                 </div>
             </f:else>

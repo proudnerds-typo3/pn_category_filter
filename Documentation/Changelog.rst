@@ -11,6 +11,22 @@ Releases follow `Semantic Versioning <https://semver.org/>`__. Only
 ``Major.Minor`` versions are published as separate documentation branches,
 because patch releases never introduce breaking changes or new features.
 
+2.0.0
+=====
+
+Support for TYPO3 v14.3 LTS; TYPO3 v13 is no longer supported. No database
+changes and no upgrade wizard, see :ref:`upgrading-2-0`.
+
+-   Requires TYPO3 v14.3 LTS and PHP 8.3 to 8.5
+-   The FlexForm fields are on the :guilabel:`Plugin` tab of the content element
+    instead of :guilabel:`Configuration`
+-   ``HighlightSearchTermViewHelper`` is compatible with Fluid 5
+-   Core services are injected through the constructor; subclasses that override
+    a constructor must pass the new arguments on
+-   Fixed: the error message after a failed AJAX request is translated and
+    announced to screen readers
+-   Fixed: the sort direction select has an accessible name
+
 1.1.0
 =====
 

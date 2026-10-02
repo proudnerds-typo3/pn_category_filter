@@ -7,6 +7,45 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [2.0.0] – 2026-10-02
+
+Support for TYPO3 v14.3 LTS. No database changes and no upgrade wizard: the
+plugin was already a content element of its own, so existing plugin instances
+keep working. Clear caches after the update. See "Upgrading to 2.0" in
+`Documentation/Installation.rst`.
+
+### Changed
+
+- **Breaking:** requires TYPO3 v14.3 LTS; TYPO3 v13 is no longer supported.
+  PHP 8.3 to 8.5
+- The FlexForm is registered through `ExtensionUtility::registerPlugin()`
+  instead of the deprecated `ExtensionManagementUtility::addPiFlexFormValue()`;
+  its fields are now on the "Plugin" tab of the content element instead of
+  "Configuration"
+- `HighlightSearchTermViewHelper` implements `render()` instead of
+  `renderStatic()`, which Fluid 5 no longer supports
+- FlexForm settings are read with `FlexFormTools` instead of `FlexFormService`,
+  which TYPO3 v14 merged into it and v15 removes
+- `CategoryFilterController`, `CategoryFilterService`,
+  `PageContentHydrationService` and `SynonymService` get `FlexFormTools`,
+  `ConnectionPool` and `CacheManager` through constructor injection. If you
+  extend one of them and override the constructor, pass the new arguments on
+- `CategoryFilterController::buildPaginationArguments()` no longer takes the
+  unused `$selectedCategories` and `$ttContentUid` parameters
+- `CategoryFilterManager::handleSortChange()` and `handleSearchChange()` no
+  longer take their unused argument
+- The JavaScript sources follow the Prettier configuration; the IIFE bundle is
+  rebuilt
+
+### Fixed
+
+- The error message after a failed AJAX request was a hard-coded Dutch text
+  with the CSS class of another extension. It is now translated (en, nl, de),
+  uses `pn-category-filter__error`, is announced with `role="alert"` and no
+  longer leaves the results container at a fixed height
+- The sort direction select had no accessible name; it is now labelled
+  with the name of its sort option (WCAG 2.2 4.1.2)
+
 ## [1.1.0] – 2026-09-23
 
 No database changes; clear caches after the update. Suggestions while typing,
@@ -107,6 +146,7 @@ First public release.
   skip the `pushState` update but also skipped the `SearchManager`
   re-initialisation. Only the `pushState` call is conditional now.
 
-[Unreleased]: https://github.com/proudnerds-typo3/pn_category_filter/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/proudnerds-typo3/pn_category_filter/compare/v2.0.0...HEAD
+[2.0.0]: https://github.com/proudnerds-typo3/pn_category_filter/compare/v1.1.0...v2.0.0
 [1.1.0]: https://github.com/proudnerds-typo3/pn_category_filter/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/proudnerds-typo3/pn_category_filter/releases/tag/v1.0.0
