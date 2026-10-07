@@ -7,6 +7,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [2.1.0] – 2026-10-07
+
+### Added
+
+- Result records get a typolink parameter in `_link`: pages link to
+  themselves, other tables through a linkhandler identifier in the new
+  `settings.recordLinks` (table = identifier), so the target page comes from
+  the site's `config.recordLinks`. Tables without an entry get an empty
+  `_link`. See "Linking results" in `Documentation/Configuration.rst`
+
+### Changed
+
+- The default `Results.html` links the title when `_link` is set, and renders
+  one title (`title`, else `header`) instead of one heading per field
+- The default `Results.html` shows `abstract` as preview text when there is no
+  `teaser`, before falling back to `description`, so page records show their
+  intro
+- `CategoryFilterController` gets `RecordLinkService` through its
+  constructor. If you extend it and override the constructor, pass it on
+
+### Fixed
+
+- The top-level category list had `role="list"` without list items, which axe
+  reports as `aria-required-children`; every item is now wrapped in an element
+  with `role="listitem"`
+- After AJAX pagination focus moves to the results heading (or the results
+  container when there is none) instead of falling back to the body. Results
+  templates mark the heading with `data-results-title`; add it to an
+  overridden `Results.html` too
+- Search treats quotes, slashes and other punctuation of any script as a word
+  boundary: `haven` now finds *'Haven Leeft'*. Quotes typed around a search
+  word are ignored, and a search term of only quotes no longer matches every
+  category suggestion
+
 ## [2.0.0] – 2026-10-02
 
 Support for TYPO3 v14.3 LTS. No database changes and no upgrade wizard: the
@@ -146,7 +180,8 @@ First public release.
   skip the `pushState` update but also skipped the `SearchManager`
   re-initialisation. Only the `pushState` call is conditional now.
 
-[Unreleased]: https://github.com/proudnerds-typo3/pn_category_filter/compare/v2.0.0...HEAD
-[2.0.0]: https://github.com/proudnerds-typo3/pn_category_filter/compare/v1.1.0...v2.0.0
-[1.1.0]: https://github.com/proudnerds-typo3/pn_category_filter/compare/v1.0.0...v1.1.0
-[1.0.0]: https://github.com/proudnerds-typo3/pn_category_filter/releases/tag/v1.0.0
+[Unreleased]: https://github.com/proudnerds-typo3/pn_category_filter/compare/2.1.0...HEAD
+[2.1.0]: https://github.com/proudnerds-typo3/pn_category_filter/compare/2.0.0...2.1.0
+[2.0.0]: https://github.com/proudnerds-typo3/pn_category_filter/compare/1.1.0...2.0.0
+[1.1.0]: https://github.com/proudnerds-typo3/pn_category_filter/compare/1.0.0...1.1.0
+[1.0.0]: https://github.com/proudnerds-typo3/pn_category_filter/releases/tag/1.0.0

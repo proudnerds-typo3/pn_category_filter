@@ -627,9 +627,44 @@ only:
         {category.title}<f:if condition="{iter.isLast}"><f:else>, </f:else></f:if>
     </f:for>
 
-Both resolvers run before the :ref:`AfterRecordsPaginatedEvent
-<events-after-records-paginated>`, so a listener on that event already sees
-their results.
+..  _configuration-record-links:
+
+Linking results
+---------------
+
+Every record of the current page gets a typolink parameter in ``_link``:
+
+-   A :sql:`pages` record links to itself (``t3://page?uid=…``), without any
+    configuration.
+-   Any other table links through a linkhandler identifier set in
+    ``recordLinks``, which produces ``t3://record?identifier=…&uid=…``. The
+    target page then comes from the site's :typoscript:`config.recordLinks`, so
+    the plugin needs no detail page.
+-   A table without an entry gets an empty ``_link``.
+
+..  code-block:: typoscript
+
+    plugin.tx_pncategoryfilter.settings {
+        recordLinks {
+            # table = identifier in config.recordLinks
+            tx_news_domain_model_news = tx_news
+        }
+    }
+
+The default :file:`Partials/Results.html` links the title when ``_link`` is
+set and shows plain text otherwise. An overridden partial can do the same:
+
+..  code-block:: html
+    :caption: Partials/Results.html
+
+    <f:if condition="{record._link}">
+        <f:then><f:link.typolink parameter="{record._link}">{record.title}</f:link.typolink></f:then>
+        <f:else>{record.title}</f:else>
+    </f:if>
+
+The resolvers and the record links run before the
+:ref:`AfterRecordsPaginatedEvent <events-after-records-paginated>`, so a
+listener on that event already sees their results.
 
 The AJAX PAGE object
 --------------------

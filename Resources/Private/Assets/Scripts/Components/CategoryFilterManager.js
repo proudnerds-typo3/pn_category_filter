@@ -5,7 +5,7 @@
  *
  * @module CategoryFilterManager
  * @author ProudNerds
- * @version 2.0.0
+ * @version 2.1.0
  */
 
 import ContentLoader from '../Utils/ContentLoader.js'
@@ -587,6 +587,22 @@ class CategoryFilterManager {
   }
 
   /**
+   * Moves focus to the results heading, or the results container without one
+   * The clicked pagination link was replaced, so focus would otherwise fall back to the body
+   *
+   * @returns {void}
+   */
+  #focusResults() {
+    const target =
+      this.resultsContainer.querySelector('[data-results-title]') ??
+      this.resultsContainer
+    if (!target.hasAttribute('tabindex')) {
+      target.setAttribute('tabindex', '-1')
+    }
+    target.focus({ preventScroll: true })
+  }
+
+  /**
    * Attaches event listener for pagination links
    * Intercepts clicks on pagination links with data-page-link attribute to load via AJAX
    *
@@ -619,7 +635,7 @@ class CategoryFilterManager {
             'GET'
           )
 
-          // Scroll to results container after pagination
+          this.#focusResults()
           this.resultsContainer.scrollIntoView({
             behavior: 'smooth',
             block: 'start'

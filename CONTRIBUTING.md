@@ -57,7 +57,7 @@ asked to add it.
    `Documentation/guides.xml`.
 3. Rebuild the IIFE bundle (see above) and check it on a page without a build
    step.
-4. Tag the release (`vX.Y.Z`) and push the tag — Packagist picks it up through
-   the webhook.
-4. Upload to the TER manually, or with
+4. Tag the release (`X.Y.Z`, without a `v`) and push the tag — Packagist picks
+   it up through the webhook.
+5. Upload to the TER manually, or with
    `vendor/bin/tailor ter:publish <version>`.

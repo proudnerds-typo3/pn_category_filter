@@ -16,7 +16,8 @@ How matching works
 -   **Multi-word AND**: ``fonds cultuur`` matches records containing both words,
     in any order and possibly in different fields.
 -   **Word start**: ``activ`` matches *Activiteit* and *basis-activiteit*, but
-    ``tiv`` does not. Hyphens and punctuation count as word boundaries.
+    ``tiv`` does not. Hyphens, quotes and other punctuation count as word
+    boundaries; quotes typed around a search word are ignored.
 -   **Case- and accent-insensitive**: ``FONDS`` finds *fonds*, and ``cafe``
     finds *café*. As a side effect ``een`` and ``één`` are the same word.
 -   **As the visitor reads it**: HTML tags are stripped and entities decoded, so

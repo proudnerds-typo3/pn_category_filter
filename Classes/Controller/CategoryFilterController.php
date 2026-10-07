@@ -9,6 +9,7 @@ use ProudNerds\PnCategoryFilter\Event\AfterRecordsPaginatedEvent;
 use ProudNerds\PnCategoryFilter\Service\CategoryFilterService;
 use ProudNerds\PnCategoryFilter\Service\CategoryResolverService;
 use ProudNerds\PnCategoryFilter\Service\FileResolverService;
+use ProudNerds\PnCategoryFilter\Service\RecordLinkService;
 use ProudNerds\PnCategoryFilter\Service\SearchService;
 use ProudNerds\PnCategoryFilter\Service\SuggestionService;
 use ProudNerds\PnCategoryFilter\Utility\CategoryUtility;
@@ -61,6 +62,7 @@ class CategoryFilterController extends ActionController
         private readonly CategoryFilterService $categoryFilterService,
         private readonly FileResolverService $fileResolverService,
         private readonly CategoryResolverService $categoryResolverService,
+        private readonly RecordLinkService $recordLinkService,
         private readonly SuggestionService $suggestionService,
         private readonly FlexFormTools $flexFormTools,
     ) {}
@@ -341,6 +343,10 @@ class CategoryFilterController extends ActionController
         $paginatedRecords = $this->categoryResolverService->resolve(
             $paginatedRecords,
             (array)($this->settings['categoryResolvers'] ?? [])
+        );
+        $paginatedRecords = $this->recordLinkService->resolve(
+            $paginatedRecords,
+            (array)($this->settings['recordLinks'] ?? [])
         );
         $paginatedEvent = $this->eventDispatcher->dispatch(new AfterRecordsPaginatedEvent(
             $paginatedRecords,

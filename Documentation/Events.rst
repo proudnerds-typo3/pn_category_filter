@@ -154,8 +154,9 @@ result set.
         -   The current request (site, language, arguments)
 
 The :ref:`file <configuration-file-resolvers>` and :ref:`category resolvers
-<configuration-category-resolvers>` run before this event. For images and
-categories, configure those instead of writing a listener.
+<configuration-category-resolvers>` and the :ref:`record links
+<configuration-record-links>` run before this event. For images, categories
+and links, configure those instead of writing a listener.
 
 Example listener
 ----------------
@@ -231,6 +232,8 @@ injection:
         -   Resolving FAL fields to file UIDs (:ref:`configuration-file-resolvers`)
     -   -   :php:`Service\CategoryResolverService`
         -   Attaching categories to records (:ref:`configuration-category-resolvers`)
+    -   -   :php:`Service\RecordLinkService`
+        -   Attaching a typolink parameter to records (:ref:`configuration-record-links`)
     -   -   :php:`Dto\FilteredRecordsResult`
         -   The result object holding the records and the category counts
 

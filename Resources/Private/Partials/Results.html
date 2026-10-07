@@ -1,7 +1,7 @@
 <html xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers" xmlns:pn="http://typo3.org/ns/ProudNerds/PnCategoryFilter/ViewHelpers" data-namespace-typo3-fluid="true">
 <f:if condition="{records}">
     <f:then>
-        <h2 class="pn-category-filter__results-title">
+        <h2 class="pn-category-filter__results-title" data-results-title>
             <f:translate key="LLL:EXT:pn_category_filter/Resources/Private/Language/locallang.xlf:results.title" />
         </h2>
 
@@ -13,12 +13,14 @@
             <f:for each="{records}" as="record">
                 <article class="pn-category-filter__item" data-table="{record._tableName}" data-uid="{record.uid}">
                     <header>
-                        <f:if condition="{record.title}">
-                            <h3 class="pn-category-filter__item-title">{record.title}</h3>
-                        </f:if>
-
-                        <f:if condition="{record.header}">
-                            <h3 class="pn-category-filter__item-title">{record.header}</h3>
+                        <f:variable name="recordTitle" value="{f:if(condition: record.title, then: record.title, else: record.header)}" />
+                        <f:if condition="{recordTitle}">
+                            <h3 class="pn-category-filter__item-title">
+                                <f:if condition="{record._link}">
+                                    <f:then><f:link.typolink parameter="{record._link}" class="pn-category-filter__item-link">{recordTitle}</f:link.typolink></f:then>
+                                    <f:else>{recordTitle}</f:else>
+                                </f:if>
+                            </h3>
                         </f:if>
                     </header>
 
@@ -28,7 +30,8 @@
                         </p>
                     </f:if>
 
-                    <f:variable name="previewText"><f:if condition="{record.teaser}"><f:then>{record.teaser}</f:then><f:else>{record.description}</f:else></f:if></f:variable>
+                    <f:variable name="previewText" value="{f:if(condition: record.abstract, then: record.abstract, else: record.description)}" />
+                    <f:variable name="previewText" value="{f:if(condition: record.teaser, then: record.teaser, else: previewText)}" />
                     <f:if condition="{previewText}">
                         <div class="pn-category-filter__item-text pn-category-filter__item-text--preview">
                             <pn:highlightSearchTerm searchTerm="{activeSearchTerm}" stripTags="1">
@@ -36,9 +39,6 @@
                             </pn:highlightSearchTerm>
                         </div>
                     </f:if>
-
-                    <f:comment><!--Example how to make a link to a detailpage--></f:comment>
-                    <f:comment><!--<f:link.action action="show" extensionName="yourExtension" pluginName="Show" controller="MyNews" arguments="{news: record.uid}" pageUid="{settings.pages.myNewsDetail}">Read more</f:link.action>--></f:comment>
                 </article>
             </f:for>
         </div>

@@ -26,6 +26,13 @@ class SearchService
      * so this acts as a second safety net when the service is called directly.
      */
     public const int MAX_SEARCH_LENGTH = 50;
+
+    /**
+     * A word starts where no letter or digit precedes it, so quotes, slashes and
+     * punctuation of any script count as a boundary: "haven" matches 'Haven Leeft'.
+     */
+    private const string WORD_START = '(?<![\\p{L}\\p{N}])';
+
     /**
      * Filter records by search term with word boundary detection.
      *
@@ -172,8 +179,13 @@ class SearchService
             return false;
         }
 
+        $patterns = $this->compilePatterns($searchTerm, []);
+        if ($patterns === []) {
+            return false;
+        }
+
         $normalized = $this->getNormalizedFieldTexts(['text' => $text], ['text'])['text'];
-        foreach ($this->compilePatterns($searchTerm, []) as $pattern) {
+        foreach ($patterns as $pattern) {
             if (preg_match($pattern, $normalized) !== 1) {
                 return false;
             }
@@ -191,8 +203,12 @@ class SearchService
      */
     private function compilePatterns(string $searchTerm, array $synonymMap): array
     {
+        // Quotes around a word are typed, not searched for: '"haven' still finds haven
         $searchWords = array_filter(
-            array_map('trim', explode(' ', $searchTerm)),
+            array_map(
+                static fn(string $word): string => (string)preg_replace('/^[\'"„‚\p{Pi}\p{Pf}]+|[\'"„‚\p{Pi}\p{Pf}]+$/u', '', trim($word)),
+                explode(' ', $searchTerm)
+            ),
             static fn($word) => $word !== ''
         );
 
@@ -209,7 +225,7 @@ class SearchService
             }
 
             $alternatives = implode('|', array_map(static fn($t) => preg_quote($t, '/'), $terms));
-            $compiledPatterns[] = '/(?:^|[\s\-.,;:!?()\[\]{}])(?:' . $alternatives . ')/u';
+            $compiledPatterns[] = '/' . self::WORD_START . '(?:' . $alternatives . ')/u';
         }
 
         return $compiledPatterns;
@@ -244,11 +260,7 @@ class SearchService
      * search flow anymore due to performance optimization (pre-compiled patterns with
      * synonym support are built directly in filterRecordsBySearch).
      *
-     * Word boundaries are defined as:
-     * - Start/end of string
-     * - Whitespace (space, tab, newline)
-     * - Hyphens (-)
-     * - Common punctuation (., ,, ;, :, !, ?, (, ), [, ], {, })
+     * A word starts where no letter or digit precedes it (see WORD_START).
      *
      * This allows:
      * - "eerlijk" to match "eerlijke" (stem/plural) but NOT "heerlijk"
@@ -260,17 +272,8 @@ class SearchService
      */
     protected function matchesWithWordBoundary(string $text, string $searchWord): bool
     {
-        // Escape special regex characters in search word
         $escapedWord = preg_quote($searchWord, '/');
-
-        // Word boundary pattern:
-        // (?:^|[\s\-.,;:!?()\[\]{}])  = start OR boundary character (space, hyphen, punctuation)
-        // {$escapedWord}              = the search word
-        // (?=[\s\-.,;:!?()\[\]{}]|$)  = followed by boundary OR end (lookahead, doesn't consume)
-        //
-        // Using lookahead (?=...) for end boundary so we don't consume characters
-        // This allows matching stems like "eerlijk" in "eerlijke"
-        $pattern = '/(?:^|[\s\-.,;:!?()\[\]{}])' . $escapedWord . '/u';
+        $pattern = '/' . self::WORD_START . $escapedWord . '/u';
 
         return preg_match($pattern, $text) === 1;
     }

@@ -106,7 +106,9 @@ Rendering the teaser
 ====================
 
 ``record.teaser`` contains stripped, whitespace-collapsed plain text. The shipped
-templates already render it:
+:file:`Results.html` shows it as preview text; without a teaser it falls back to
+``record.abstract`` and then ``record.description``, and without any of the
+three it renders no preview. The core of it:
 
 ..  code-block:: html
 

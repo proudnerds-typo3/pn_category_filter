@@ -11,6 +11,22 @@ Releases follow `Semantic Versioning <https://semver.org/>`__. Only
 ``Major.Minor`` versions are published as separate documentation branches,
 because patch releases never introduce breaking changes or new features.
 
+2.1.0
+=====
+
+-   Result records link to their page or, through ``recordLinks`` and the
+    site's :typoscript:`config.recordLinks`, to their detail view; see
+    :ref:`configuration-record-links`
+-   The default :file:`Results.html` links the title when a link is available
+    and shows the page ``abstract`` as preview text when there is no teaser
+-   ``CategoryFilterController`` gets ``RecordLinkService`` through the
+    constructor; subclasses that override it must pass it on
+-   Fixed: the category list exposes list items to assistive technology
+-   Fixed: after AJAX pagination focus moves to the results heading; an
+    overridden ``Results.html`` marks its heading with ``data-results-title``
+-   Fixed: quotes, slashes and other punctuation count as word boundaries in
+    search, so ``haven`` finds *'Haven Leeft'*
+
 2.0.0
 =====
 
