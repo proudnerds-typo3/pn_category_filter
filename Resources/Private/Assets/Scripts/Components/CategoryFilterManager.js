@@ -225,7 +225,8 @@ class CategoryFilterManager {
             this.searchManager?.clearDebounce()
             this.handleSearchChange()
           },
-          onSelectCategory: (categoryUid) => this.#selectCategory(categoryUid)
+          onSelectCategory: (categoryUid) => this.#selectCategory(categoryUid),
+          onSelectFieldValue: (key, value) => this.#selectFieldValue(key, value)
         })
       : null
   }
@@ -255,6 +256,25 @@ class CategoryFilterManager {
     )
     if (checkbox && !checkbox.checked) {
       checkbox.checked = true
+      this.handleFilterChange()
+    }
+  }
+
+  /**
+   * Checks a field filter value chosen from the suggestions; a radio button replaces the
+   * group's previous choice by itself
+   *
+   * @param {string} key
+   * @param {string} value
+   * @returns {void}
+   */
+  #selectFieldValue(key, value) {
+    const input = Array.from(this.fieldInputs).find(
+      (candidate) =>
+        candidate.dataset.fieldFacet === key && candidate.value === value
+    )
+    if (input && !input.checked) {
+      input.checked = true
       this.handleFilterChange()
     }
   }

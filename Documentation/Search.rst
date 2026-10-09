@@ -97,6 +97,10 @@ input once the term reaches
 -   up to three selectable categories (the ones with a checkbox, so no parent
     categories) whose title matches the term, with their result count; choosing
     one checks it in the filter;
+-   up to three values of :ref:`field filters <field-facets>` whose label
+    matches the term, shown as "<filter>: <value> (<count>)"; values that are
+    already selected or would give no results are left out, and choosing one
+    checks it in the filter;
 -   up to five titles of the best matching records that contain the term
     themselves, taken from the first field of
     :ref:`searchFields <confval-flexform-searchfields>`; choosing one searches

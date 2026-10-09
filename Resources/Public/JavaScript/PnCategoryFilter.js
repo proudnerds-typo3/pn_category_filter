@@ -569,16 +569,18 @@
     #minChars;
     #onSelectTitle;
     #onSelectCategory;
+    #onSelectFieldValue;
     /**
      * @param {HTMLFormElement} searchForm - The search form containing the listbox
-     * @param {{onSelectTitle: Function, onSelectCategory: Function}} callbacks
+     * @param {{onSelectTitle: Function, onSelectCategory: Function, onSelectFieldValue: Function}} callbacks
      */
-    constructor(searchForm, { onSelectTitle, onSelectCategory }) {
+    constructor(searchForm, { onSelectTitle, onSelectCategory, onSelectFieldValue }) {
       this.#input = searchForm.querySelector(".pn-category-filter__search-input");
       this.#listbox = searchForm.querySelector("[data-search-suggestions]");
       this.#status = searchForm.querySelector("[data-search-suggestions-status]");
       this.#onSelectTitle = onSelectTitle;
       this.#onSelectCategory = onSelectCategory;
+      this.#onSelectFieldValue = onSelectFieldValue;
       this.#minChars = parseInt(searchForm.dataset.searchMinChars || "3", 10);
       if (this.#input && this.#listbox) {
         this.#init(searchForm);
@@ -622,13 +624,14 @@
     /**
      * Shows the suggestions of the latest results update; opens only while the visitor is typing.
      *
-     * @param {{titles: string[], categories: {uid: number, title: string, count: number}[]}|null} data
+     * @param {{titles: string[], categories: {uid: number, title: string, count: number}[], fieldValues: {key: string, value: string, label: string, facet: string, count: number}[]}|null} data
      * @returns {void}
      */
     update(data) {
       if (!this.#listbox) return;
       const titles = data?.titles ?? [];
       const categories = data?.categories ?? [];
+      const fieldValues = data?.fieldValues ?? [];
       this.#listbox.replaceChildren();
       this.#options = [];
       this.#activeIndex = -1;
@@ -638,6 +641,13 @@
           "category",
           String(category.uid),
           `${categoryLabel}: ${category.title} (${category.count})`
+        );
+      });
+      fieldValues.forEach((fieldValue) => {
+        this.#addOption(
+          "field",
+          JSON.stringify({ key: fieldValue.key, value: fieldValue.value }),
+          `${fieldValue.facet}: ${fieldValue.label} (${fieldValue.count})`
         );
       });
       titles.forEach((title) => this.#addOption("title", title, title));
@@ -742,6 +752,9 @@
       this.#waitForInput = true;
       if (suggestionType === "category") {
         this.#onSelectCategory(suggestionValue);
+      } else if (suggestionType === "field") {
+        const { key, value } = JSON.parse(suggestionValue);
+        this.#onSelectFieldValue?.(key, value);
       } else {
         this.#input.value = suggestionValue;
         this.#onSelectTitle(suggestionValue);
@@ -908,7 +921,8 @@
           this.searchManager?.clearDebounce();
           this.handleSearchChange();
         },
-        onSelectCategory: (categoryUid) => this.#selectCategory(categoryUid)
+        onSelectCategory: (categoryUid) => this.#selectCategory(categoryUid),
+        onSelectFieldValue: (key, value) => this.#selectFieldValue(key, value)
       }) : null;
     }
     /**
@@ -935,6 +949,23 @@
       );
       if (checkbox && !checkbox.checked) {
         checkbox.checked = true;
+        this.handleFilterChange();
+      }
+    }
+    /**
+     * Checks a field filter value chosen from the suggestions; a radio button replaces the
+     * group's previous choice by itself
+     *
+     * @param {string} key
+     * @param {string} value
+     * @returns {void}
+     */
+    #selectFieldValue(key, value) {
+      const input = Array.from(this.fieldInputs).find(
+        (candidate) => candidate.dataset.fieldFacet === key && candidate.value === value
+      );
+      if (input && !input.checked) {
+        input.checked = true;
         this.handleFilterChange();
       }
     }

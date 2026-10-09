@@ -22,6 +22,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   field filter counts in `<script data-field-facet-counts>`
 - Template variable `hasActiveFieldFilters`; the default `Results.html` uses
   it to announce the result count as a status message
+- Search suggestions include up to three field filter values whose label
+  matches the term ("Status: completed (4)"); choosing one checks it. The
+  suggestions JSON has a new `fieldValues` list and suggestion options a new
+  type `field` (class `pn-category-filter__suggestion--field`)
 
 ### Changed
 

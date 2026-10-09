@@ -1,7 +1,7 @@
 /**
  * SuggestionManager
  *
- * Turns the search input into an ARIA 1.2 combobox with title and category suggestions.
+ * Turns the search input into an ARIA 1.2 combobox with title, category and field filter suggestions.
  * The suggestions arrive with every results update, so there is no request of its own.
  *
  * @module SuggestionManager
@@ -18,17 +18,22 @@ class SuggestionManager {
   #minChars
   #onSelectTitle
   #onSelectCategory
+  #onSelectFieldValue
 
   /**
    * @param {HTMLFormElement} searchForm - The search form containing the listbox
-   * @param {{onSelectTitle: Function, onSelectCategory: Function}} callbacks
+   * @param {{onSelectTitle: Function, onSelectCategory: Function, onSelectFieldValue: Function}} callbacks
    */
-  constructor(searchForm, { onSelectTitle, onSelectCategory }) {
+  constructor(
+    searchForm,
+    { onSelectTitle, onSelectCategory, onSelectFieldValue }
+  ) {
     this.#input = searchForm.querySelector('.pn-category-filter__search-input')
     this.#listbox = searchForm.querySelector('[data-search-suggestions]')
     this.#status = searchForm.querySelector('[data-search-suggestions-status]')
     this.#onSelectTitle = onSelectTitle
     this.#onSelectCategory = onSelectCategory
+    this.#onSelectFieldValue = onSelectFieldValue
     this.#minChars = parseInt(searchForm.dataset.searchMinChars || '3', 10)
 
     if (this.#input && this.#listbox) {
@@ -80,7 +85,7 @@ class SuggestionManager {
   /**
    * Shows the suggestions of the latest results update; opens only while the visitor is typing.
    *
-   * @param {{titles: string[], categories: {uid: number, title: string, count: number}[]}|null} data
+   * @param {{titles: string[], categories: {uid: number, title: string, count: number}[], fieldValues: {key: string, value: string, label: string, facet: string, count: number}[]}|null} data
    * @returns {void}
    */
   update(data) {
@@ -88,6 +93,7 @@ class SuggestionManager {
 
     const titles = data?.titles ?? []
     const categories = data?.categories ?? []
+    const fieldValues = data?.fieldValues ?? []
     this.#listbox.replaceChildren()
     this.#options = []
     this.#activeIndex = -1
@@ -98,6 +104,13 @@ class SuggestionManager {
         'category',
         String(category.uid),
         `${categoryLabel}: ${category.title} (${category.count})`
+      )
+    })
+    fieldValues.forEach((fieldValue) => {
+      this.#addOption(
+        'field',
+        JSON.stringify({ key: fieldValue.key, value: fieldValue.value }),
+        `${fieldValue.facet}: ${fieldValue.label} (${fieldValue.count})`
       )
     })
     titles.forEach((title) => this.#addOption('title', title, title))
@@ -225,6 +238,9 @@ class SuggestionManager {
     this.#waitForInput = true
     if (suggestionType === 'category') {
       this.#onSelectCategory(suggestionValue)
+    } else if (suggestionType === 'field') {
+      const { key, value } = JSON.parse(suggestionValue)
+      this.#onSelectFieldValue?.(key, value)
     } else {
       this.#input.value = suggestionValue
       this.#onSelectTitle(suggestionValue)

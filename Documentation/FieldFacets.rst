@@ -79,6 +79,10 @@ results is disabled, unless it is selected.
 
 The category badges in turn respect the active field filters.
 
+With :ref:`search suggestions <search-suggestions>` enabled, a value whose label
+matches the search term is suggested as "<filter>: <value> (<count>)"; choosing
+it checks the value.
+
 Request and URL
 ===============
 

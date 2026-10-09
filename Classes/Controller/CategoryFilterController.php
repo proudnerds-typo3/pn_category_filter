@@ -249,6 +249,7 @@ class CategoryFilterController extends ActionController
         $categoryCounts = [];
         $categoryCountsMap = [];
         $fieldFacetCounts = [];
+        $fieldFacetViewData = [];
         $searchSuggestions = null;
 
         // Get sorting with URL override priority
@@ -328,13 +329,18 @@ class CategoryFilterController extends ActionController
                 $categoryCountsMap = $this->categoryFilterService->flattenTreeCounts($categoryTree);
             }
 
+            if (!empty($this->settings['showFilterMenu'])) {
+                $fieldFacetViewData = $this->buildFieldFacetViewData($fieldFacetCounts);
+            }
+
             if ($this->suggestionsActive($searchTerm)) {
                 $searchSuggestions = $this->suggestionService->build(
                     $records,
                     $categoryTree,
                     $categoryCountsMap,
                     $searchTerm,
-                    $this->settings
+                    $this->settings,
+                    $fieldFacetViewData
                 );
             }
         }
@@ -387,9 +393,7 @@ class CategoryFilterController extends ActionController
             'categoryCountsJson' => $categoryCountsMap === []
                 ? ''
                 : json_encode($categoryCountsMap, JSON_THROW_ON_ERROR | JSON_HEX_TAG | JSON_HEX_AMP),
-            'fieldFacets' => empty($this->settings['showFilterMenu'])
-                ? []
-                : $this->buildFieldFacetViewData($fieldFacetCounts),
+            'fieldFacets' => $fieldFacetViewData,
             // Objects on every level, also when the values are 0, 1, 2…
             'fieldFacetCountsJson' => $fieldFacetCounts === []
                 ? ''

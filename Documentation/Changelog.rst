@@ -15,7 +15,8 @@ because patch releases never introduce breaking changes or new features.
 =====
 
 -   :ref:`Field filters <field-facets>`: filter on the value of a TCA
-    ``select`` field next to the categories, with facet-aware result counts
+    ``select`` field next to the categories, with facet-aware result counts;
+    matching values also appear as :ref:`search suggestions <search-suggestions>`
 -   An overridden :file:`List.html` passes ``fieldFacets`` to
     :file:`Partials/FilterMenu/CategoryList.html` and renders the menu when
     ``{categoryTree} || {fieldFacets}``; an overridden :file:`Pagination.html`

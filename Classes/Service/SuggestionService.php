@@ -5,13 +5,15 @@ declare(strict_types=1);
 namespace ProudNerds\PnCategoryFilter\Service;
 
 /**
- * Builds the search suggestions shown while typing: titles of the best matching records and
- * categories whose title matches the term, both taken from the result set already computed.
+ * Builds the search suggestions shown while typing: titles of the best matching records, and
+ * categories and field filter values whose label matches the term, all from the result set
+ * already computed.
  */
 final class SuggestionService
 {
     public const int MAX_TITLES = 5;
     public const int MAX_CATEGORIES = 3;
+    public const int MAX_FIELD_VALUES = 3;
 
     public function __construct(
         private readonly SearchService $searchService,
@@ -22,13 +24,25 @@ final class SuggestionService
      * @param array<int,array<string,mixed>> $categoryTree Filter tree as built for the menu
      * @param array<int,int> $categoryCounts categoryUid => search-aware result count
      * @param array<string,mixed> $settings Plugin settings (searchFields decides the title field)
-     * @return array{titles: list<string>, categories: list<array{uid: int, title: string, count: int}>}
+     * @param list<array<string,mixed>> $fieldFacets Field filters as rendered in the menu, with counts
+     * @return array{
+     *     titles: list<string>,
+     *     categories: list<array{uid: int, title: string, count: int}>,
+     *     fieldValues: list<array{key: string, value: string, label: string, facet: string, count: int}>
+     * }
      */
-    public function build(array $records, array $categoryTree, array $categoryCounts, string $searchTerm, array $settings): array
-    {
+    public function build(
+        array $records,
+        array $categoryTree,
+        array $categoryCounts,
+        string $searchTerm,
+        array $settings,
+        array $fieldFacets = [],
+    ): array {
         return [
             'titles' => $this->collectTitles($records, $settings, $searchTerm),
             'categories' => $this->collectCategories($categoryTree, $categoryCounts, $searchTerm),
+            'fieldValues' => $this->collectFieldValues($fieldFacets, $searchTerm),
         ];
     }
 
@@ -56,6 +70,36 @@ final class SuggestionService
         }
 
         return $titles;
+    }
+
+    /**
+     * Selected values are left out: choosing one would change nothing.
+     *
+     * @param list<array<string,mixed>> $fieldFacets
+     * @return list<array{key: string, value: string, label: string, facet: string, count: int}>
+     */
+    private function collectFieldValues(array $fieldFacets, string $searchTerm): array
+    {
+        $matches = [];
+        foreach ($fieldFacets as $facet) {
+            foreach ((array)($facet['values'] ?? []) as $value) {
+                $label = (string)($value['label'] ?? '');
+                $count = (int)($value['count'] ?? 0);
+                if ($count > 0 && empty($value['selected']) && $this->searchService->matchesText($label, $searchTerm)) {
+                    $matches[] = [
+                        'key' => (string)($facet['key'] ?? ''),
+                        'value' => (string)($value['value'] ?? ''),
+                        'label' => $label,
+                        'facet' => (string)($facet['label'] ?? ''),
+                        'count' => $count,
+                    ];
+                }
+            }
+        }
+
+        usort($matches, static fn(array $a, array $b): int => $b['count'] <=> $a['count']);
+
+        return array_slice($matches, 0, self::MAX_FIELD_VALUES);
     }
 
     /**
