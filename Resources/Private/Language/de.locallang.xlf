@@ -42,6 +42,10 @@
                 <source>results</source>
                 <target>Ergebnisse</target>
             </trans-unit>
+            <trans-unit id="filter.fieldFacetAll" resname="filter.fieldFacetAll">
+                <source>All</source>
+                <target>Alle</target>
+            </trans-unit>
 
             <!-- Search -->
             <trans-unit id="search.title" resname="search.title">

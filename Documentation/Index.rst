@@ -53,6 +53,7 @@ Solr server, an indexer or a queue to maintain.
     Installation
     Configuration
     FilterLogic
+    FieldFacets
     Search
     ResultCount
     BoostFields

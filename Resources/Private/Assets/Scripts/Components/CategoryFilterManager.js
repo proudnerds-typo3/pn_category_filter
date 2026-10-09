@@ -5,7 +5,7 @@
  *
  * @module CategoryFilterManager
  * @author ProudNerds
- * @version 2.1.0
+ * @version 2.2.0
  */
 
 import ContentLoader from '../Utils/ContentLoader.js'
@@ -31,9 +31,8 @@ class CategoryFilterManager {
     this.resultsContainer = document.querySelector(
       '.pn-category-filter__results'
     )
-    this.checkboxes = filterContainer.querySelectorAll(
-      '.pn-category-filter__category-checkbox'
-    )
+    this.checkboxes = filterContainer.querySelectorAll('[data-category-filter]')
+    this.fieldInputs = filterContainer.querySelectorAll('[data-field-facet]')
     this.isResetting = false
     this.pendingReload = false
 
@@ -89,9 +88,9 @@ class CategoryFilterManager {
    * @returns {void}
    */
   attachEventListeners() {
-    this.checkboxes.forEach((checkbox) => {
-      checkbox.addEventListener('change', () => this.handleFilterChange())
-    })
+    for (const input of [...this.checkboxes, ...this.fieldInputs]) {
+      input.addEventListener('change', () => this.handleFilterChange())
+    }
   }
 
   /**
@@ -119,6 +118,11 @@ class CategoryFilterManager {
     // Uncheck all category checkboxes
     this.checkboxes.forEach((checkbox) => {
       checkbox.checked = false
+    })
+
+    // Radio groups fall back to their "All" option, which has an empty value
+    this.fieldInputs.forEach((input) => {
+      input.checked = input.type === 'radio' && input.value === ''
     })
 
     // Reset sorting back to defaults (no sorting)
@@ -205,6 +209,7 @@ class CategoryFilterManager {
         // Patch the result-count badges (and 0-count leaf disabled state) from the
         // server counts map that ships inside the swapped results container.
         this.applyResultCounts()
+        this.#applyFieldFacetCounts()
       }
     })
   }
@@ -331,7 +336,7 @@ class CategoryFilterManager {
    * @returns {Promise<void>}
    */
   async loadResults() {
-    const firstCheckbox = this.checkboxes[0]
+    const firstCheckbox = this.checkboxes[0] ?? this.fieldInputs[0]
 
     if (!firstCheckbox || !firstCheckbox.dataset.ajaxUrl) {
       console.error('No checkbox or AJAX URL found')
@@ -369,6 +374,19 @@ class CategoryFilterManager {
     }
     // When no categories selected (reset), don't add selectedCategories key at all
     // This tells the server to use default behavior (show all records from FlexForm categories)
+
+    const fieldFilterCounts = {}
+    this.fieldInputs.forEach((input) => {
+      if (!input.checked || input.value === '') {
+        return
+      }
+      const key = input.dataset.fieldFacet
+      const index = fieldFilterCounts[key] ?? 0
+      formData[
+        `tx_pncategoryfilter_categoryfilterlist[fieldFilters][${key}][${index}]`
+      ] = input.value
+      fieldFilterCounts[key] = index + 1
+    })
 
     // Add sorting parameters if SortingManager is available
     if (this.sortingManager?.hasUserSorted()) {
@@ -469,12 +487,12 @@ class CategoryFilterManager {
       }
 
       const childCheckboxes = parentItem.querySelectorAll(
-        '.pn-category-filter__category-checkbox'
+        '[data-category-filter], [data-field-facet]'
       )
 
-      // Count how many children are checked
+      // Count how many children are checked; the "All" radio option is no filter
       const activeChildCount = Array.from(childCheckboxes).filter(
-        (cb) => cb.checked
+        (cb) => cb.checked && cb.value !== ''
       ).length
 
       if (activeChildCount > 0) {
@@ -536,17 +554,7 @@ class CategoryFilterManager {
       }
 
       const count = counts[uid]
-      badge.textContent = count
-
-      // Mirror the count into the adjacent screenreader phrase ("<count> results"), which
-      // lives in the .assistive [data-result-count-sr] span right after the decorative badge.
-      const srPhrase = badge.nextElementSibling
-      if (srPhrase && srPhrase.hasAttribute('data-result-count-sr')) {
-        const srValue = srPhrase.querySelector('[data-result-count-value]')
-        if (srValue) {
-          srValue.textContent = count
-        }
-      }
+      this.#setBadgeCount(badge, count)
 
       // Only leaf nodes (no children, so they carry a checkbox) get the 0-count treatment.
       if (node.dataset.hasChildren === 'true') {
@@ -555,6 +563,66 @@ class CategoryFilterManager {
 
       this.#toggleLeafEmptyState(node, count === 0)
     })
+  }
+
+  /**
+   * Patches the field filter badges from the facet key => value => count map, as
+   * applyResultCounts() does for categories; every value node gets the 0-count treatment
+   *
+   * @returns {void}
+   */
+  #applyFieldFacetCounts() {
+    const countsScript = this.resultsContainer?.querySelector(
+      'script[data-field-facet-counts]'
+    )
+    if (!countsScript) {
+      return
+    }
+
+    let counts
+    try {
+      counts = JSON.parse(countsScript.textContent)
+    } catch (error) {
+      console.error('Invalid field filter counts JSON:', error)
+      return
+    }
+
+    this.filterContainer
+      .querySelectorAll('[data-field-facet-group]')
+      .forEach((group) => {
+        const facetCounts = counts[group.dataset.fieldFacetGroup] ?? {}
+        group.querySelectorAll('[data-field-facet-value]').forEach((node) => {
+          const count = facetCounts[node.dataset.fieldFacetValue]
+          if (count === undefined) {
+            return
+          }
+          const badge = node.querySelector('[data-result-count]')
+          if (badge) {
+            this.#setBadgeCount(badge, count)
+            this.#toggleLeafEmptyState(node, count === 0)
+          }
+        })
+      })
+  }
+
+  /**
+   * Sets a decorative badge and the screenreader phrase ("<count> results") in the
+   * [data-result-count-sr] span right after it
+   *
+   * @param {HTMLElement} badge
+   * @param {number} count
+   * @returns {void}
+   */
+  #setBadgeCount(badge, count) {
+    badge.textContent = count
+
+    const srPhrase = badge.nextElementSibling
+    if (srPhrase && srPhrase.hasAttribute('data-result-count-sr')) {
+      const srValue = srPhrase.querySelector('[data-result-count-value]')
+      if (srValue) {
+        srValue.textContent = count
+      }
+    }
   }
 
   /**
@@ -576,7 +644,7 @@ class CategoryFilterManager {
     node.classList.toggle(emptyModifier, isEmpty)
 
     const checkbox = node.querySelector(
-      '.pn-category-filter__category-checkbox'
+      '[data-category-filter], [data-field-facet]'
     )
     if (checkbox) {
       // Never disable a checked leaf: disabling it would trap the selection (WCAG 2.1.2) —

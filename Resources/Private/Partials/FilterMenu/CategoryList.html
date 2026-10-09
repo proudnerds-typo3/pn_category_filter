@@ -18,8 +18,14 @@
     -->
 </f:comment>
 
-<f:if condition="{categoryTree}">
+<f:if condition="{categoryTree} || {fieldFacets}">
     <div class="pn-category-filter__category-list flex" role="list">
+        <f:comment><!-- Field filters come first and only on the top level; nested lists get no fieldFacets --></f:comment>
+        <f:for each="{fieldFacets}" as="facet">
+            <div role="listitem">
+                <f:render partial="FilterMenu/FieldFacet" arguments="{facet: facet, ttContentUid: ttContentUid, settings: settings}" />
+            </div>
+        </f:for>
         <f:for each="{categoryTree}" as="category">
             <div role="listitem">
                 <f:if condition="{category.hasChildren}">

@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace ProudNerds\PnCategoryFilter\Controller;
 
 use Doctrine\DBAL\Exception;
+use ProudNerds\PnCategoryFilter\Dto\FieldFacet;
 use ProudNerds\PnCategoryFilter\Event\AfterRecordsPaginatedEvent;
 use ProudNerds\PnCategoryFilter\Service\CategoryFilterService;
 use ProudNerds\PnCategoryFilter\Service\CategoryResolverService;
+use ProudNerds\PnCategoryFilter\Service\FieldFacetService;
 use ProudNerds\PnCategoryFilter\Service\FileResolverService;
 use ProudNerds\PnCategoryFilter\Service\RecordLinkService;
 use ProudNerds\PnCategoryFilter\Service\SearchService;
@@ -58,6 +60,11 @@ class CategoryFilterController extends ActionController
         'tx_extensionmanager_domain_model_extension',
     ];
 
+    /**
+     * @var array<string,FieldFacet>
+     */
+    private array $fieldFacets = [];
+
     public function __construct(
         private readonly CategoryFilterService $categoryFilterService,
         private readonly FileResolverService $fileResolverService,
@@ -65,6 +72,7 @@ class CategoryFilterController extends ActionController
         private readonly RecordLinkService $recordLinkService,
         private readonly SuggestionService $suggestionService,
         private readonly FlexFormTools $flexFormTools,
+        private readonly FieldFacetService $fieldFacetService,
     ) {}
 
     public function initializeView(): void
@@ -185,6 +193,11 @@ class CategoryFilterController extends ActionController
                 $arguments['tx_pncategoryfilter_categoryfilterlist']['search'] = $searchTerm;
             }
 
+            $fieldFilters = $this->getActiveFieldFilters();
+            if ($fieldFilters !== []) {
+                $arguments['tx_pncategoryfilter_categoryfilterlist']['fieldFilters'] = $fieldFilters;
+            }
+
             // Generate URL with parameters or clean URL if nothing is set
             $hasParameters = !empty($arguments['tx_pncategoryfilter_categoryfilterlist']);
 
@@ -229,11 +242,13 @@ class CategoryFilterController extends ActionController
 
         $tables = $this->getTableList();
         $currentPage = $this->getCurrentPageNumberFromRequest();
+        $this->fieldFacets = $this->buildFieldFacets($tables);
 
         $records = [];
         $categoryTree = [];
         $categoryCounts = [];
         $categoryCountsMap = [];
+        $fieldFacetCounts = [];
         $searchSuggestions = null;
 
         // Get sorting with URL override priority
@@ -286,10 +301,12 @@ class CategoryFilterController extends ActionController
                 $this->getCategoryListFromFlexForm(),
                 // A visitor-chosen sort order wins over relevance, as it does over boost.
                 !$userHasSorted && (bool)($this->settings['relevanceSorting'] ?? true),
+                $this->fieldFacets,
             );
 
             $records = $filteredResult->records;
             $categoryCounts = $filteredResult->counts;
+            $fieldFacetCounts = $filteredResult->fieldFacetCounts;
 
             // Get category tree for filter menu if enabled - always based on FlexForm categories
             if (!empty($this->settings['showFilterMenu']) && !empty($treeCategories)) {
@@ -370,6 +387,14 @@ class CategoryFilterController extends ActionController
             'categoryCountsJson' => $categoryCountsMap === []
                 ? ''
                 : json_encode($categoryCountsMap, JSON_THROW_ON_ERROR | JSON_HEX_TAG | JSON_HEX_AMP),
+            'fieldFacets' => empty($this->settings['showFilterMenu'])
+                ? []
+                : $this->buildFieldFacetViewData($fieldFacetCounts),
+            // Objects on every level, also when the values are 0, 1, 2…
+            'fieldFacetCountsJson' => $fieldFacetCounts === []
+                ? ''
+                : json_encode($fieldFacetCounts, JSON_THROW_ON_ERROR | JSON_HEX_TAG | JSON_HEX_AMP | JSON_FORCE_OBJECT),
+            'hasActiveFieldFilters' => $this->getActiveFieldFilters() !== [],
             // Suggestions while typing; only when enabled and the term is long enough to search.
             'searchSuggestionsJson' => $searchSuggestions === null
                 ? ''
@@ -480,6 +505,72 @@ class CategoryFilterController extends ActionController
 
         // Only keep selected categories that are within the allowed tree
         return array_values(array_intersect($selectedCategories, $allowedCategoriesExpanded));
+    }
+
+    /**
+     * Facets enabled in the plugin (settings.fieldFacetKeys) with the visitor's validated selection
+     *
+     * @param array<string> $tables
+     * @return array<string,FieldFacet>
+     */
+    protected function buildFieldFacets(array $tables): array
+    {
+        $requested = $this->request->hasArgument('fieldFilters')
+            ? $this->request->getArgument('fieldFilters')
+            : [];
+
+        return $this->fieldFacetService->buildFacets(
+            (array)($this->settings['fieldFacets'] ?? []),
+            GeneralUtility::trimExplode(',', (string)($this->settings['fieldFacetKeys'] ?? ''), true),
+            array_values($tables),
+            is_array($requested) ? $requested : [],
+            $this->request->getAttribute('language'),
+        );
+    }
+
+    /**
+     * @return array<string,list<string>> facet key => selected values, for pushState and pagination links
+     */
+    protected function getActiveFieldFilters(): array
+    {
+        $filters = [];
+        foreach ($this->fieldFacets as $facet) {
+            if ($facet->isActive()) {
+                $filters[$facet->key] = $facet->selected;
+            }
+        }
+
+        return $filters;
+    }
+
+    /**
+     * @param array<string,array<int|string,int>> $counts
+     * @return list<array<string,mixed>>
+     */
+    protected function buildFieldFacetViewData(array $counts): array
+    {
+        $viewData = [];
+        foreach ($this->fieldFacets as $facet) {
+            $values = [];
+            foreach ($facet->values as $value => $label) {
+                $value = (string)$value;
+                $values[] = [
+                    'value' => $value,
+                    'label' => $label,
+                    'count' => $counts[$facet->key][$value] ?? 0,
+                    'selected' => in_array($value, $facet->selected, true),
+                ];
+            }
+            $viewData[] = [
+                'key' => $facet->key,
+                'label' => $facet->label,
+                'multiple' => $facet->multiple,
+                'active' => $facet->isActive(),
+                'values' => $values,
+            ];
+        }
+
+        return $viewData;
     }
 
     /**
@@ -652,6 +743,11 @@ class CategoryFilterController extends ActionController
         $searchTerm = $this->getSearchTerm();
         if (!empty($searchTerm)) {
             $arguments['tx_pncategoryfilter_categoryfilterlist']['search'] = $searchTerm;
+        }
+
+        $fieldFilters = $this->getActiveFieldFilters();
+        if ($fieldFilters !== []) {
+            $arguments['tx_pncategoryfilter_categoryfilterlist']['fieldFilters'] = $fieldFilters;
         }
 
         return $arguments;

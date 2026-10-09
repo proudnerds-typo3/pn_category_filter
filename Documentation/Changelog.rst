@@ -11,6 +11,21 @@ Releases follow `Semantic Versioning <https://semver.org/>`__. Only
 ``Major.Minor`` versions are published as separate documentation branches,
 because patch releases never introduce breaking changes or new features.
 
+2.2.0
+=====
+
+-   :ref:`Field filters <field-facets>`: filter on the value of a TCA
+    ``select`` field next to the categories, with facet-aware result counts
+-   An overridden :file:`List.html` passes ``fieldFacets`` to
+    :file:`Partials/FilterMenu/CategoryList.html` and renders the menu when
+    ``{categoryTree} || {fieldFacets}``; an overridden :file:`Pagination.html`
+    passes ``fieldFilters`` in its links
+-   ``CategoryFilterService::fetchFilteredRecords()`` has a new last parameter
+    ``array $fieldFacets = []``; subclasses that override it must add it
+-   ``CategoryFilterController`` and ``CategoryFilterService`` get
+    ``FieldFacetService`` through the constructor; subclasses that override it
+    must pass it on
+
 2.1.0
 =====
 

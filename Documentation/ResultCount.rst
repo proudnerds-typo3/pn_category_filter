@@ -23,9 +23,9 @@ Behaviour
 -   The drill-down follows the active :ref:`filter combine logic <filter-logic>`:
 
     *   *Refine* (``facet``): each option is counted **without its own facet's
-        constraint**, which is how Solr behaves. A selected option therefore
-        shows its full total, while the other options show "how many results you
-        would get if you also picked this one".
+        constraint**, which is how Solr behaves: each badge shows how many
+        records carry that option, given the other active facets and the search
+        term. A selected option therefore shows its full total.
     *   *Expand* (``expand``): every option shows its own search-aware total over
         the whole configured tree, so picking one filter never drops the others
         to zero — there is no filter trap.

@@ -73,6 +73,14 @@
                 <source>Refine — OR within a group, AND across groups</source>
                 <target>Verfijnen — OR binnen een groep, AND tussen groepen</target>
             </trans-unit>
+            <trans-unit id="settings.fieldFacetKeys" resname="settings.fieldFacetKeys">
+                <source>Field filters</source>
+                <target>Veldfilters</target>
+            </trans-unit>
+            <trans-unit id="settings.fieldFacetKeys.description" resname="settings.fieldFacetKeys.description">
+                <source>Filters on a select field of the records, next to the categories. The TSconfig tx_pncategoryfilter.availableFieldFacets lists which exist; TypoScript settings.fieldFacets defines how they work.</source>
+                <target>Filters op een keuzeveld van de records, naast de categorieën. Welke er zijn bepaalt de TSconfig tx_pncategoryfilter.availableFieldFacets; de werking staat in TypoScript settings.fieldFacets.</target>
+            </trans-unit>
 
             <!-- Table Settings -->
             <trans-unit id="settings.tables" resname="settings.tables">

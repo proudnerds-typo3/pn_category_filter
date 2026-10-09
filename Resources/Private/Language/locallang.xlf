@@ -33,6 +33,9 @@
             <trans-unit id="filter.resultCountUnit" resname="filter.resultCountUnit">
                 <source>results</source>
             </trans-unit>
+            <trans-unit id="filter.fieldFacetAll" resname="filter.fieldFacetAll">
+                <source>All</source>
+            </trans-unit>
 
             <!-- Search -->
             <trans-unit id="search.title" resname="search.title">

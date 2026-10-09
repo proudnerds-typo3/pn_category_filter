@@ -6,6 +6,7 @@ namespace ProudNerds\PnCategoryFilter\Service;
 
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Exception;
+use ProudNerds\PnCategoryFilter\Dto\FieldFacet;
 use ProudNerds\PnCategoryFilter\Dto\FilteredRecordsResult;
 use ProudNerds\PnCategoryFilter\Event\AfterRecordsFetchedEvent;
 use ProudNerds\PnCategoryFilter\Utility\CategoryUtility;
@@ -27,6 +28,7 @@ class CategoryFilterService
         private readonly SynonymService $synonymService,
         private readonly LoggerInterface $logger,
         private readonly ConnectionPool $connectionPool,
+        private readonly FieldFacetService $fieldFacetService,
     ) {}
     /**
      * Sorting options
@@ -62,6 +64,7 @@ class CategoryFilterService
      * @param string $combineMode How selected categories combine: 'expand' (union) or 'facet' (OR within facet, AND across facets)
      * @param array $rootCategories Configured root category UIDs from FlexForm (required to resolve facets in 'facet' mode)
      * @param bool $relevanceSorting Order search results by relevance before the sort field (boost still first)
+     * @param array<string,FieldFacet> $fieldFacets Field filters: OR within a facet, AND with the categories and other facets
      * @return FilteredRecordsResult Filtered records plus per-category match counts
      * @throws Exception
      */
@@ -82,6 +85,7 @@ class CategoryFilterService
         string $combineMode = self::COMBINE_EXPAND,
         array $rootCategories = [],
         bool $relevanceSorting = false,
+        array $fieldFacets = [],
     ): FilteredRecordsResult {
         // Build the matched record set according to the combine mode.
         // Both branches produce the COMPLETE set (no slicing) — limit/pagination run later.
@@ -153,8 +157,13 @@ class CategoryFilterService
             $allRecords = $this->restrictRecordsToKeys($unionRecords, $selectedKeys);
         }
 
+        // The category selection before the field filters is what the field facet counts start from
+        $categoryRecords = $allRecords;
+        $fieldKeys = $this->fieldFacetService->matchingKeys($unionRecords, $fieldFacets);
+
         // Search once over the union; the displayed set is a subset of it, so it is derived from the
         // survivors instead of being searched a second time.
+        $synonymMap = [];
         if (!empty($searchTerm)) {
             // Fetch synonym map from Solr (empty array when synonyms are disabled or Solr is unavailable)
             $synonymMap = $solrSynonymsActive && $site !== null
@@ -163,13 +172,25 @@ class CategoryFilterService
 
             $unionRecords = $this->searchService->filterRecordsBySearch($unionRecords, $searchTerm, $settings, $synonymMap);
         }
-        $survivorKeys = $this->extractRecordKeys($unionRecords);
+        $searchKeys = $this->extractRecordKeys($unionRecords);
+        $survivorKeys = $fieldKeys === null ? $searchKeys : array_intersect_key($searchKeys, $fieldKeys);
         $relevanceScores = [];
-        if (!empty($searchTerm)) {
+        if (!empty($searchTerm) || $fieldKeys !== null) {
             $allRecords = $this->restrictRecordsToKeys($allRecords, $survivorKeys);
-            if ($relevanceSorting) {
-                $relevanceScores = $this->searchService->scoreRecords($allRecords, $searchTerm, $settings, $synonymMap);
-            }
+        }
+        if (!empty($searchTerm) && $relevanceSorting) {
+            $relevanceScores = $this->searchService->scoreRecords($allRecords, $searchTerm, $settings, $synonymMap);
+        }
+
+        // Each facet counts its values without its own selection, as facet mode does for categories
+        $fieldFacetCounts = [];
+        foreach ($fieldFacets as $facet) {
+            $otherKeys = $this->fieldFacetService->matchingKeys($categoryRecords, $fieldFacets, $facet->key);
+            $fieldFacetCounts[$facet->key] = $this->fieldFacetService->countValues(
+                $categoryRecords,
+                $facet,
+                $otherKeys === null ? $searchKeys : array_intersect_key($searchKeys, $otherKeys)
+            );
         }
 
         // Count matches per category on the COMPLETE set (before limit/pagination), search-aware.
@@ -201,7 +222,7 @@ class CategoryFilterService
             $allRecords = array_slice($allRecords, 0, $limit);
         }
 
-        return new FilteredRecordsResult(array_values($allRecords), $counts, $survivingCategoryKeys);
+        return new FilteredRecordsResult(array_values($allRecords), $counts, $survivingCategoryKeys, $fieldFacetCounts);
     }
 
     /**

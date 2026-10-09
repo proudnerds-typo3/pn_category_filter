@@ -45,6 +45,29 @@ class CategoryItemsProcFunc
     }
 
     /**
+     * Populate field filter items from TSconfig tx_pncategoryfilter.availableFieldFacets (key = label)
+     *
+     * @param array $config
+     */
+    public function getFieldFacetItems(array &$config): void
+    {
+        $pageTSconfig = BackendUtility::getPagesTSconfig($this->getPageId($config));
+        $facets = $pageTSconfig['tx_pncategoryfilter.']['availableFieldFacets.'] ?? [];
+        $languageService = $GLOBALS['LANG'] ?? null;
+
+        $config['items'] = [];
+        foreach ($facets as $key => $label) {
+            if (!is_string($label)) {
+                continue;
+            }
+            $config['items'][] = [
+                'label' => $languageService?->sL($label) ?: $key,
+                'value' => $key,
+            ];
+        }
+    }
+
+    /**
      * Get page ID from config context
      *
      * @param array $config

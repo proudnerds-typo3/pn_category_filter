@@ -763,9 +763,8 @@
       this.resultsContainer = document.querySelector(
         ".pn-category-filter__results"
       );
-      this.checkboxes = filterContainer.querySelectorAll(
-        ".pn-category-filter__category-checkbox"
-      );
+      this.checkboxes = filterContainer.querySelectorAll("[data-category-filter]");
+      this.fieldInputs = filterContainer.querySelectorAll("[data-field-facet]");
       this.isResetting = false;
       this.pendingReload = false;
       this.filterRoot = filterContainer.closest(".pn-category-filter") ?? filterContainer.parentElement;
@@ -807,9 +806,9 @@
      * @returns {void}
      */
     attachEventListeners() {
-      this.checkboxes.forEach((checkbox) => {
-        checkbox.addEventListener("change", () => this.handleFilterChange());
-      });
+      for (const input of [...this.checkboxes, ...this.fieldInputs]) {
+        input.addEventListener("change", () => this.handleFilterChange());
+      }
     }
     /**
      * Attaches event listener to reset button using event delegation
@@ -833,6 +832,9 @@
     async handleReset() {
       this.checkboxes.forEach((checkbox) => {
         checkbox.checked = false;
+      });
+      this.fieldInputs.forEach((input) => {
+        input.checked = input.type === "radio" && input.value === "";
       });
       if (this.sortingManager) {
         this.sortingManager.setSorting("", "none");
@@ -892,6 +894,7 @@
           }
           this.updateCategoryAmounts();
           this.applyResultCounts();
+          this.#applyFieldFacetCounts();
         }
       });
     }
@@ -1001,7 +1004,7 @@
      * @returns {Promise<void>}
      */
     async loadResults() {
-      const firstCheckbox = this.checkboxes[0];
+      const firstCheckbox = this.checkboxes[0] ?? this.fieldInputs[0];
       if (!firstCheckbox || !firstCheckbox.dataset.ajaxUrl) {
         console.error("No checkbox or AJAX URL found");
         return;
@@ -1021,6 +1024,16 @@
           formData[`tx_pncategoryfilter_categoryfilterlist[selectedCategories][${index}]`] = categoryId;
         });
       }
+      const fieldFilterCounts = {};
+      this.fieldInputs.forEach((input) => {
+        if (!input.checked || input.value === "") {
+          return;
+        }
+        const key = input.dataset.fieldFacet;
+        const index = fieldFilterCounts[key] ?? 0;
+        formData[`tx_pncategoryfilter_categoryfilterlist[fieldFilters][${key}][${index}]`] = input.value;
+        fieldFilterCounts[key] = index + 1;
+      });
       if (this.sortingManager?.hasUserSorted()) {
         const { sortField, sortOrder } = this.sortingManager.getCurrentSorting();
         if (sortField && sortOrder !== "none") {
@@ -1101,10 +1114,10 @@
           return;
         }
         const childCheckboxes = parentItem.querySelectorAll(
-          ".pn-category-filter__category-checkbox"
+          "[data-category-filter], [data-field-facet]"
         );
         const activeChildCount = Array.from(childCheckboxes).filter(
-          (cb) => cb.checked
+          (cb) => cb.checked && cb.value !== ""
         ).length;
         if (activeChildCount > 0) {
           amountBadge.textContent = String(activeChildCount);
@@ -1159,19 +1172,65 @@
           return;
         }
         const count = counts[uid];
-        badge.textContent = count;
-        const srPhrase = badge.nextElementSibling;
-        if (srPhrase && srPhrase.hasAttribute("data-result-count-sr")) {
-          const srValue = srPhrase.querySelector("[data-result-count-value]");
-          if (srValue) {
-            srValue.textContent = count;
-          }
-        }
+        this.#setBadgeCount(badge, count);
         if (node.dataset.hasChildren === "true") {
           return;
         }
         this.#toggleLeafEmptyState(node, count === 0);
       });
+    }
+    /**
+     * Patches the field filter badges from the facet key => value => count map, as
+     * applyResultCounts() does for categories; every value node gets the 0-count treatment
+     *
+     * @returns {void}
+     */
+    #applyFieldFacetCounts() {
+      const countsScript = this.resultsContainer?.querySelector(
+        "script[data-field-facet-counts]"
+      );
+      if (!countsScript) {
+        return;
+      }
+      let counts;
+      try {
+        counts = JSON.parse(countsScript.textContent);
+      } catch (error) {
+        console.error("Invalid field filter counts JSON:", error);
+        return;
+      }
+      this.filterContainer.querySelectorAll("[data-field-facet-group]").forEach((group) => {
+        const facetCounts = counts[group.dataset.fieldFacetGroup] ?? {};
+        group.querySelectorAll("[data-field-facet-value]").forEach((node) => {
+          const count = facetCounts[node.dataset.fieldFacetValue];
+          if (count === void 0) {
+            return;
+          }
+          const badge = node.querySelector("[data-result-count]");
+          if (badge) {
+            this.#setBadgeCount(badge, count);
+            this.#toggleLeafEmptyState(node, count === 0);
+          }
+        });
+      });
+    }
+    /**
+     * Sets a decorative badge and the screenreader phrase ("<count> results") in the
+     * [data-result-count-sr] span right after it
+     *
+     * @param {HTMLElement} badge
+     * @param {number} count
+     * @returns {void}
+     */
+    #setBadgeCount(badge, count) {
+      badge.textContent = count;
+      const srPhrase = badge.nextElementSibling;
+      if (srPhrase && srPhrase.hasAttribute("data-result-count-sr")) {
+        const srValue = srPhrase.querySelector("[data-result-count-value]");
+        if (srValue) {
+          srValue.textContent = count;
+        }
+      }
     }
     /**
      * Mirrors the server-render rule for a leaf node: toggles the --empty modifier on the node
@@ -1189,7 +1248,7 @@
       ) ? "pn-category-filter__category-child--empty" : "pn-category-filter__category-item--empty";
       node.classList.toggle(emptyModifier, isEmpty);
       const checkbox = node.querySelector(
-        ".pn-category-filter__category-checkbox"
+        "[data-category-filter], [data-field-facet]"
       );
       if (checkbox) {
         checkbox.disabled = isEmpty && !checkbox.checked;

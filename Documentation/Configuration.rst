@@ -160,6 +160,14 @@ Tab: Category Settings
     How selected categories are combined: ``expand`` (union) or ``facet``
     (refine). See :ref:`filter-logic`.
 
+..  confval:: settings.fieldFacetKeys
+    :name: flexform-fieldFacetKeys
+    :type: string (multiple)
+
+    The field filters to show above the categories, in this order. The list
+    comes from the page TSconfig ``tx_pncategoryfilter.availableFieldFacets``.
+    See :ref:`field-facets`.
+
 Tab: Table Settings
 -------------------
 
@@ -768,6 +776,8 @@ The relevant files:
         -   The filter menu
     -   -   :file:`Partials/FilterMenu/CategoryListChildren.html`
         -   A nested level of the menu
+    -   -   :file:`Partials/FilterMenu/FieldFacet.html`
+        -   One :ref:`field filter <field-facets>`
     -   -   :file:`Partials/FilterMenu/SearchForm.html`
         -   The search input
     -   -   :file:`Partials/FilterMenu/Actions.html`

@@ -1,0 +1,70 @@
+<html xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers" data-namespace-typo3-fluid="true">
+
+<f:comment>
+    <!-- One field filter, with the markup of a parent category. multiple = 1 gives checkboxes,
+    multiple = 0 radio buttons with "All" first. The JS hooks on data-field-facet (input) and
+    data-field-facet-value (the node with the count badge). -->
+</f:comment>
+
+<f:variable name="ajaxUrl" value="{f:uri.action(action: 'ajaxLoadResults', pageType: settings.pageType.ajaxLoadResults, arguments: {ttContentUid: ttContentUid})}" />
+<f:variable name="inputType" value="{f:if(condition: facet.multiple, then: 'checkbox', else: 'radio')}" />
+<f:variable name="inputName" value="tx_pncategoryfilter_categoryfilterlist[fieldFilters][{facet.key}][]" />
+
+<details class="pn-category-filter__category-item" data-field-facet-group="{facet.key}" data-has-children="true" {f:if(condition: facet.active, then: 'open')}>
+    <summary class="pn-category-filter__category-toggle">
+        <span class="pn-category-filter__category-label">{facet.label}</span>
+        <f:if condition="{settings.showActiveFilterCount}">
+            <span class="pn-category-filter__amount hidden" aria-hidden="true">
+                0
+            </span>
+        </f:if>
+        <span class="pn-category-filter__toggle-icon" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" class="icon-chevron">
+                <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" class="icon-plus">
+                <path d="M7.99998 3.33325V12.6666M3.33331 7.99992H12.6666" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" class="icon-minus">
+                <path d="M3.33331 7.99992H12.6666" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+        </span>
+    </summary>
+
+    <div role="{f:if(condition: facet.multiple, then: 'group', else: 'radiogroup')}" aria-label="{facet.label}">
+        <ul class="pn-category-filter__category-children">
+            <f:if condition="{facet.multiple}">
+                <f:else>
+                    <li class="pn-category-filter__category-child">
+                        <div class="pn-category-filter__category-checkbox-wrapper">
+                            <input type="radio" id="field-facet-{facet.key}-all" name="{inputName}" value="" class="pn-category-filter__category-checkbox" data-field-facet="{facet.key}" data-ajax-url="{ajaxUrl}" {f:if(condition: facet.active, else: 'checked')} />
+                            <label for="field-facet-{facet.key}-all" class="pn-category-filter__category-label">
+                                <f:translate key="LLL:EXT:pn_category_filter/Resources/Private/Language/locallang.xlf:filter.fieldFacetAll" />
+                            </label>
+                        </div>
+                    </li>
+                </f:else>
+            </f:if>
+
+            <f:for each="{facet.values}" as="item" iteration="iteration">
+                <f:comment><!-- A 0-count value is disabled when result counts are shown, unless it is selected: it must stay operable to deselect it --></f:comment>
+                <f:variable name="resultCountEmpty" value="{f:if(condition: '{settings.showResultCount} && {item.count} == 0 && !{item.selected}', then: 1, else: 0)}" />
+                <f:variable name="inputId" value="field-facet-{facet.key}-{iteration.index}" />
+                <li class="pn-category-filter__category-child{f:if(condition: resultCountEmpty, then: ' pn-category-filter__category-child--empty')}" data-field-facet-value="{item.value}">
+                    <div class="pn-category-filter__category-checkbox-wrapper">
+                        <input type="{inputType}" id="{inputId}" name="{inputName}" value="{item.value}" class="pn-category-filter__category-checkbox" data-field-facet="{facet.key}" data-ajax-url="{ajaxUrl}" {f:if(condition: item.selected, then: 'checked')} {f:if(condition: resultCountEmpty, then: 'disabled')}{f:if(condition: settings.showResultCount, then: ' aria-describedby=pn-cf-count-{inputId}')} />
+                        <label for="{inputId}" class="pn-category-filter__category-label">{item.label}</label>
+                        <f:if condition="{settings.showResultCount}">
+                            <span class="pn-category-filter__result-count" data-result-count aria-hidden="true">{item.count}</span>
+                            <span class="assistive" id="pn-cf-count-{inputId}" data-result-count-sr><span data-result-count-value>{item.count}</span> <f:translate key="LLL:EXT:pn_category_filter/Resources/Private/Language/locallang.xlf:filter.resultCountUnit" /></span>
+                        </f:if>
+                    </div>
+                </li>
+            </f:for>
+        </ul>
+    </div>
+</details>
+
+</html>

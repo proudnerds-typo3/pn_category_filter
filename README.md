@@ -15,6 +15,8 @@ server, an indexer or a queue to maintain.
 
 - Category filtering with hierarchy, over `pages`, `tt_content` or any
   categorized custom table
+- Field filters on a TCA `select` field (e.g. a status) next to the categories,
+  with facet-aware counts
 - Two combine modes: **Expand** (union) and **Refine** (faceted — OR within a
   group, AND across groups)
 - AJAX search with multi-word AND matching, debouncing and term highlighting
@@ -62,6 +64,7 @@ published at
 | [Installation](Documentation/Installation.rst) | Install, TypoScript, assets |
 | [Configuration](Documentation/Configuration.rst) | Every FlexForm, TypoScript, TSconfig and site setting |
 | [Filter combine logic](Documentation/FilterLogic.rst) | Expand vs. Refine |
+| [Field filters](Documentation/FieldFacets.rst) | Filtering on a select field next to the categories |
 | [Search](Documentation/Search.rst) | Search behaviour, highlighting, Solr synonyms |
 | [Result count badges](Documentation/ResultCount.rst) | The `(n)` badges |
 | [Boost fields](Documentation/BoostFields.rst) | Pinning records to the top |

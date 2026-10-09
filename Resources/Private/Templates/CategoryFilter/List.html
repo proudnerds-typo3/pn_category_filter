@@ -21,9 +21,9 @@
                     </svg>
                 </button>
 
-                <f:if condition="{categoryTree}">
+                <f:if condition="{categoryTree} || {fieldFacets}">
                     <nav id="pn-category-filter-categories" class="pn-category-filter__categories" aria-label="{f:translate(key: 'LLL:EXT:pn_category_filter/Resources/Private/Language/locallang.xlf:filter.navigation')}">
-                        <f:render partial="FilterMenu/CategoryList" arguments="{categoryTree: categoryTree, level: 0, ttContentUid: ttContentUid, settings: settings}" />
+                        <f:render partial="FilterMenu/CategoryList" arguments="{categoryTree: categoryTree, fieldFacets: fieldFacets, level: 0, ttContentUid: ttContentUid, settings: settings}" />
                     </nav>
 
                     <f:if condition="{settings.displayMode} == 'horizontal'">

@@ -57,6 +57,12 @@
             <trans-unit id="settings.filterLogic.facet" resname="settings.filterLogic.facet">
                 <source>Refine — OR within a group, AND across groups</source>
             </trans-unit>
+            <trans-unit id="settings.fieldFacetKeys" resname="settings.fieldFacetKeys">
+                <source>Field filters</source>
+            </trans-unit>
+            <trans-unit id="settings.fieldFacetKeys.description" resname="settings.fieldFacetKeys.description">
+                <source>Filters on a select field of the records, next to the categories. The TSconfig tx_pncategoryfilter.availableFieldFacets lists which exist; TypoScript settings.fieldFacets defines how they work.</source>
+            </trans-unit>
 
             <!-- Table Settings -->
             <trans-unit id="settings.tables" resname="settings.tables">

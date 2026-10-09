@@ -34,6 +34,8 @@ Filtering
 ---------
 
 -   Category filtering with hierarchical support: parents include their children
+-   :ref:`Field filters <field-facets>` on a TCA ``select`` field, such as a
+    status, next to the categories
 -   Two combine modes, :ref:`Expand and Refine <filter-logic>`: a union, or a
     faceted search with OR within a group and AND across groups
 -   Multi-table: query :sql:`pages`, :sql:`tt_content` or any categorized custom

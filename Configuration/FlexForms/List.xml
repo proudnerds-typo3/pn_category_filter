@@ -71,6 +71,18 @@
                             <default>expand</default>
                         </config>
                     </settings.filterLogic>
+
+                    <settings.fieldFacetKeys>
+                        <label>LLL:EXT:pn_category_filter/Resources/Private/Language/locallang_be.xlf:settings.fieldFacetKeys</label>
+                        <description>LLL:EXT:pn_category_filter/Resources/Private/Language/locallang_be.xlf:settings.fieldFacetKeys.description</description>
+                        <config>
+                            <type>select</type>
+                            <renderType>selectMultipleSideBySide</renderType>
+                            <size>3</size>
+                            <maxitems>99</maxitems>
+                            <itemsProcFunc>ProudNerds\PnCategoryFilter\UserFunc\CategoryItemsProcFunc->getFieldFacetItems</itemsProcFunc>
+                        </config>
+                    </settings.fieldFacetKeys>
                 </el>
             </ROOT>
         </sDEF>

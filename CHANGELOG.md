@@ -7,6 +7,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [2.2.0] – 2026-10-09
+
+### Added
+
+- Field filters: filter records on the value of a TCA `select` field next to
+  the categories. Define them in TypoScript `settings.fieldFacets.<key>`
+  (`table`, `field`, `label`, `multiple`), offer them through the page
+  TSconfig `tx_pncategoryfilter.availableFieldFacets` and pick them per plugin
+  in the new FlexForm field `settings.fieldFacetKeys`. Values combine with OR
+  within a filter and with AND with categories, search and other filters; each
+  value gets a facet-aware result count. See `Documentation/FieldFacets.rst`
+- New partial `FilterMenu/FieldFacet.html`; the AJAX response carries the
+  field filter counts in `<script data-field-facet-counts>`
+- Template variable `hasActiveFieldFilters`; the default `Results.html` uses
+  it to announce the result count as a status message
+
+### Changed
+
+- `List.html` passes `fieldFacets` to `FilterMenu/CategoryList.html` and
+  renders the menu when either the category tree or `fieldFacets` is non-empty
+  (`{categoryTree} || {fieldFacets}`, also in `CategoryList.html`). An
+  overridden `List.html` must do the same, or field filters are not shown
+- `CategoryFilterService::fetchFilteredRecords()` has a new last parameter
+  `array $fieldFacets = []`. A subclass that overrides the method must add it,
+  or PHP stops with an incompatible declaration
+- `Pagination.html` passes `fieldFilters` in every link; add it to an
+  overridden `Pagination.html`
+- The JavaScript finds category checkboxes by `data-category-filter` instead
+  of the class `pn-category-filter__category-checkbox`
+- `CategoryFilterController` gets `FieldFacetService` and
+  `CategoryFilterService` gets `FieldFacetService` through their constructors.
+  If you extend them and override the constructor, pass it on
+
 ## [2.1.0] – 2026-10-07
 
 ### Added
@@ -180,7 +213,8 @@ First public release.
   skip the `pushState` update but also skipped the `SearchManager`
   re-initialisation. Only the `pushState` call is conditional now.
 
-[Unreleased]: https://github.com/proudnerds-typo3/pn_category_filter/compare/2.1.0...HEAD
+[Unreleased]: https://github.com/proudnerds-typo3/pn_category_filter/compare/2.2.0...HEAD
+[2.2.0]: https://github.com/proudnerds-typo3/pn_category_filter/compare/2.1.0...2.2.0
 [2.1.0]: https://github.com/proudnerds-typo3/pn_category_filter/compare/2.0.0...2.1.0
 [2.0.0]: https://github.com/proudnerds-typo3/pn_category_filter/compare/1.1.0...2.0.0
 [1.1.0]: https://github.com/proudnerds-typo3/pn_category_filter/compare/1.0.0...1.1.0
