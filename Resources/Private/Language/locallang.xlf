@@ -30,6 +30,9 @@
             <trans-unit id="filter.reset" resname="filter.reset">
                 <source>Reset Filter</source>
             </trans-unit>
+            <trans-unit id="filter.apply" resname="filter.apply">
+                <source>Apply filters</source>
+            </trans-unit>
             <trans-unit id="filter.resultCountUnit" resname="filter.resultCountUnit">
                 <source>results</source>
             </trans-unit>
@@ -107,6 +110,9 @@
             </trans-unit>
             <trans-unit id="pagination.page" resname="pagination.page">
                 <source>Page</source>
+            </trans-unit>
+            <trans-unit id="pagination.label" resname="pagination.label">
+                <source>Pagination</source>
             </trans-unit>
         </body>
     </file>

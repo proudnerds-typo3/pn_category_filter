@@ -40,6 +40,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   `CategoryFilterService` gets `FieldFacetService` through their constructors.
   If you extend them and override the constructor, pass it on
 
+### Fixed
+
+- The toggle button in the filter overlay (`FilterMenu/Actions.html`) had a
+  hard-coded Dutch label "Filters toepassen"; it now comes from the new
+  language key `filter.apply` (en, nl, de). Sites that copied the button
+  into an override can use the same key (#1)
+- The pagination landmark had a hard-coded English `aria-label`
+  "Pagination"; it now uses the new key `pagination.label` (en, nl, de)
+- The German backend labels of the display mode setting were missing
+
 ## [2.1.0] – 2026-10-07
 
 ### Added

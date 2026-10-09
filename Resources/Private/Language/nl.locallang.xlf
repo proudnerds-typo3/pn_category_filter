@@ -38,6 +38,10 @@
                 <source>Reset Filter</source>
                 <target>Herstel filters</target>
             </trans-unit>
+            <trans-unit id="filter.apply" resname="filter.apply">
+                <source>Apply filters</source>
+                <target>Filters toepassen</target>
+            </trans-unit>
             <trans-unit id="filter.resultCountUnit" resname="filter.resultCountUnit">
                 <source>results</source>
                 <target>resultaten</target>
@@ -139,6 +143,10 @@
             <trans-unit id="pagination.page" resname="pagination.page">
                 <source>Page</source>
                 <target>Pagina</target>
+            </trans-unit>
+            <trans-unit id="pagination.label" resname="pagination.label">
+                <source>Pagination</source>
+                <target>Paginering</target>
             </trans-unit>
         </body>
     </file>

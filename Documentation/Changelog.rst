@@ -22,6 +22,10 @@ because patch releases never introduce breaking changes or new features.
     passes ``fieldFilters`` in its links
 -   ``CategoryFilterService::fetchFilteredRecords()`` has a new last parameter
     ``array $fieldFacets = []``; subclasses that override it must add it
+-   Fixed: the overlay toggle button label comes from the language files
+    (``filter.apply``) instead of a hard-coded Dutch text, the pagination
+    landmark label from ``pagination.label`` instead of a hard-coded English
+    one; the German display mode labels were added
 -   ``CategoryFilterController`` and ``CategoryFilterService`` get
     ``FieldFacetService`` through the constructor; subclasses that override it
     must pass it on

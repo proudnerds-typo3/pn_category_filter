@@ -115,6 +115,22 @@
             </trans-unit>
 
             <!-- Display Settings -->
+            <trans-unit id="settings.displayMode" resname="settings.displayMode">
+                <source>Display Mode</source>
+                <target>Anzeigemodus</target>
+            </trans-unit>
+            <trans-unit id="settings.displayMode.description" resname="settings.displayMode.description">
+                <source>Choose how the filter and results are laid out. Vertical places the filter menu in a sidebar next to the results. Horizontal places the filter menu above the results.</source>
+                <target>Legen Sie fest, wie Filter und Ergebnisse angeordnet werden. Vertikal stellt das Filtermenü in einer Seitenleiste neben die Ergebnisse. Horizontal stellt das Filtermenü über die Ergebnisse.</target>
+            </trans-unit>
+            <trans-unit id="settings.displayMode.horizontal" resname="settings.displayMode.horizontal">
+                <source>Horizontal (above results)</source>
+                <target>Horizontal (über den Ergebnissen)</target>
+            </trans-unit>
+            <trans-unit id="settings.displayMode.vertical" resname="settings.displayMode.vertical">
+                <source>Vertical (sidebar)</source>
+                <target>Vertikal (Seitenleiste)</target>
+            </trans-unit>
             <trans-unit id="settings.showResultCount" resname="settings.showResultCount">
                 <source>Show result count behind each filter</source>
                 <target>Ergebnisanzahl hinter Filtern anzeigen</target>
