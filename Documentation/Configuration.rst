@@ -230,7 +230,8 @@ Tab: Display Settings
     :Default: 1
 
     Reflect filters, search term and sort order in the URL, so a result set can
-    be bookmarked and shared.
+    be bookmarked and shared. The browser's back and forward buttons restore
+    the filter state of each step.
 
 ..  confval:: settings.limit
     :name: flexform-limit
@@ -815,6 +816,8 @@ The relevant files:
         -   The search input
     -   -   :file:`Partials/FilterMenu/Actions.html`
         -   The reset button and the sorting controls
+    -   -   :file:`Partials/FilterMenu/ResultCountUnit.html`
+        -   The word after a result count ("result" or "results")
 
 ..  warning::
     The JavaScript hooks onto ``data-*`` attributes — ``data-ajax-url``,

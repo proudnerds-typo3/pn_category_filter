@@ -40,6 +40,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   overridden `Pagination.html`
 - The JavaScript finds category checkboxes by `data-category-filter` instead
   of the class `pn-category-filter__category-checkbox`
+- Title suggestions also list records that match the term in another search
+  field, after the titles that contain the term; before, a term found only
+  in, say, the page content gave no title suggestions
 - `CategoryFilterController` gets `FieldFacetService` and
   `CategoryFilterService` gets `FieldFacetService` through their constructors.
   If you extend them and override the constructor, pass it on
@@ -53,6 +56,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - The pagination landmark had a hard-coded English `aria-label`
   "Pagination"; it now uses the new key `pagination.label` (en, nl, de)
 - The German backend labels of the display mode setting were missing
+- The browser's back and forward buttons changed the URL but not the
+  filters, search term, sorting or results; they now restore the state of
+  that step. A hash link (such as a skip link) does not reload
+- A count of one used the plural ("1 results found"). New language keys
+  `results.countSingular`, `filter.resultCountUnitSingular` and
+  `suggestions.countSingular` (en, nl, de) give the singular. The result
+  count badges render the unit through the new partial
+  `FilterMenu/ResultCountUnit.html`, which carries both forms for the
+  JavaScript. Overridden `Results.html`, `CategoryList.html`,
+  `CategoryListChildren.html` and `FieldFacet.html` must make the same change
+  to get the singular
+- The sorting checkboxes and selects had no `id` or `name`; they now get an
+  `id` per plugin instance
 
 ## [2.1.0] – 2026-10-07
 

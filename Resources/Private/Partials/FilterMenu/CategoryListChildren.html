@@ -37,7 +37,7 @@
                             <f:comment><!-- Result-count badge (deduplicated rollup for this parent) — toggled by showResultCount. The visible badge is decorative (aria-hidden); the adjacent .assistive span carries the screenreader phrase "{count} results" and is read as part of the toggle. JS patches both on data-result-count / data-result-count-value. --></f:comment>
                             <f:if condition="{settings.showResultCount}">
                                 <span class="pn-category-filter__result-count" data-result-count aria-hidden="true">{category.count}</span>
-                                <span class="assistive" data-result-count-sr><span data-result-count-value>{category.count}</span> <f:translate key="LLL:EXT:pn_category_filter/Resources/Private/Language/locallang.xlf:filter.resultCountUnit" /></span>
+                                <span class="assistive" data-result-count-sr><span data-result-count-value>{category.count}</span> <f:render partial="FilterMenu/ResultCountUnit" arguments="{count: category.count}" /></span>
                             </f:if>
                         </a>
 
@@ -61,7 +61,7 @@
                             <f:comment><!-- Result-count badge for this leaf — toggled by showResultCount. The visible badge is decorative (aria-hidden); the .assistive span (referenced by the checkbox aria-describedby) carries the screenreader phrase "{count} results". JS patches both on data-result-count / data-result-count-value. --></f:comment>
                             <f:if condition="{settings.showResultCount}">
                                 <span class="pn-category-filter__result-count" data-result-count aria-hidden="true">{category.count}</span>
-                                <span class="assistive" id="pn-cf-count-{category.uid}" data-result-count-sr><span data-result-count-value>{category.count}</span> <f:translate key="LLL:EXT:pn_category_filter/Resources/Private/Language/locallang.xlf:filter.resultCountUnit" /></span>
+                                <span class="assistive" id="pn-cf-count-{category.uid}" data-result-count-sr><span data-result-count-value>{category.count}</span> <f:render partial="FilterMenu/ResultCountUnit" arguments="{count: category.count}" /></span>
                             </f:if>
                         </div>
                     </li>

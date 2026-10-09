@@ -47,9 +47,10 @@ final class SuggestionService
     }
 
     /**
-     * @param array<int,array<string,mixed>> $records
-     * Only titles that contain the term themselves, so choosing one keeps the search meaningful.
+     * Titles that contain the term come first, then titles of records that match in another search
+     * field. Choosing one searches for that title, which the record always matches.
      *
+     * @param array<int,array<string,mixed>> $records
      * @param array<string,mixed> $settings
      * @return list<string>
      */
@@ -58,18 +59,24 @@ final class SuggestionService
         $fields = array_values(array_filter(array_map('trim', explode(',', (string)($settings['searchFields'] ?? 'title')))));
         $titleField = $fields[0] ?? 'title';
 
-        $titles = [];
+        $inTitle = [];
+        $elsewhere = [];
         foreach ($records as $record) {
             $title = trim(html_entity_decode(strip_tags((string)($record[$titleField] ?? '')), ENT_QUOTES | ENT_HTML5, 'UTF-8'));
-            if ($title !== '' && !in_array($title, $titles, true) && $this->searchService->matchesText($title, $searchTerm)) {
-                $titles[] = $title;
-                if (count($titles) === self::MAX_TITLES) {
+            if ($title === '' || in_array($title, $inTitle, true) || in_array($title, $elsewhere, true)) {
+                continue;
+            }
+            if ($this->searchService->matchesText($title, $searchTerm)) {
+                $inTitle[] = $title;
+                if (count($inTitle) === self::MAX_TITLES) {
                     break;
                 }
+            } elseif (count($elsewhere) < self::MAX_TITLES) {
+                $elsewhere[] = $title;
             }
         }
 
-        return $titles;
+        return array_slice([...$inTitle, ...$elsewhere], 0, self::MAX_TITLES);
     }
 
     /**

@@ -101,10 +101,10 @@ input once the term reaches
     matches the term, shown as "<filter>: <value> (<count>)"; values that are
     already selected or would give no results are left out, and choosing one
     checks it in the filter;
--   up to five titles of the best matching records that contain the term
-    themselves, taken from the first field of
-    :ref:`searchFields <confval-flexform-searchfields>`; choosing one searches
-    for that title.
+-   up to five titles of the best matching records, taken from the first field
+    of :ref:`searchFields <confval-flexform-searchfields>`: first the titles
+    that contain the term, then those of records that match in another search
+    field (for example the page content); choosing one searches for that title.
 
 The suggestions arrive with the results of the same request, as JSON in a
 :html:`<script type="application/json" data-suggestions-json>` element, so they

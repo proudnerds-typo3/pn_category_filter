@@ -134,9 +134,15 @@ class SuggestionManager {
     this.#input.setAttribute('aria-expanded', 'true')
     this.#input.removeAttribute('aria-activedescendant')
     if (this.#status) {
-      this.#status.textContent = (
-        this.#listbox.dataset.countLabel || '%s'
-      ).replace('%s', String(this.#options.length))
+      const { countLabel, countLabelSingular } = this.#listbox.dataset
+      const label =
+        this.#options.length === 1 && countLabelSingular
+          ? countLabelSingular
+          : countLabel
+      this.#status.textContent = (label || '%s').replace(
+        '%s',
+        String(this.#options.length)
+      )
     }
   }
 

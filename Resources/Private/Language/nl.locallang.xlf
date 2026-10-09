@@ -12,6 +12,10 @@
                 <source>%s results found</source>
                 <target>%s resultaten gevonden</target>
             </trans-unit>
+            <trans-unit id="results.countSingular" resname="results.countSingular">
+                <source>%s result found</source>
+                <target>%s resultaat gevonden</target>
+            </trans-unit>
             <trans-unit id="results.empty" resname="results.empty">
                 <source>No results found.</source>
                 <target>Geen resultaten gevonden.</target>
@@ -45,6 +49,10 @@
             <trans-unit id="filter.resultCountUnit" resname="filter.resultCountUnit">
                 <source>results</source>
                 <target>resultaten</target>
+            </trans-unit>
+            <trans-unit id="filter.resultCountUnitSingular" resname="filter.resultCountUnitSingular">
+                <source>result</source>
+                <target>resultaat</target>
             </trans-unit>
             <trans-unit id="filter.fieldFacetAll" resname="filter.fieldFacetAll">
                 <source>All</source>
@@ -87,6 +95,10 @@
             <trans-unit id="suggestions.count" resname="suggestions.count">
                 <source>%s suggestions available, use the arrow keys to choose</source>
                 <target>%s suggesties beschikbaar, kies met de pijltjestoetsen</target>
+            </trans-unit>
+            <trans-unit id="suggestions.countSingular" resname="suggestions.countSingular">
+                <source>%s suggestion available, use the arrow keys to choose</source>
+                <target>%s suggestie beschikbaar, kies met de pijltjestoetsen</target>
             </trans-unit>
             <trans-unit id="suggestions.category" resname="suggestions.category">
                 <source>Category</source>

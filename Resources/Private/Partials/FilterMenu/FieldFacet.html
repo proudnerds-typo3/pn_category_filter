@@ -58,7 +58,7 @@
                         <label for="{inputId}" class="pn-category-filter__category-label">{item.label}</label>
                         <f:if condition="{settings.showResultCount}">
                             <span class="pn-category-filter__result-count" data-result-count aria-hidden="true">{item.count}</span>
-                            <span class="assistive" id="pn-cf-count-{inputId}" data-result-count-sr><span data-result-count-value>{item.count}</span> <f:translate key="LLL:EXT:pn_category_filter/Resources/Private/Language/locallang.xlf:filter.resultCountUnit" /></span>
+                            <span class="assistive" id="pn-cf-count-{inputId}" data-result-count-sr><span data-result-count-value>{item.count}</span> <f:render partial="FilterMenu/ResultCountUnit" arguments="{count: item.count}" /></span>
                         </f:if>
                     </div>
                 </li>

@@ -43,7 +43,7 @@
             </summary>
 
             <div class="pn-category-filter__sort-options">
-                <f:for each="{settings.frontendSortingOptions}" as="sortOption" key="sortKey">
+                <f:for each="{settings.frontendSortingOptions}" as="sortOption" key="sortKey" iteration="sortIteration">
                     <f:if condition="{sortOption.label}">
                         <div class="pn-category-filter__sort-group">
                             <f:variable name="isChecked" value="0" />
@@ -51,13 +51,15 @@
                                 <f:variable name="isChecked" value="1" />
                             </f:if>
 
+                            <f:variable name="sortInputId" value="pn-category-filter-sort-{ttContentUid}-{sortIteration.index}" />
+
                             <label class="pn-category-filter__sort-checkbox-label">
                                 <f:if condition="{isChecked} == 1">
                                     <f:then>
-                                        <input type="checkbox" class="pn-category-filter__sort-checkbox" data-sort-field="{sortOption.field}" checked="checked" />
+                                        <input type="checkbox" id="{sortInputId}" class="pn-category-filter__sort-checkbox" data-sort-field="{sortOption.field}" checked="checked" />
                                     </f:then>
                                     <f:else>
-                                        <input type="checkbox" class="pn-category-filter__sort-checkbox" data-sort-field="{sortOption.field}" />
+                                        <input type="checkbox" id="{sortInputId}" class="pn-category-filter__sort-checkbox" data-sort-field="{sortOption.field}" />
                                     </f:else>
                                 </f:if>
                                 <span class="pn-category-filter__sort-option-label">{sortOption.label}</span>
@@ -65,10 +67,10 @@
 
                             <f:if condition="{isChecked} == 1">
                                 <f:then>
-                                    <f:render section="SortSelect" arguments="{sortField: sortOption.field, sortLabel: sortOption.label, currentSorting: activeSorting}" />
+                                    <f:render section="SortSelect" arguments="{sortField: sortOption.field, sortLabel: sortOption.label, selectId: '{sortInputId}-direction', currentSorting: activeSorting}" />
                                 </f:then>
                                 <f:else>
-                                    <f:render section="SortSelect" arguments="{sortField: sortOption.field, sortLabel: sortOption.label, currentSorting: 'desc'}" />
+                                    <f:render section="SortSelect" arguments="{sortField: sortOption.field, sortLabel: sortOption.label, selectId: '{sortInputId}-direction', currentSorting: 'desc'}" />
                                 </f:else>
                             </f:if>
                         </div>
@@ -80,7 +82,7 @@
 </div>
 
 <f:section name="SortSelect">
-    <select class="pn-category-filter__sort-select" data-sort-field="{sortField}" aria-label="{f:translate(key: 'LLL:EXT:pn_category_filter/Resources/Private/Language/locallang.xlf:sort.directionFor', arguments: {0: sortLabel})}">
+    <select id="{selectId}" class="pn-category-filter__sort-select" data-sort-field="{sortField}" aria-label="{f:translate(key: 'LLL:EXT:pn_category_filter/Resources/Private/Language/locallang.xlf:sort.directionFor', arguments: {0: sortLabel})}">
         <f:if condition="{currentSorting} == 'asc'">
             <f:then>
                 <option value="asc" selected="selected">

@@ -1,0 +1,6 @@
+<html xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers" data-namespace-typo3-fluid="true">
+<f:comment><!-- The unit after a result count; carries both forms so the JavaScript can switch it when it patches the count. --></f:comment>
+<f:variable name="unitSingular" value="{f:translate(key: 'LLL:EXT:pn_category_filter/Resources/Private/Language/locallang.xlf:filter.resultCountUnitSingular')}" />
+<f:variable name="unitPlural" value="{f:translate(key: 'LLL:EXT:pn_category_filter/Resources/Private/Language/locallang.xlf:filter.resultCountUnit')}" />
+<span data-result-count-unit data-unit-singular="{unitSingular}" data-unit-plural="{unitPlural}">{f:if(condition: '{count} == 1', then: unitSingular, else: unitPlural)}</span>
+</html>

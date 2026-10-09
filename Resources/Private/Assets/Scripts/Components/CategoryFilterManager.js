@@ -20,6 +20,9 @@ import SuggestionManager from './SuggestionManager.js'
  * @class
  */
 class CategoryFilterManager {
+  // The query string the results currently show; a popstate that keeps it (a hash link) needs no reload
+  #lastQuery = window.location.search
+
   /**
    * Creates an instance of CategoryFilterManager
    *
@@ -33,7 +36,7 @@ class CategoryFilterManager {
     )
     this.checkboxes = filterContainer.querySelectorAll('[data-category-filter]')
     this.fieldInputs = filterContainer.querySelectorAll('[data-field-facet]')
-    this.isResetting = false
+    this.skipPushState = false
     this.pendingReload = false
 
     // Look up the root container to find elements placed outside the menu aside (vertical mode)
@@ -77,6 +80,7 @@ class CategoryFilterManager {
     this.attachResetButtonListener()
     this.attachPaginationListener()
     this.attachMobileToggleListener()
+    this.#attachHistoryListener()
     if (this.filterRoot.classList.contains('pn-category-filter--horizontal')) {
       this.#attachAccordionListener()
     }
@@ -138,9 +142,10 @@ class CategoryFilterManager {
     // Always clean the URL when resetting (remove query parameters)
     const cleanUrl = window.location.pathname
     window.history.pushState({}, '', cleanUrl)
+    this.#lastQuery = window.location.search
 
     // Set flag to prevent ContentLoaderUpdated from overwriting the clean URL
-    this.isResetting = true
+    this.skipPushState = true
 
     await this.queueResultsReload()
   }
@@ -154,9 +159,9 @@ class CategoryFilterManager {
     document.addEventListener('ContentLoaderUpdated', (event) => {
       // Check if this is our results container
       if (event.detail.targetElement === this.resultsContainer) {
-        // Skip pushState update if we're resetting (we already set clean URL),
-        // but always re-attach SearchManager and update badges.
-        if (!this.isResetting) {
+        // Skip pushState update after a reset (clean URL already set) or a history step
+        // (the URL is already the one shown), but always re-attach SearchManager and update badges.
+        if (!this.skipPushState) {
           // Look for pushstate URL in the updated content
           const pushStateElement = this.resultsContainer.querySelector(
             '[data-pushstate-url]'
@@ -167,6 +172,7 @@ class CategoryFilterManager {
               pushStateElement.dataset.pushstateUrl
             )
             window.history.pushState({}, '', decodedUrl)
+            this.#lastQuery = window.location.search
           }
         }
 
@@ -343,9 +349,9 @@ class CategoryFilterManager {
       } while (this.pendingReload)
     } finally {
       this.pendingReload = false
-      // isResetting is scoped to this run: every pass of the loop must skip the pushState,
-      // so the clean URL set by handleReset() survives a reset that queued behind a load.
-      this.isResetting = false
+      // skipPushState is scoped to this run: every pass of the loop must skip the pushState,
+      // so the URL set by a reset or a history step survives one that queued behind a load.
+      this.skipPushState = false
       LoadingManager.setLoading(false, action)
     }
   }
@@ -482,6 +488,70 @@ class CategoryFilterManager {
     }
 
     // Update category amount badges
+    this.updateCategoryAmounts()
+  }
+
+  /**
+   * Reloads the results when the visitor goes back or forward to a filter state
+   *
+   * @returns {void}
+   */
+  #attachHistoryListener() {
+    window.addEventListener('popstate', () => {
+      if (window.location.search === this.#lastQuery) {
+        return
+      }
+      this.#lastQuery = window.location.search
+      this.#restoreStateFromUrl()
+      this.skipPushState = true
+      this.queueResultsReload()
+    })
+  }
+
+  /**
+   * Sets categories, field filters, search term and sorting to the state in the URL;
+   * what the URL leaves out goes back to its default, as after a reset
+   *
+   * @returns {void}
+   */
+  #restoreStateFromUrl() {
+    const prefix = 'tx_pncategoryfilter_categoryfilterlist'
+    const params = new URLSearchParams(window.location.search)
+    const categories = []
+    const fieldValues = {}
+    params.forEach((value, key) => {
+      if (key.startsWith(`${prefix}[selectedCategories]`)) {
+        categories.push(value)
+        return
+      }
+      const fieldKey = key.match(/^[^[]+\[fieldFilters\]\[([^\]]+)\]/)?.[1]
+      if (key.startsWith(`${prefix}[fieldFilters]`) && fieldKey) {
+        ;(fieldValues[fieldKey] ??= []).push(value)
+      }
+    })
+
+    this.checkboxes.forEach((checkbox) => {
+      checkbox.checked = categories.includes(checkbox.value)
+    })
+    this.fieldInputs.forEach((input) => {
+      const values = fieldValues[input.dataset.fieldFacet] ?? []
+      input.checked =
+        values.length > 0
+          ? values.includes(input.value)
+          : input.type === 'radio' && input.value === ''
+    })
+
+    this.searchManager?.setSearchTerm(params.get(`${prefix}[search]`) ?? '')
+
+    if (this.sortingManager) {
+      const sortField = params.get(`${prefix}[sortField]`) ?? ''
+      this.sortingManager.setSorting(
+        sortField,
+        params.get(`${prefix}[sorting]`) ?? 'none'
+      )
+      this.sortingManager.setUserHasSorted(sortField !== '')
+    }
+
     this.updateCategoryAmounts()
   }
 
@@ -641,6 +711,11 @@ class CategoryFilterManager {
       const srValue = srPhrase.querySelector('[data-result-count-value]')
       if (srValue) {
         srValue.textContent = count
+      }
+      const srUnit = srPhrase.querySelector('[data-result-count-unit]')
+      if (srUnit) {
+        srUnit.textContent =
+          count === 1 ? srUnit.dataset.unitSingular : srUnit.dataset.unitPlural
       }
     }
   }

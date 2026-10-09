@@ -23,10 +23,17 @@ because patch releases never introduce breaking changes or new features.
     passes ``fieldFilters`` in its links
 -   ``CategoryFilterService::fetchFilteredRecords()`` has a new last parameter
     ``array $fieldFacets = []``; subclasses that override it must add it
+-   Title suggestions also list records that match in another search field,
+    after the titles that contain the term
 -   Fixed: the overlay toggle button label comes from the language files
     (``filter.apply``) instead of a hard-coded Dutch text, the pagination
     landmark label from ``pagination.label`` instead of a hard-coded English
     one; the German display mode labels were added
+-   Fixed: the back and forward buttons restore the filter state of that step;
+    a count of one uses the singular (new language keys ``*Singular`` and the
+    partial :file:`Partials/FilterMenu/ResultCountUnit.html`, which overridden
+    result and filter menu partials must adopt); the sorting controls get an
+    ``id``
 -   ``CategoryFilterController`` and ``CategoryFilterService`` get
     ``FieldFacetService`` through the constructor; subclasses that override it
     must pass it on

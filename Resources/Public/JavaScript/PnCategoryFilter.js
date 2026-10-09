@@ -664,7 +664,12 @@
       this.#input.setAttribute("aria-expanded", "true");
       this.#input.removeAttribute("aria-activedescendant");
       if (this.#status) {
-        this.#status.textContent = (this.#listbox.dataset.countLabel || "%s").replace("%s", String(this.#options.length));
+        const { countLabel, countLabelSingular } = this.#listbox.dataset;
+        const label = this.#options.length === 1 && countLabelSingular ? countLabelSingular : countLabel;
+        this.#status.textContent = (label || "%s").replace(
+          "%s",
+          String(this.#options.length)
+        );
       }
     }
     /**
@@ -765,6 +770,8 @@
 
   // Resources/Private/Assets/Scripts/Components/CategoryFilterManager.js
   var CategoryFilterManager = class {
+    // The query string the results currently show; a popstate that keeps it (a hash link) needs no reload
+    #lastQuery = window.location.search;
     /**
      * Creates an instance of CategoryFilterManager
      *
@@ -778,7 +785,7 @@
       );
       this.checkboxes = filterContainer.querySelectorAll("[data-category-filter]");
       this.fieldInputs = filterContainer.querySelectorAll("[data-field-facet]");
-      this.isResetting = false;
+      this.skipPushState = false;
       this.pendingReload = false;
       this.filterRoot = filterContainer.closest(".pn-category-filter") ?? filterContainer.parentElement;
       const filterRoot = this.filterRoot;
@@ -809,6 +816,7 @@
       this.attachResetButtonListener();
       this.attachPaginationListener();
       this.attachMobileToggleListener();
+      this.#attachHistoryListener();
       if (this.filterRoot.classList.contains("pn-category-filter--horizontal")) {
         this.#attachAccordionListener();
       }
@@ -857,7 +865,8 @@
       }
       const cleanUrl = window.location.pathname;
       window.history.pushState({}, "", cleanUrl);
-      this.isResetting = true;
+      this.#lastQuery = window.location.search;
+      this.skipPushState = true;
       await this.queueResultsReload();
     }
     /**
@@ -868,7 +877,7 @@
     attachContentUpdateListener() {
       document.addEventListener("ContentLoaderUpdated", (event) => {
         if (event.detail.targetElement === this.resultsContainer) {
-          if (!this.isResetting) {
+          if (!this.skipPushState) {
             const pushStateElement = this.resultsContainer.querySelector(
               "[data-pushstate-url]"
             );
@@ -877,6 +886,7 @@
                 pushStateElement.dataset.pushstateUrl
               );
               window.history.pushState({}, "", decodedUrl);
+              this.#lastQuery = window.location.search;
             }
           }
           const newSearchForm = this.resultsContainer.querySelector(
@@ -1025,7 +1035,7 @@
         } while (this.pendingReload);
       } finally {
         this.pendingReload = false;
-        this.isResetting = false;
+        this.skipPushState = false;
         LoadingManager_default.setLoading(false, action);
       }
     }
@@ -1123,6 +1133,62 @@
           const categoryId = parseInt(checkbox.value, 10);
           checkbox.checked = selectedCategories.includes(categoryId);
         });
+      }
+      this.updateCategoryAmounts();
+    }
+    /**
+     * Reloads the results when the visitor goes back or forward to a filter state
+     *
+     * @returns {void}
+     */
+    #attachHistoryListener() {
+      window.addEventListener("popstate", () => {
+        if (window.location.search === this.#lastQuery) {
+          return;
+        }
+        this.#lastQuery = window.location.search;
+        this.#restoreStateFromUrl();
+        this.skipPushState = true;
+        this.queueResultsReload();
+      });
+    }
+    /**
+     * Sets categories, field filters, search term and sorting to the state in the URL;
+     * what the URL leaves out goes back to its default, as after a reset
+     *
+     * @returns {void}
+     */
+    #restoreStateFromUrl() {
+      const prefix = "tx_pncategoryfilter_categoryfilterlist";
+      const params = new URLSearchParams(window.location.search);
+      const categories = [];
+      const fieldValues = {};
+      params.forEach((value, key) => {
+        if (key.startsWith(`${prefix}[selectedCategories]`)) {
+          categories.push(value);
+          return;
+        }
+        const fieldKey = key.match(/^[^[]+\[fieldFilters\]\[([^\]]+)\]/)?.[1];
+        if (key.startsWith(`${prefix}[fieldFilters]`) && fieldKey) {
+          ;
+          (fieldValues[fieldKey] ??= []).push(value);
+        }
+      });
+      this.checkboxes.forEach((checkbox) => {
+        checkbox.checked = categories.includes(checkbox.value);
+      });
+      this.fieldInputs.forEach((input) => {
+        const values = fieldValues[input.dataset.fieldFacet] ?? [];
+        input.checked = values.length > 0 ? values.includes(input.value) : input.type === "radio" && input.value === "";
+      });
+      this.searchManager?.setSearchTerm(params.get(`${prefix}[search]`) ?? "");
+      if (this.sortingManager) {
+        const sortField = params.get(`${prefix}[sortField]`) ?? "";
+        this.sortingManager.setSorting(
+          sortField,
+          params.get(`${prefix}[sorting]`) ?? "none"
+        );
+        this.sortingManager.setUserHasSorted(sortField !== "");
       }
       this.updateCategoryAmounts();
     }
@@ -1260,6 +1326,10 @@
         const srValue = srPhrase.querySelector("[data-result-count-value]");
         if (srValue) {
           srValue.textContent = count;
+        }
+        const srUnit = srPhrase.querySelector("[data-result-count-unit]");
+        if (srUnit) {
+          srUnit.textContent = count === 1 ? srUnit.dataset.unitSingular : srUnit.dataset.unitPlural;
         }
       }
     }

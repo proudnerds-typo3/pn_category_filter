@@ -6,7 +6,10 @@
         </h2>
 
         <p class="pn-category-filter__count" {f:if(condition: '{selectedCategories} || {activeSearchTerm} || {hasActiveFieldFilters}' , then: 'role="status"' )}>
-            <f:translate key="LLL:EXT:pn_category_filter/Resources/Private/Language/locallang.xlf:results.count" arguments="{0: totalRecords}" />
+            <f:if condition="{totalRecords} == 1">
+                <f:then><f:translate key="LLL:EXT:pn_category_filter/Resources/Private/Language/locallang.xlf:results.countSingular" arguments="{0: totalRecords}" /></f:then>
+                <f:else><f:translate key="LLL:EXT:pn_category_filter/Resources/Private/Language/locallang.xlf:results.count" arguments="{0: totalRecords}" /></f:else>
+            </f:if>
         </p>
 
         <div class="pn-category-filter__items">
