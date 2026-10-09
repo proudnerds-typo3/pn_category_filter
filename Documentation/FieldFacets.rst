@@ -39,9 +39,9 @@ A field filter takes three steps.
             status = LLL:EXT:my_site/Resources/Private/Language/locallang.xlf:filter.status
         }
 
-3.  Select it in the plugin: :confval:`flexform-fieldFacetKeys`.
+3.  Select it in the plugin: :ref:`fieldFacetKeys <confval-flexform-fieldfacetkeys>`.
 
-The table must be one of the plugin's :confval:`flexform-tables`, and the field
+The table must be one of the plugin's :ref:`tables <confval-flexform-tables>`, and the field
 must be a ``select`` field. A key that does not meet these conditions is
 skipped. Keys may contain letters, digits, ``-`` and ``_``.
 

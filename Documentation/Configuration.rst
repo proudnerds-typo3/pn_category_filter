@@ -113,6 +113,16 @@ or by extending it:
 
 A table only produces results if it has a ``categories`` relation in its TCA.
 
+The FlexForm's *Field filters* selector lists the keys of
+``availableFieldFacets`` (key = label). The default file ships none; a site adds
+its own next to the TypoScript definition, see :ref:`field-facets`:
+
+..  code-block:: typoscript
+
+    tx_pncategoryfilter.availableFieldFacets {
+        status = LLL:EXT:my_site/Resources/Private/Language/locallang.xlf:filter.status
+    }
+
 ..  _configuration-flexform:
 
 FlexForm settings
@@ -490,6 +500,29 @@ TypoScript setup
 Some settings only exist in the setup: not as a constant, and not in the
 FlexForm.
 
+..  _configuration-field-facets:
+
+Field filters
+-------------
+
+``fieldFacets`` defines the :ref:`field filters <field-facets>` a plugin can
+switch on through :ref:`fieldFacetKeys <confval-flexform-fieldfacetkeys>`:
+
+..  code-block:: typoscript
+
+    plugin.tx_pncategoryfilter.settings.fieldFacets {
+        status {
+            table = pages
+            field = tx_mysite_status
+            label = LLL:EXT:my_site/Resources/Private/Language/locallang.xlf:filter.status
+            multiple = 1
+        }
+    }
+
+``table`` must be one of the plugin's tables and ``field`` a TCA ``select``
+field; ``label`` is optional and ``multiple = 0`` shows radio buttons with
+"All".
+
 ..  _configuration-sorting:
 
 Adding more sorting options
@@ -785,5 +818,6 @@ The relevant files:
 
 ..  warning::
     The JavaScript hooks onto ``data-*`` attributes — ``data-ajax-url``,
-    ``data-search-fields``, ``data-category-counts`` and others — never onto CSS
-    class names. Keep those attributes intact when you override a template.
+    ``data-search-fields``, ``data-category-filter``, ``data-category-counts``,
+    ``data-field-facet`` and others — never onto CSS class names. Keep those
+    attributes intact when you override a template.

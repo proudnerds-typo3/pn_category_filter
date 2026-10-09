@@ -234,8 +234,14 @@ injection:
         -   Attaching categories to records (:ref:`configuration-category-resolvers`)
     -   -   :php:`Service\RecordLinkService`
         -   Attaching a typolink parameter to records (:ref:`configuration-record-links`)
+    -   -   :php:`Service\FieldFacetService`
+        -   Resolving, filtering and counting :ref:`field filters <field-facets>`
     -   -   :php:`Dto\FilteredRecordsResult`
-        -   The result object holding the records and the category counts
+        -   The result object holding the records, the category counts and the
+            field filter counts
+    -   -   :php:`Dto\FieldFacet`
+        -   One configured field filter with its values and the visitor's
+            selection
 
 ..  note::
     These classes are not covered by a stability promise yet. Signatures may
