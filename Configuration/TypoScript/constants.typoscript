@@ -18,6 +18,9 @@ plugin.tx_pncategoryfilter {
     # cat=plugin.tx_pncategoryfilter/display; type=boolean; label=Show result-count badge behind each filter option (FlexForm overrides this). Default off (opt-in).
     showResultCount = 0
 
+    # cat=plugin.tx_pncategoryfilter/display; type=boolean; label=Hide filter options that none of the plugin's records carry (FlexForm overrides this). Default off.
+    hideEmptyOptions = 0
+
     # cat=plugin.tx_pncategoryfilter/display; type=boolean; label=Show active-sub-filter count badge on parent categories (FlexForm overrides this). Default on (existing behaviour).
     showActiveFilterCount = 1
 

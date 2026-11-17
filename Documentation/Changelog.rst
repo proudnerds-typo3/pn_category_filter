@@ -11,6 +11,23 @@ Releases follow `Semantic Versioning <https://semver.org/>`__. Only
 ``Major.Minor`` versions are published as separate documentation branches,
 because patch releases never introduce breaking changes or new features.
 
+2.3.0
+=====
+
+-   :ref:`Hiding options without results <hide-empty-options>`: the new
+    setting ``hideEmptyOptions`` leaves out the filter options that none of the
+    plugin's records carry, whatever the visitor selects or searches; a
+    selected option is always shown
+-   ``CategoryFilterService::removeUnavailableNodes()`` and
+    ``markSelectedNodes()``; ``FilteredRecordsResult`` has the new properties
+    ``availableCategoryKeys`` and ``fieldFacetTotals``; category tree nodes
+    carry a boolean ``selected``
+-   Fixed: a category selected through the URL with 0 results was rendered
+    disabled and could not be unchecked; it is now rendered checked and stays
+    operable. Overridden :file:`Partials/FilterMenu/CategoryList.html` and
+    :file:`Partials/FilterMenu/CategoryListChildren.html` can adopt the
+    ``category.selected`` condition
+
 2.2.0
 =====
 

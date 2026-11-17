@@ -317,6 +317,16 @@ class CategoryFilterController extends ActionController
                     (bool)($this->settings['showOnlyChildrenInFilter'] ?? false)
                 );
 
+                $selectedCategories = $this->hasActiveCategorySelection() ? $filterCategories : [];
+                if (!empty($this->settings['hideEmptyOptions'])) {
+                    $categoryTree = $this->categoryFilterService->removeUnavailableNodes(
+                        $categoryTree,
+                        $filteredResult->availableCategoryKeys,
+                        $selectedCategories
+                    );
+                }
+                $categoryTree = $this->categoryFilterService->markSelectedNodes($categoryTree, $selectedCategories);
+
                 // Annotate each node with its match count (leaf counts + deduplicated parent rollups)
                 $categoryTree = $this->categoryFilterService->attachCountsToTree(
                     $categoryTree,
@@ -330,7 +340,7 @@ class CategoryFilterController extends ActionController
             }
 
             if (!empty($this->settings['showFilterMenu'])) {
-                $fieldFacetViewData = $this->buildFieldFacetViewData($fieldFacetCounts);
+                $fieldFacetViewData = $this->buildFieldFacetViewData($fieldFacetCounts, $filteredResult->fieldFacetTotals);
             }
 
             if ($this->suggestionsActive($searchTerm)) {
@@ -549,21 +559,30 @@ class CategoryFilterController extends ActionController
 
     /**
      * @param array<string,array<int|string,int>> $counts
+     * @param array<string,array<int|string,int>> $totals Counts over all the plugin's records, for hideEmptyOptions
      * @return list<array<string,mixed>>
      */
-    protected function buildFieldFacetViewData(array $counts): array
+    protected function buildFieldFacetViewData(array $counts, array $totals = []): array
     {
+        $hideEmptyOptions = !empty($this->settings['hideEmptyOptions']);
         $viewData = [];
         foreach ($this->fieldFacets as $facet) {
             $values = [];
             foreach ($facet->values as $value => $label) {
                 $value = (string)$value;
+                $selected = in_array($value, $facet->selected, true);
+                if ($hideEmptyOptions && !$selected && ($totals[$facet->key][$value] ?? 0) === 0) {
+                    continue;
+                }
                 $values[] = [
                     'value' => $value,
                     'label' => $label,
                     'count' => $counts[$facet->key][$value] ?? 0,
-                    'selected' => in_array($value, $facet->selected, true),
+                    'selected' => $selected,
                 ];
+            }
+            if ($hideEmptyOptions && $values === []) {
+                continue;
             }
             $viewData[] = [
                 'key' => $facet->key,

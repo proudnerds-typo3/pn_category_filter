@@ -43,7 +43,33 @@ is added, the checkbox gets ``disabled``, and the cursor becomes
 
 A leaf that is **checked** and drops to zero stays operable, so it can still be
 unchecked — otherwise the visitor would be locked into an empty result set
-(WCAG 2.1.2, no keyboard trap).
+(WCAG 2.1.2, no keyboard trap). This also holds when the page is opened with
+the option already selected, for example through a link with
+``selectedCategories`` in the URL.
+
+..  _hide-empty-options:
+
+Hiding options without results
+==============================
+
+A large category tree, for example one shared by several record types, can
+hold many options that none of the plugin's records carry. With
+:ref:`hideEmptyOptions <confval-flexform-hideemptyoptions>` enabled, those
+options are left out of the filter menu:
+
+-   An option is left out when none of the plugin's records (its tables,
+    record storage pages and categories, after any
+    :ref:`AfterRecordsFetchedEvent <events>` listener) carry it. The visitor's
+    selection, search term and field filters play no part in this.
+-   An option that only drops to zero through a selection or search term stays
+    visible and is disabled as described above, so the menu does not shift
+    while the visitor filters.
+-   A selected option is always shown, so it can be unchecked.
+-   A parent category without any remaining children is left out too, and so
+    is a field filter without any remaining values.
+
+The setting is available since version 2.3.0 and works with and without
+``showResultCount``.
 
 Accessibility
 =============

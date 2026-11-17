@@ -20,6 +20,7 @@ plugin.tx_pncategoryfilter {
     textCropLength = {$plugin.tx_pncategoryfilter.settings.textCropLength}
     displayMode = {$plugin.tx_pncategoryfilter.settings.displayMode}
     showResultCount = {$plugin.tx_pncategoryfilter.settings.showResultCount}
+    hideEmptyOptions = {$plugin.tx_pncategoryfilter.settings.hideEmptyOptions}
     showActiveFilterCount = {$plugin.tx_pncategoryfilter.settings.showActiveFilterCount}
     relevanceSorting = {$plugin.tx_pncategoryfilter.settings.relevanceSorting}
     showSearchSuggestions = {$plugin.tx_pncategoryfilter.settings.showSearchSuggestions}

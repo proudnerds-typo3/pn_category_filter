@@ -21,6 +21,7 @@ server, an indexer or a queue to maintain.
   group, AND across groups)
 - AJAX search with multi-word AND matching, debouncing and term highlighting
 - Optional result-count `(n)` badges per filter option, facet- and search-aware
+- Optionally hide the options that none of the plugin's records carry
 - Boost fields, default sorting and optional frontend sorting controls
 - Page content hydration: make `pages` searchable on their `tt_content`
 - Optional synonym expansion through an existing EXT:solr synonym list
@@ -66,7 +67,7 @@ published at
 | [Filter combine logic](Documentation/FilterLogic.rst) | Expand vs. Refine |
 | [Field filters](Documentation/FieldFacets.rst) | Filtering on a select field next to the categories |
 | [Search](Documentation/Search.rst) | Search behaviour, highlighting, Solr synonyms |
-| [Result count badges](Documentation/ResultCount.rst) | The `(n)` badges |
+| [Result count badges](Documentation/ResultCount.rst) | The `(n)` badges, hiding options without results |
 | [Boost fields](Documentation/BoostFields.rst) | Pinning records to the top |
 | [Page content hydration](Documentation/PageContent.rst) | Searching `pages` on their content |
 | [Events and API](Documentation/Events.rst) | PSR-14 event, ViewHelper, services |

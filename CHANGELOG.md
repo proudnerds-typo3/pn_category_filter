@@ -7,6 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [2.3.0] – 2026-11-17
+
+### Added
+
+- Setting `hideEmptyOptions` (FlexForm *Display Settings* and TypoScript
+  constant, default off): the filter menu leaves out the options that none of
+  the plugin's records carry, whatever the visitor selects or searches. An
+  option that only drops to 0 through a selection or search term stays visible
+  and disabled; a selected option is always shown; a parent without remaining
+  children and a field filter without remaining values are left out too. See
+  `Documentation/ResultCount.rst`
+- `CategoryFilterService::removeUnavailableNodes()` and `markSelectedNodes()`;
+  `FilteredRecordsResult` has two new properties, `availableCategoryKeys` and
+  `fieldFacetTotals`: what the plugin's records carry before selection, search
+  and field filters
+- Category tree nodes carry a boolean `selected`
+
+### Fixed
+
+- A category that was selected through the URL (a link with
+  `selectedCategories`) and had 0 results was rendered disabled, so the
+  visitor could not uncheck it. A selected category is now rendered checked
+  and stays operable, as field filter values already did. Sites that override
+  `FilterMenu/CategoryList.html` or `FilterMenu/CategoryListChildren.html` can
+  add `&& !{category.selected}` to the `resultCountEmpty` condition and render
+  `checked` from `category.selected`
+
 ## [2.2.0] – 2026-10-09
 
 ### Added
@@ -243,7 +270,8 @@ First public release.
   skip the `pushState` update but also skipped the `SearchManager`
   re-initialisation. Only the `pushState` call is conditional now.
 
-[Unreleased]: https://github.com/proudnerds-typo3/pn_category_filter/compare/2.2.0...HEAD
+[Unreleased]: https://github.com/proudnerds-typo3/pn_category_filter/compare/2.3.0...HEAD
+[2.3.0]: https://github.com/proudnerds-typo3/pn_category_filter/compare/2.2.0...2.3.0
 [2.2.0]: https://github.com/proudnerds-typo3/pn_category_filter/compare/2.1.0...2.2.0
 [2.1.0]: https://github.com/proudnerds-typo3/pn_category_filter/compare/2.0.0...2.1.0
 [2.0.0]: https://github.com/proudnerds-typo3/pn_category_filter/compare/1.1.0...2.0.0

@@ -70,12 +70,12 @@
                         </details>
                     </f:then>
                     <f:else>
-                        <f:comment><!-- 0-count leaf is disabled (grey, not clickable) — only when result counts are shown --></f:comment>
-                        <f:variable name="resultCountEmpty" value="{f:if(condition: '{settings.showResultCount} && {category.count} == 0', then: 1, else: 0)}" />
+                        <f:comment><!-- 0-count leaf is disabled (grey, not clickable) when result counts are shown, unless it is selected: it must stay operable to deselect it --></f:comment>
+                        <f:variable name="resultCountEmpty" value="{f:if(condition: '{settings.showResultCount} && {category.count} == 0 && !{category.selected}', then: 1, else: 0)}" />
                         <div class="pn-category-filter__category-item{f:if(condition: resultCountEmpty, then: ' pn-category-filter__category-item--empty')}" data-category-uid="{category.uid}">
 
                             <div class="pn-category-filter__category-checkbox-wrapper">
-                                <input type="checkbox" id="category-{category.uid}" name="tx_pncategoryfilter_categoryfilterlist[selectedCategories][]" value="{category.uid}" class="pn-category-filter__category-checkbox" data-category-filter="{category.uid}" data-ajax-url="{f:uri.action(action: 'ajaxLoadResults', pageType: settings.pageType.ajaxLoadResults, arguments: {ttContentUid: ttContentUid})}" {f:if(condition: resultCountEmpty, then: 'disabled')}{f:if(condition: settings.showResultCount, then: ' aria-describedby=pn-cf-count-{category.uid}')} />
+                                <input type="checkbox" id="category-{category.uid}" name="tx_pncategoryfilter_categoryfilterlist[selectedCategories][]" value="{category.uid}" class="pn-category-filter__category-checkbox" data-category-filter="{category.uid}" data-ajax-url="{f:uri.action(action: 'ajaxLoadResults', pageType: settings.pageType.ajaxLoadResults, arguments: {ttContentUid: ttContentUid})}" {f:if(condition: category.selected, then: 'checked')} {f:if(condition: resultCountEmpty, then: 'disabled')}{f:if(condition: settings.showResultCount, then: ' aria-describedby=pn-cf-count-{category.uid}')} />
                                 <label for="category-{category.uid}" class="pn-category-filter__category-label">
                                     <f:format.htmlspecialchars>{category.title}</f:format.htmlspecialchars>
                                 </label>

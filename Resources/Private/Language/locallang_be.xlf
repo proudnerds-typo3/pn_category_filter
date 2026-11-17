@@ -109,6 +109,12 @@
             <trans-unit id="settings.showResultCount.description" resname="settings.showResultCount.description">
                 <source>Display the number of matching results behind each filter option (Solr-style facet counts). Counts update with the search term and other active filters. Options with 0 results are shown greyed-out and cannot be selected.</source>
             </trans-unit>
+            <trans-unit id="settings.hideEmptyOptions" resname="settings.hideEmptyOptions">
+                <source>Hide options without results</source>
+            </trans-unit>
+            <trans-unit id="settings.hideEmptyOptions.description" resname="settings.hideEmptyOptions.description">
+                <source>Leave out filter options that none of the records of this plugin carry, whatever the visitor selects or searches. An option that only drops to 0 through a selection or search term stays visible. A selected option is always shown.</source>
+            </trans-unit>
 
             <trans-unit id="settings.showActiveFilterCount" resname="settings.showActiveFilterCount">
                 <source>Show Active Sub-filter Count</source>

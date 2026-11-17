@@ -216,6 +216,15 @@ Tab: Display Settings
     Show a result-count ``(n)`` badge behind every filter option. See
     :ref:`result-count`.
 
+..  confval:: settings.hideEmptyOptions
+    :name: flexform-hideEmptyOptions
+    :type: boolean
+    :Default: 0
+
+    Leave out the filter options that none of the plugin's records carry,
+    whatever the visitor selects or searches. A selected option is always
+    shown. See :ref:`hide-empty-options`.
+
 ..  confval:: settings.showActiveFilterCount
     :name: flexform-showActiveFilterCount
     :type: boolean
@@ -386,6 +395,13 @@ General settings
     :Default: 0
 
     The default for the result-count badge.
+
+..  confval:: settings.hideEmptyOptions
+    :name: constant-hideEmptyOptions
+    :type: boolean
+    :Default: 0
+
+    The default for hiding options without results.
 
 ..  confval:: settings.showActiveFilterCount
     :name: constant-showActiveFilterCount

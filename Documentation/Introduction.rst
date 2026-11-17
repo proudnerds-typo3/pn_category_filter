@@ -42,6 +42,8 @@ Filtering
     table in one plugin instance
 -   Optional :ref:`result count badges <result-count>` per option, facet- and
     search-aware, with zero-result options dimmed and disabled
+-   Optionally :ref:`hide the options <hide-empty-options>` that none of the
+    plugin's records carry
 -   Vertical (sidebar checkboxes) or horizontal (dropdown facets) layout
 
 Search

@@ -19,11 +19,17 @@ final readonly class FilteredRecordsResult
      * @param array<int,array<string,bool>> $survivingCategoryKeys categoryUid => set of surviving "{table}_{uid}"
      *        keys; source of truth for deduplicated parent rollups (see CategoryFilterService::attachCountsToTree())
      * @param array<string,array<int|string,int>> $fieldFacetCounts facet key => value => number of matching records
+     * @param array<int,array<string,bool>> $availableCategoryKeys categoryUid => "{table}_{uid}" keys of all the
+     *        plugin's records, before selection, search and field filters (empty sets omitted); only with hideEmptyOptions
+     * @param array<string,array<int|string,int>> $fieldFacetTotals facet key => value => number of all the
+     *        plugin's records, before selection, search and field filters; only with hideEmptyOptions
      */
     public function __construct(
         public array $records,
         public array $counts,
         public array $survivingCategoryKeys,
         public array $fieldFacetCounts = [],
+        public array $availableCategoryKeys = [],
+        public array $fieldFacetTotals = [],
     ) {}
 }

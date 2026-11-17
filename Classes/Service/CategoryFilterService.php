@@ -157,6 +157,16 @@ class CategoryFilterService
             $allRecords = $this->restrictRecordsToKeys($unionRecords, $selectedKeys);
         }
 
+        // Before search and field filters: which options the plugin's records carry at all
+        $availableCategoryKeys = [];
+        $fieldFacetTotals = [];
+        if (!empty($settings['hideEmptyOptions'])) {
+            $availableCategoryKeys = $this->intersectSurvivingKeys($categoryKeys, $this->extractRecordKeys($unionRecords));
+            foreach ($fieldFacets as $facet) {
+                $fieldFacetTotals[$facet->key] = $this->fieldFacetService->countValues($unionRecords, $facet, null);
+            }
+        }
+
         // The category selection before the field filters is what the field facet counts start from
         $categoryRecords = $allRecords;
         $fieldKeys = $this->fieldFacetService->matchingKeys($unionRecords, $fieldFacets);
@@ -222,7 +232,14 @@ class CategoryFilterService
             $allRecords = array_slice($allRecords, 0, $limit);
         }
 
-        return new FilteredRecordsResult(array_values($allRecords), $counts, $survivingCategoryKeys, $fieldFacetCounts);
+        return new FilteredRecordsResult(
+            array_values($allRecords),
+            $counts,
+            $survivingCategoryKeys,
+            $fieldFacetCounts,
+            $availableCategoryKeys,
+            $fieldFacetTotals,
+        );
     }
 
     /**
@@ -859,6 +876,72 @@ class CategoryFilterService
             }
         }
         unset($category); // Break reference
+
+        return $tree;
+    }
+
+    /**
+     * Drops the leaves no record of the plugin carries, and the parents left without children.
+     * A parent has no checkbox, so without children it offers nothing to choose.
+     *
+     * @param array $tree Hierarchical nodes as produced by getCategoryTreeForFilter()
+     * @param array<int,array<string,bool>> $availableCategoryKeys categoryUid => record keys, empty sets omitted
+     * @param array<int> $keepUids Leaves that stay regardless, such as the selected ones
+     * @return array The tree without the unavailable nodes
+     */
+    public function removeUnavailableNodes(array $tree, array $availableCategoryKeys, array $keepUids = []): array
+    {
+        $keep = array_fill_keys(array_map('intval', $keepUids), true);
+        $result = [];
+        foreach ($tree as $node) {
+            $node = $this->removeUnavailableNode($node, $availableCategoryKeys, $keep);
+            if ($node !== null) {
+                $result[] = $node;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param array<int,array<string,bool>> $availableCategoryKeys
+     * @param array<int,bool> $keep
+     */
+    private function removeUnavailableNode(array $node, array $availableCategoryKeys, array $keep): ?array
+    {
+        if (empty($node['hasChildren'])) {
+            $uid = (int)($node['uid'] ?? 0);
+
+            return isset($availableCategoryKeys[$uid]) || isset($keep[$uid]) ? $node : null;
+        }
+
+        $node['childCategories'] = $this->removeUnavailableNodes(
+            (array)($node['childCategories'] ?? []),
+            $availableCategoryKeys,
+            array_keys($keep)
+        );
+
+        return $node['childCategories'] === [] ? null : $node;
+    }
+
+    /**
+     * Flags the leaves the visitor selected, so the menu renders them checked and operable
+     * even when they have no results.
+     *
+     * @param array $tree Hierarchical nodes as produced by getCategoryTreeForFilter()
+     * @param array<int> $selectedUids
+     * @return array Tree with a boolean 'selected' on every node
+     */
+    public function markSelectedNodes(array $tree, array $selectedUids): array
+    {
+        $selected = array_map('intval', $selectedUids);
+        foreach ($tree as &$node) {
+            $node['selected'] = empty($node['hasChildren']) && in_array((int)($node['uid'] ?? 0), $selected, true);
+            if (!empty($node['childCategories']) && is_array($node['childCategories'])) {
+                $node['childCategories'] = $this->markSelectedNodes($node['childCategories'], $selected);
+            }
+        }
+        unset($node);
 
         return $tree;
     }
